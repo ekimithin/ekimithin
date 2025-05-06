@@ -1,55 +1,54 @@
 // js/admin.js
-// 🔐 Διαχειριστικό panel - Supabase έκδοση
+// 🔐 Διαχειριστικό panel - Supabase
 
 import { supabase } from "./supabase.js";
 
-// 🔐 Προστασία admin - redirect αν δεν είναι συνδεδεμένος
+// 🔐 Έλεγχος σύνδεσης
 (async () => {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) window.location.href = "/login.html";
 })();
 
-// 📥 Φόρμα δημιουργίας memorial
+// 📥 Φόρμα δημιουργίας
 const form = document.getElementById("memorialForm");
-const partnerCode = "A"; // συνεργάτης
+const partnerCode = "A";
 
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const firstname = form.firstname?.value.trim();
-  const lastname = form.lastname?.value.trim().toLowerCase();
-  const birth_date = form.birth_date?.value;
-  const death_date = form.death_date?.value;
-  const gender = form.gender?.value;
-  const region = form.region?.value.trim();
-  const city = form.city?.value.trim().toLowerCase();
-  const message = form.message?.value.trim();
-  const photoUrl = form.photoUrl?.value.trim();
-  const video = form.video?.value.trim();
+  const firstname = form.firstname?.value?.trim() || "";
+  const lastname = form.lastname?.value?.trim().toLowerCase() || "";
+  const birth_date = form.birth_date?.value || null;
+  const death_date = form.death_date?.value || null;
+  const gender = form.gender?.value || "";
+  const region = form.region?.value?.trim() || "";
+  const city = form.city?.value?.trim().toLowerCase() || "";
+  const message = form.message?.value?.trim() || "";
+  const photoUrl = form.photoUrl?.value?.trim() || "";
+  const video = form.video?.value?.trim() || "";
 
-  // Έλεγχος ημερομηνιών
+  // 📆 Έλεγχος ημερομηνιών
   if (birth_date && death_date && new Date(birth_date) > new Date(death_date)) {
-    alert("⚠️ Η ημερομηνία γέννησης πρέπει να είναι πριν την ημερομηνία θανάτου.");
+    alert("❌ Η ημερομηνία γέννησης δεν μπορεί να είναι μετά την ημερομηνία θανάτου.");
     return;
   }
 
   try {
-    // Υπολογισμός αύξοντα αριθμού
+    // 🔢 Υπολογισμός index
     const { count } = await supabase
       .from("memorials")
       .select("*", { count: "exact", head: true })
       .ilike("lastname", lastname)
       .ilike("city", city);
-
     const index = (count || 0) + 1;
     const id = `${lastname}${city}${partnerCode}${index}`.replace(/\s+/g, '');
     const memorialUrl = `${location.origin}/memorial.html?id=${id}`;
 
-    // Αποθήκευση στο Supabase
+    // 💾 Καταχώρηση
     const { error } = await supabase.from("memorials").upsert({
       id,
-      firstname,
-      lastname,
+      first_name: firstname,
+      last_name: lastname,
       birth_date,
       death_date,
       gender,
@@ -64,7 +63,7 @@ form?.addEventListener("submit", async (e) => {
 
     if (error) throw error;
 
-    // Δημιουργία QR Code
+    // 🧾 QR
     const qrImage = document.getElementById("qr-image");
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(memorialUrl)}`;
     qrImage.src = qrUrl;
@@ -86,21 +85,21 @@ form?.addEventListener("submit", async (e) => {
   }
 });
 
-// 🔍 Αναζήτηση memorials
+// 🔎 Αναζήτηση
 const searchForm = document.getElementById("searchForm");
 const resultsContainer = document.getElementById("resultsContainer");
 
 searchForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const lastname = document.getElementById("searchLastname")?.value.trim().toLowerCase();
-  const city = document.getElementById("searchCity")?.value.trim().toLowerCase();
+  const lastname = document.getElementById("searchLastname")?.value?.trim().toLowerCase() || "";
+  const city = document.getElementById("searchCity")?.value?.trim().toLowerCase() || "";
 
   let query = supabase.from("memorials").select("*");
 
   if (lastname && city) {
-    query = query.ilike("lastname", lastname).ilike("city", city);
+    query = query.ilike("last_name", lastname).ilike("city", city);
   } else if (lastname) {
-    query = query.ilike("lastname", lastname);
+    query = query.ilike("last_name", lastname);
   } else if (city) {
     query = query.ilike("city", city);
   }
@@ -116,26 +115,24 @@ searchForm?.addEventListener("submit", async (e) => {
   data.forEach((entry) => {
     const div = document.createElement("div");
     div.style = "border:1px solid #ccc; padding:1rem; margin-bottom:1rem; border-radius:5px";
-
     div.innerHTML = `
-      <strong>${entry.firstname} ${entry.lastname}</strong><br/>
+      <strong>${entry.first_name} ${entry.last_name}</strong><br/>
       <small>${entry.city}, ${entry.region}</small><br/>
       <button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
       <button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
     `;
-
     resultsContainer.appendChild(div);
   });
 
   // ✏️ Επεξεργασία
-  document.querySelectorAll(".editBtn").forEach(btn => {
+  document.querySelectorAll(".editBtn").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
       const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
       if (error || !data) return alert("Δεν βρέθηκε το memorial");
 
-      form.firstname.value = data.firstname;
-      form.lastname.value = data.lastname;
+      form.firstname.value = data.first_name;
+      form.lastname.value = data.last_name;
       form.birth_date.value = data.birth_date;
       form.death_date.value = data.death_date;
       form.gender.value = data.gender;
@@ -145,12 +142,12 @@ searchForm?.addEventListener("submit", async (e) => {
       form.photoUrl.value = data.photo_url;
       form.video.value = data.youtube_url;
 
-      alert("Τα στοιχεία φορτώθηκαν. Πάτησε 'Δημιουργία Memorial' για να τα αποθηκεύσεις.");
+      alert("Τα στοιχεία φορτώθηκαν. Πάτησε 'Καταχώρηση Memorial' για αποθήκευση.");
     });
   });
 
   // 🗑️ Διαγραφή
-  document.querySelectorAll(".deleteBtn").forEach(btn => {
+  document.querySelectorAll(".deleteBtn").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
       if (confirm("Θες σίγουρα να διαγράψεις αυτό το memorial;")) {
