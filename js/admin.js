@@ -4,7 +4,7 @@
 import { supabase } from "./supabase.js";
 
 // 🔐 Προστασία admin - redirect αν δεν είναι συνδεδεμένος
-(async () =&gt; {
+(async () => {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) window.location.href = "/login.html";
 })();
@@ -13,22 +13,26 @@ import { supabase } from "./supabase.js";
 const form = document.getElementById("memorialForm");
 const partnerCode = "A"; // συνεργάτης
 
-form.addEventListener("submit", async (e) =&gt; {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const firstname = form.firstname.value.trim();
   const lastname = form.lastname.value.trim().toLowerCase();
-  const birth = form.birth.value;
-  const death = form.death.value;
+  const birth_date = form.birth.value;
+  const death_date = form.death.value;
   const gender = form.gender.value;
   const region = form.region.value.trim();
   const city = form.city.value.trim().toLowerCase();
   const message = form.message.value.trim();
-  const photoUrl = form.photoUrl.value.trim();
-  const video = form.video.value.trim();
+  const photo_url = form.photoUrl.value.trim();
+  const youtube_url = form.video.value.trim();
+
+  // Έλεγχος εγκυρότητας ημερομηνιών
+  if (birth_date && death_date && new Date(birth_date) > new Date(death_date)) {
+    return alert("⚠️ Η ημερομηνία γέννησης πρέπει να είναι πριν την ημερομηνία θανάτου.");
+  }
 
   try {
-    // 🔍 Υπολογισμός αύξοντα αριθμού
     const { count } = await supabase
       .from("memorials")
       .select("*", { count: "exact", head: true })
@@ -39,28 +43,27 @@ form.addEventListener("submit", async (e) =&gt; {
     const id = `${lastname}${city}${partnerCode}${index}`.replace(/\s+/g, '');
     const memorialUrl = `${location.origin}/memorial.html?id=${id}`;
 
-    // 📤 Αποθήκευση
     const { error } = await supabase.from("memorials").upsert({
       id,
       firstname,
       lastname,
-      birth,
-      death,
+      birth_date,
+      death_date,
       gender,
       region,
       city,
       message,
-      photo_url: photoUrl,
-      youtube_url: video,
+      photo_url,
+      youtube_url,
       candles: 0,
       created_at: new Date().toISOString()
     });
 
     if (error) throw error;
 
-    // 🧾 QR Code
+    // QR code
     const qrImage = document.getElementById("qr-image");
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&amp;data=${encodeURIComponent(memorialUrl)}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(memorialUrl)}`;
     qrImage.src = qrUrl;
     qrImage.style.display = "block";
 
@@ -84,14 +87,14 @@ form.addEventListener("submit", async (e) =&gt; {
 const searchForm = document.getElementById("searchForm");
 const resultsContainer = document.getElementById("resultsContainer");
 
-searchForm?.addEventListener("submit", async (e) =&gt; {
+searchForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const lastname = document.getElementById("searchLastname").value.trim().toLowerCase();
   const city = document.getElementById("searchCity").value.trim().toLowerCase();
 
   let query = supabase.from("memorials").select("*");
 
-  if (lastname &amp;&amp; city) {
+  if (lastname && city) {
     query = query.ilike("lastname", lastname).ilike("city", city);
   } else if (lastname) {
     query = query.ilike("lastname", lastname);
@@ -107,31 +110,31 @@ searchForm?.addEventListener("submit", async (e) =&gt; {
     return;
   }
 
-  data.forEach((entry) =&gt; {
+  data.forEach((entry) => {
     const div = document.createElement("div");
     div.style = "border:1px solid #ccc; padding:1rem; margin-bottom:1rem; border-radius:5px";
 
     div.innerHTML = `
       <strong>${entry.firstname} ${entry.lastname}</strong><br/>
-<small>${entry.city}, ${entry.region}</small><br/>
-<button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
-<button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
+      <small>${entry.city}, ${entry.region}</small><br/>
+      <button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
+      <button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
     `;
 
     resultsContainer.appendChild(div);
   });
 
   // ✏️ Επεξεργασία
-  document.querySelectorAll(".editBtn").forEach(btn =&gt; {
-    btn.addEventListener("click", async () =&gt; {
+  document.querySelectorAll(".editBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
       const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
       if (error || !data) return alert("Δεν βρέθηκε το memorial");
 
       form.firstname.value = data.firstname;
       form.lastname.value = data.lastname;
-      form.birth.value = data.birth;
-      form.death.value = data.death;
+      form.birth.value = data.birth_date;
+      form.death.value = data.death_date;
       form.gender.value = data.gender;
       form.region.value = data.region;
       form.city.value = data.city;
@@ -144,8 +147,8 @@ searchForm?.addEventListener("submit", async (e) =&gt; {
   });
 
   // 🗑️ Διαγραφή
-  document.querySelectorAll(".deleteBtn").forEach(btn =&gt; {
-    btn.addEventListener("click", async () =&gt; {
+  document.querySelectorAll(".deleteBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
       if (confirm("Θες σίγουρα να διαγράψεις αυτό το memorial;")) {
         const { error } = await supabase.from("memorials").delete().eq("id", id);
