@@ -13,36 +13,39 @@ import { supabase } from "./supabase.js";
 const form = document.getElementById("memorialForm");
 const partnerCode = "A"; // συνεργάτης
 
-form.addEventListener("submit", async (e) => {
+form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const firstname = form.firstname.value.trim();
-  const lastname = form.lastname.value.trim().toLowerCase();
-  const birth_date = form.birth.value;
-  const death_date = form.death.value;
-  const gender = form.gender.value;
-  const region = form.region.value.trim();
-  const city = form.city.value.trim().toLowerCase();
-  const message = form.message.value.trim();
-  const photo_url = form.photoUrl.value.trim();
-  const youtube_url = form.video.value.trim();
+  const firstname = form.firstname?.value.trim();
+  const lastname = form.lastname?.value.trim().toLowerCase();
+  const birth_date = form.birth_date?.value;
+  const death_date = form.death_date?.value;
+  const gender = form.gender?.value;
+  const region = form.region?.value.trim();
+  const city = form.city?.value.trim().toLowerCase();
+  const message = form.message?.value.trim();
+  const photoUrl = form.photoUrl?.value.trim();
+  const video = form.video?.value.trim();
 
-  // Έλεγχος εγκυρότητας ημερομηνιών
+  // Έλεγχος ημερομηνιών
   if (birth_date && death_date && new Date(birth_date) > new Date(death_date)) {
-    return alert("⚠️ Η ημερομηνία γέννησης πρέπει να είναι πριν την ημερομηνία θανάτου.");
+    alert("⚠️ Η ημερομηνία γέννησης πρέπει να είναι πριν την ημερομηνία θανάτου.");
+    return;
   }
 
   try {
+    // Υπολογισμός αύξοντα αριθμού
     const { count } = await supabase
       .from("memorials")
       .select("*", { count: "exact", head: true })
       .ilike("lastname", lastname)
       .ilike("city", city);
-    const index = (count || 0) + 1;
 
+    const index = (count || 0) + 1;
     const id = `${lastname}${city}${partnerCode}${index}`.replace(/\s+/g, '');
     const memorialUrl = `${location.origin}/memorial.html?id=${id}`;
 
+    // Αποθήκευση στο Supabase
     const { error } = await supabase.from("memorials").upsert({
       id,
       firstname,
@@ -53,15 +56,15 @@ form.addEventListener("submit", async (e) => {
       region,
       city,
       message,
-      photo_url,
-      youtube_url,
+      photo_url: photoUrl,
+      youtube_url: video,
       candles: 0,
       created_at: new Date().toISOString()
     });
 
     if (error) throw error;
 
-    // QR code
+    // Δημιουργία QR Code
     const qrImage = document.getElementById("qr-image");
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(memorialUrl)}`;
     qrImage.src = qrUrl;
@@ -89,8 +92,8 @@ const resultsContainer = document.getElementById("resultsContainer");
 
 searchForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const lastname = document.getElementById("searchLastname").value.trim().toLowerCase();
-  const city = document.getElementById("searchCity").value.trim().toLowerCase();
+  const lastname = document.getElementById("searchLastname")?.value.trim().toLowerCase();
+  const city = document.getElementById("searchCity")?.value.trim().toLowerCase();
 
   let query = supabase.from("memorials").select("*");
 
@@ -133,8 +136,8 @@ searchForm?.addEventListener("submit", async (e) => {
 
       form.firstname.value = data.firstname;
       form.lastname.value = data.lastname;
-      form.birth.value = data.birth_date;
-      form.death.value = data.death_date;
+      form.birth_date.value = data.birth_date;
+      form.death_date.value = data.death_date;
       form.gender.value = data.gender;
       form.region.value = data.region;
       form.city.value = data.city;
