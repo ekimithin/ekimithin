@@ -11,49 +11,49 @@
 
   <main class="container">
 
-    <section style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <section class="header">
       <h1>Διαχείριση Memorials</h1>
       <button id="logoutBtn" class="logout-btn">🚪 Αποσύνδεση</button>
     </section>
 
-    <section style="margin-bottom: 3rem;">
+    <section class="section">
       <h2>➕ Δημιουργία Memorial</h2>
       <form id="memorialForm">
         <label for="firstname">Όνομα:</label>
-        <input type="text" name="firstname" id="firstname" required />
+        <input type="text" id="firstname" required />
 
         <label for="lastname">Επώνυμο:</label>
-        <input type="text" name="lastname" id="lastname" required />
+        <input type="text" id="lastname" required />
 
-        <label for="birth">Ημ. Γέννησης:</label>
-        <input type="date" name="birth_date" id="birth_date" />
+        <label for="birth_date">Ημ. Γέννησης:</label>
+        <input type="date" id="birth_date" />
 
-        <label for="death">Ημ. Θανάτου:</label>
-        <input type="date" name="death_date" id="death_date" />
+        <label for="death_date">Ημ. Θανάτου:</label>
+        <input type="date" id="death_date" />
 
         <label for="gender">Φύλο:</label>
-        <select name="gender" id="gender">
+        <select id="gender">
           <option value="">Επιλογή</option>
           <option value="male">Άνδρας</option>
           <option value="female">Γυναίκα</option>
         </select>
 
         <label for="region">Περιοχή:</label>
-        <input type="text" name="region" id="region" />
+        <input type="text" id="region" />
 
         <label for="city">Πόλη:</label>
-        <input type="text" name="city" id="city" />
+        <input type="text" id="city" />
 
         <label for="message">Μήνυμα Μνήμης:</label>
-        <textarea name="message" id="message" rows="4"></textarea>
+        <textarea id="message" rows="4"></textarea>
 
         <label for="photoUrl">Φωτογραφία (URL):</label>
-        <input type="text" name="photoUrl" id="photoUrl" placeholder="Π.χ. από Blogger" />
+        <input type="text" id="photoUrl" placeholder="Π.χ. από Blogger" />
 
         <label for="video">YouTube Video (προαιρετικό):</label>
-        <input type="text" name="video" id="video" placeholder="https://www.youtube.com/watch?v=..." />
+        <input type="text" id="video" placeholder="https://www.youtube.com/watch?v=..." />
 
-        <button type="submit">📌 Καταχώρηση Memorial</button>
+        <button type="submit" class="btn-primary">📌 Καταχώρηση Memorial</button>
       </form>
 
       <div id="qr-preview" style="margin-top:2rem;">
@@ -64,7 +64,7 @@
 
     <hr />
 
-    <section style="margin-top: 3rem;">
+    <section class="section">
       <h2>🔍 Αναζήτηση Memorials</h2>
       <form id="searchForm">
         <input type="text" id="searchLastname" placeholder="Αναζήτηση με Επώνυμο" />
