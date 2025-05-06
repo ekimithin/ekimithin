@@ -18,7 +18,7 @@ form.addEventListener("submit", async (e) => {
 
   const firstname = form.firstname.value.trim();
   const lastname = form.lastname.value.trim().toLowerCase();
-  const birth = form.birth.value;
+  const birth_date = form.birth_date.value;
   const death = form.death.value;
   const gender = form.gender.value;
   const region = form.region.value.trim();
@@ -44,7 +44,7 @@ form.addEventListener("submit", async (e) => {
       id,
       firstname,
       lastname,
-      birth,
+      birth_date,
       death,
       gender,
       region,
@@ -130,7 +130,7 @@ searchForm?.addEventListener("submit", async (e) => {
 
       form.firstname.value = data.firstname;
       form.lastname.value = data.lastname;
-      form.birth.value = data.birth;
+      form.birth_date.value = data.birth_date;
       form.death.value = data.death;
       form.gender.value = data.gender;
       form.region.value = data.region;
