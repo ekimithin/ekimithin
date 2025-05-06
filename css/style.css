@@ -1,0 +1,114 @@
+/* 
+  ΑΡΧΕΙΟ: css/style.css
+  ΠΕΡΙΓΡΑΦΗ: Κύριο αρχείο CSS για το frontend του ekimithin.gr
+  Περιέχει καθαρό, μοντέρνο και responsive design.
+  Φόρτωση από όλα τα δημόσια HTML (π.χ. index.html, login.html κλπ)
+*/
+
+/* Βασικά Στυλ */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* Header με σκούρο φόντο και κεντραρισμένο λογότυπο */
+header {
+  background: #222;
+  color: white;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+header img {
+  display: block;
+  margin: 0 auto;
+  height: 60px;
+}
+
+/* Περιεχόμενο */
+section {
+  padding: 2rem;
+  max-width: 800px;
+  margin: auto;
+}
+
+/* Κουμπί CTA */
+.cta {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #333;
+  color: white;
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+/* Πλοήγηση (π.χ. footer ή πάνω links) */
+nav {
+  text-align: center;
+  background: #eee;
+  padding: 1rem;
+}
+nav a {
+  color: #333;
+  text-decoration: none;
+  margin: 0 1rem;
+  font-weight: bold;
+}
+nav a:hover {
+  text-decoration: underline;
+}
+
+footer {
+  background: #222;
+  color: #fff;
+  text-align: center;
+  padding: 2rem 1rem;
+  margin-top: 4rem;
+}
+footer nav {
+  margin-top: 1rem;
+}
+footer a {
+  color: #ccc;
+  text-decoration: none;
+  margin: 0 1rem;
+  font-weight: normal;
+}
+footer a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+input, textarea, select, button {
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  background: #333;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #555;
+}
+
+#resultsContainer > div {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+}

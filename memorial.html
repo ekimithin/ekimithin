@@ -1,0 +1,60 @@
+<!-- public/memorial.html -->
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Σελίδα Μνήμης</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .memorial-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      text-align: center;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+    }
+    img.photo {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    iframe {
+      margin-top: 2rem;
+      max-width: 100%;
+    }
+    .candle {
+      margin-top: 2rem;
+    }
+    .candle button {
+      background: orange;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <main class="memorial-container">
+    <h1 id="fullName">...</h1>
+    <p id="dates">...</p>
+    <p id="location">...</p>
+    <img id="photo" class="photo" src="" alt="Φωτογραφία" />
+    <p id="message">...</p>
+    <div id="videoContainer"></div>
+
+    <div class="candle">
+      <p>🕯️ <span id="candleCount">0</span> κεριά έχουν ανάψει</p>
+      <button id="lightCandleBtn">Άναψε ένα κερί</button>
+    </div>
+  </main>
+
+  <!-- 📦 Scripts -->
+  <script type="module" src="js/supabase.js"></script>
+  <script type="module" src="js/view.js"></script>
+</body>
+</html>

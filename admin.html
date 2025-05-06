@@ -1,0 +1,85 @@
+<!-- public/admin.html -->
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Διαχειριστικό Panel - ekimithin.gr</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main class="container">
+
+    <section style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h1>Διαχείριση Memorials</h1>
+      <button id="logoutBtn" class="logout-btn">🚪 Αποσύνδεση</button>
+    </section>
+
+    <section style="margin-bottom: 3rem;">
+      <h2>➕ Δημιουργία Memorial</h2>
+      <form id="memorialForm">
+        <label for="firstname">Όνομα:</label>
+        <input type="text" name="firstname" id="firstname" required />
+
+        <label for="lastname">Επώνυμο:</label>
+        <input type="text" name="lastname" id="lastname" required />
+
+        <label for="birth">Ημ. Γέννησης:</label>
+        <input type="date" name="birth" id="birth" />
+
+        <label for="death">Ημ. Θανάτου:</label>
+        <input type="date" name="death" id="death" />
+
+        <label for="gender">Φύλο:</label>
+        <select name="gender" id="gender">
+          <option value="">Επιλογή</option>
+          <option value="male">Άνδρας</option>
+          <option value="female">Γυναίκα</option>
+        </select>
+
+        <label for="region">Περιοχή:</label>
+        <input type="text" name="region" id="region" />
+
+        <label for="city">Πόλη:</label>
+        <input type="text" name="city" id="city" />
+
+        <label for="message">Μήνυμα Μνήμης:</label>
+        <textarea name="message" id="message" rows="4"></textarea>
+
+        <label for="photoUrl">Φωτογραφία (URL):</label>
+        <input type="text" name="photoUrl" id="photoUrl" placeholder="Π.χ. από Blogger" />
+
+        <label for="video">YouTube Video (προαιρετικό):</label>
+        <input type="text" name="video" id="video" placeholder="https://www.youtube.com/watch?v=..." />
+
+        <button type="submit">📌 Καταχώρηση Memorial</button>
+      </form>
+
+      <div id="qr-preview" style="margin-top:2rem;">
+        <h3>QR Code:</h3>
+        <img id="qr-image" alt="QR Code" style="display:none; max-width:300px;" />
+      </div>
+    </section>
+
+    <hr />
+
+    <section style="margin-top: 3rem;">
+      <h2>🔍 Αναζήτηση Memorials</h2>
+      <form id="searchForm">
+        <input type="text" id="searchLastname" placeholder="Αναζήτηση με Επώνυμο" />
+        <input type="text" id="searchCity" placeholder="Αναζήτηση με Πόλη" />
+        <button type="submit">Αναζήτηση</button>
+      </form>
+
+      <div id="resultsContainer" style="margin-top:2rem;"></div>
+    </section>
+
+  </main>
+
+  <!-- 📦 Scripts -->
+  <script type="module" src="js/supabase.js"></script>
+  <script type="module" src="js/admin.js"></script>
+  <script type="module" src="js/logout.js"></script>
+</body>
+</html>
