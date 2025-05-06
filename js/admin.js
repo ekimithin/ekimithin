@@ -4,7 +4,7 @@
 import { supabase } from "./supabase.js";
 
 // 🔐 Προστασία admin - redirect αν δεν είναι συνδεδεμένος
-(async () => {
+(async () =&gt; {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) window.location.href = "/login.html";
 })();
@@ -13,13 +13,13 @@ import { supabase } from "./supabase.js";
 const form = document.getElementById("memorialForm");
 const partnerCode = "A"; // συνεργάτης
 
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async (e) =&gt; {
   e.preventDefault();
 
   const firstname = form.firstname.value.trim();
   const lastname = form.lastname.value.trim().toLowerCase();
-  const birth_date = form.birth_date.value;
-  const death_date = form.death_date.value;
+  const birth = form.birth.value;
+  const death = form.death.value;
   const gender = form.gender.value;
   const region = form.region.value.trim();
   const city = form.city.value.trim().toLowerCase();
@@ -44,7 +44,7 @@ form.addEventListener("submit", async (e) => {
       id,
       firstname,
       lastname,
-      birth_date,
+      birth,
       death,
       gender,
       region,
@@ -60,7 +60,7 @@ form.addEventListener("submit", async (e) => {
 
     // 🧾 QR Code
     const qrImage = document.getElementById("qr-image");
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(memorialUrl)}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&amp;data=${encodeURIComponent(memorialUrl)}`;
     qrImage.src = qrUrl;
     qrImage.style.display = "block";
 
@@ -84,14 +84,14 @@ form.addEventListener("submit", async (e) => {
 const searchForm = document.getElementById("searchForm");
 const resultsContainer = document.getElementById("resultsContainer");
 
-searchForm?.addEventListener("submit", async (e) => {
+searchForm?.addEventListener("submit", async (e) =&gt; {
   e.preventDefault();
   const lastname = document.getElementById("searchLastname").value.trim().toLowerCase();
   const city = document.getElementById("searchCity").value.trim().toLowerCase();
 
   let query = supabase.from("memorials").select("*");
 
-  if (lastname && city) {
+  if (lastname &amp;&amp; city) {
     query = query.ilike("lastname", lastname).ilike("city", city);
   } else if (lastname) {
     query = query.ilike("lastname", lastname);
@@ -107,30 +107,30 @@ searchForm?.addEventListener("submit", async (e) => {
     return;
   }
 
-  data.forEach((entry) => {
+  data.forEach((entry) =&gt; {
     const div = document.createElement("div");
     div.style = "border:1px solid #ccc; padding:1rem; margin-bottom:1rem; border-radius:5px";
 
     div.innerHTML = `
-      <strong>${entry.firstname} ${entry.lastname}</strong><br>
-      <small>${entry.city}, ${entry.region}</small><br>
-      <button data-id="${entry.id}" class="editBtn">✏️ Επεξεργασία</button>
-      <button data-id="${entry.id}" class="deleteBtn">🗑️ Διαγραφή</button>
+      <strong>${entry.firstname} ${entry.lastname}</strong><br/>
+<small>${entry.city}, ${entry.region}</small><br/>
+<button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
+<button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
     `;
 
     resultsContainer.appendChild(div);
   });
 
   // ✏️ Επεξεργασία
-  document.querySelectorAll(".editBtn").forEach(btn => {
-    btn.addEventListener("click", async () => {
+  document.querySelectorAll(".editBtn").forEach(btn =&gt; {
+    btn.addEventListener("click", async () =&gt; {
       const id = btn.getAttribute("data-id");
       const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
       if (error || !data) return alert("Δεν βρέθηκε το memorial");
 
       form.firstname.value = data.firstname;
       form.lastname.value = data.lastname;
-      form.birth_date.value = data.birth_date;
+      form.birth.value = data.birth;
       form.death.value = data.death;
       form.gender.value = data.gender;
       form.region.value = data.region;
@@ -144,8 +144,8 @@ searchForm?.addEventListener("submit", async (e) => {
   });
 
   // 🗑️ Διαγραφή
-  document.querySelectorAll(".deleteBtn").forEach(btn => {
-    btn.addEventListener("click", async () => {
+  document.querySelectorAll(".deleteBtn").forEach(btn =&gt; {
+    btn.addEventListener("click", async () =&gt; {
       const id = btn.getAttribute("data-id");
       if (confirm("Θες σίγουρα να διαγράψεις αυτό το memorial;")) {
         const { error } = await supabase.from("memorials").delete().eq("id", id);
