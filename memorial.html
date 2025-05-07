@@ -4,107 +4,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Σελίδα Μνήμης</title>
+  <title>Σελίδα Μνήμης – ekimithin.gr</title>
+  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί και μήνυμα." />
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    .memorial-container {
-      max-width: 600px;
-      margin: 2rem auto;
-      text-align: center;
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-    }
-    img.photo {
-      max-width: 100%;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-    iframe {
-      margin-top: 2rem;
-      max-width: 100%;
-    }
-    .candle {
-      margin-top: 2rem;
-    }
-    .candle button {
-      background: orange;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      color: white;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-  </style>
 </head>
 <body>
-  <main class="memorial-container">
+
+  <!-- Header με λογότυπο -->
+  <header>
+    <a href="index.html"><img src="images/logo.png" alt="ekimithin logo" style="cursor:pointer;" /></a>
+  </header>
+
+  <!-- Κεντρικό περιεχόμενο -->
+  <main class="memorial-container" style="max-width:600px; margin:2rem auto; text-align:center; background:#fff; padding:2rem; border-radius:8px;">
     <h1 id="fullName">...</h1>
-    <p id="dates">...</p>
-    <p id="location">...</p>
-    <img id="photo" class="photo" src="" alt="Φωτογραφία" />
-    <p id="message">...</p>
+    <div id="dates" style="margin-bottom: 1rem;"></div>
+    <p id="location" style="font-weight: bold;"></p>
+    <img id="photo" class="photo" src="" alt="Φωτογραφία" style="max-width:100%; border-radius:8px; margin: 1rem 0;" />
+    <p id="message"></p>
     <div id="videoContainer"></div>
 
-    <div class="candle">
+    <div class="candle" style="margin-top:2rem;">
       <p>🕯️ <span id="candleCount">0</span> κεριά έχουν ανάψει</p>
-      <button id="lightCandleBtn">Άναψε ένα κερί</button>
+      <button id="lightCandleBtn" style="background:orange; border:none; padding:0.8rem 1.5rem; font-size:1rem; color:white; cursor:pointer; border-radius:5px;">
+        Άναψε ένα κερί
+      </button>
     </div>
   </main>
 
+  <!-- Footer -->
+  <footer style="margin-top:3rem; text-align:center; font-size:0.9rem; color:#666;">
+    <p>&copy; 2025 ekimithin.gr – Με σεβασμό στη μνήμη</p>
+    <nav style="margin-top:1rem;">
+      <a href="index.html">Αρχική</a> |
+      <a href="psifiaki-mnimi.html">Τι είναι η Ψηφιακή Μνήμη</a> |
+      <a href="contact.html">Επικοινωνία</a>
+    </nav>
+  </footer>
+
+  <!-- 📦 Scripts -->
   <script type="module" src="js/supabase.js"></script>
-  <script type="module">
-    import { supabase } from "./js/supabase.js";
-
-    const params = new URLSearchParams(location.search);
-    const id = params.get("id");
-
-    const fullName = document.getElementById("fullName");
-    const dates = document.getElementById("dates");
-    const locationText = document.getElementById("location");
-    const photo = document.getElementById("photo");
-    const message = document.getElementById("message");
-    const videoContainer = document.getElementById("videoContainer");
-    const candleCount = document.getElementById("candleCount");
-    const lightCandleBtn = document.getElementById("lightCandleBtn");
-
-    const loadMemorial = async () => {
-      const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
-      if (error || !data) {
-        fullName.textContent = "Memorial not found.";
-        return;
-      }
-
-      fullName.textContent = `${data.first_name} ${data.last_name}`;
-      dates.textContent = `🗓️ ${data.birth_date || "?"} – ${data.death_date || "?"}`;
-      locationText.textContent = `${data.city}, ${data.region}`;
-      message.textContent = data.message;
-      candleCount.textContent = data.candles || 0;
-
-      if (data.photo_url) photo.src = data.photo_url;
-      if (data.youtube_url) {
-        videoContainer.innerHTML = `
-          <iframe width="100%" height="315"
-            src="https://www.youtube.com/embed/${extractYouTubeID(data.youtube_url)}"
-            frameborder="0" allowfullscreen>
-          </iframe>`;
-      }
-    };
-
-    const extractYouTubeID = (url) => {
-      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
-      return match ? match[1] : null;
-    };
-
-    lightCandleBtn?.addEventListener("click", async () => {
-      const { data, error } = await supabase.rpc("increment_candles", { memorial_id: id });
-      if (!error && data) {
-        candleCount.textContent = data;
-      }
-    });
-
-    loadMemorial();
-  </script>
+  <script type="module" src="js/view.js"></script>
 </body>
 </html>
