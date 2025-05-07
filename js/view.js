@@ -41,7 +41,11 @@ function updateCandleText(count) {
 
 // 👉 Φόρτωσε memorial από Supabase
 (async () => {
-  const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
+  const { data, error } = await supabase
+    .from("memorials")
+    .select("*")
+    .eq("id", id)
+    .single();
 
   if (error || !data) {
     document.body.innerHTML = "<p style='text-align:center;'>❌ Δεν βρέθηκε η σελίδα μνήμης.</p>";
@@ -53,37 +57,38 @@ function updateCandleText(count) {
   document.getElementById("message").textContent = data.message || "";
   document.getElementById("photo").src = data.photo_url || "";
 
-  // YouTube video (αν υπάρχει)
+  // 🎞️ YouTube video (αν υπάρχει)
   if (data.youtube_url) {
     const videoContainer = document.getElementById("videoContainer");
     const embedUrl = data.youtube_url.replace("watch?v=", "embed/");
     videoContainer.innerHTML = `<iframe width="100%" height="315" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
   }
 
-  // Ημερομηνίες και ηλικία
+  // 📅 Ημερομηνίες και ηλικία
   const birthStr = formatDate(data.birth_date);
   const deathStr = formatDate(data.death_date);
   const age = calculateAge(data.birth_date, data.death_date);
 
   if (birthStr && deathStr) {
     document.getElementById("dates").innerHTML = `
-  <p>Έζησε από</p>
-  <p><strong>${birthStr}</strong> μέχρι <strong>${deathStr}</strong></p>
-  <p>Απεβίωσε σε ηλικία <strong>${age}</strong> ετών</p>
-`;
+      <p>Έζησε από</p>
+      <p><strong>${birthStr}</strong> μέχρι <strong>${deathStr}</strong></p>
+      <p>Απεβίωσε σε ηλικία <strong>${age}</strong> ετών</p>
+    `;
   } else {
     document.getElementById("dates").innerHTML = "";
   }
 
   updateCandleText(data.candles || 0);
 })();
-  
+
 // 🕯️ Άναψε κερί
 document.getElementById("lightCandleBtn").addEventListener("click", async () => {
   const lastLitKey = `lastCandle_${id}`;
   const lastLit = localStorage.getItem(lastLitKey);
   const now = Date.now();
 
+  // 🔁 Έλεγχος 24ώρου
   if (lastLit && now - parseInt(lastLit) < 24 * 60 * 60 * 1000) {
     alert("Μπορείς να ανάψεις μόνο 1 κερί το 24ωρο");
     return;
@@ -91,18 +96,13 @@ document.getElementById("lightCandleBtn").addEventListener("click", async () => 
 
   const { data, error } = await supabase.rpc("increment_candle", { memorial_id: id });
 
-  if (error) {
-    alert("❌ Σφάλμα κατά την καταγραφή του κεριού");
+  if (error || data === null) {
+    alert("❌ Το κερί δεν καταγράφηκε. Δοκίμασε ξανά.");
     console.error(error);
     return;
   }
 
-  if (data === null) {
-    alert("❌ Το κερί δεν καταγράφηκε. Δοκίμασε ξανά.");
-    return;
-  }
-
-  // ✅ Αν όλα πήγαν καλά
+  // ✅ Αν όλα πήγαν καλά, αποθήκευσε ώρα και ανανέωσε το UI
   localStorage.setItem(lastLitKey, now.toString());
   updateCandleText(data);
 });
