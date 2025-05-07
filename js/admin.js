@@ -124,20 +124,24 @@ searchForm?.addEventListener("submit", async (e) => {
     return;
   }
 
-  data.forEach((entry) => {
-    const div = document.createElement("div");
-    div.style = "border:1px solid #ccc; padding:1rem; margin-bottom:1rem; border-radius:5px";
+  data.forEach((entry, index) => {
+  const div = document.createElement("div");
 
-    div.innerHTML = `
-      <strong>${entry.first_name} ${entry.last_name}</strong><br/>
-      <small>${entry.city}, ${entry.region}</small><br/>
-      <a href="/memorial.html?id=${entry.id}" target="_blank">➡️ Προβολή</a><br/>
-      <button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
-      <button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
-    `;
+  div.style = "border:1px solid #ccc; padding:1rem; margin-bottom:1rem; border-radius:5px";
 
-    resultsContainer.appendChild(div);
-  });
+  div.innerHTML = `
+    <strong>${index + 1}. ${entry.first_name} ${entry.last_name} 
+      <span style="color: red;">(ID: ${entry.id})</span>
+    </strong><br/>
+    <small>${entry.city}, ${entry.region}</small><br/>
+    <a href="/memorial.html?id=${entry.id}" target="_blank">➡️ Προβολή</a><br/>
+    <button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
+    <button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
+  `;
+
+  resultsContainer.appendChild(div);
+});
+
 
   // ✏️ Επεξεργασία
   document.querySelectorAll(".editBtn").forEach(btn => {
