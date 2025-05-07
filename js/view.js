@@ -85,7 +85,7 @@ document.getElementById("lightCandleBtn").addEventListener("click", async () => 
   const now = Date.now();
 
   if (lastLit && now - parseInt(lastLit) < 24 * 60 * 60 * 1000) {
-    alert("Μπορείς να ανάψεις μόνο 1 κερί το 24ωρο για αυτό το μνημόσυνο.");
+    alert("Μπορείς να ανάψεις μόνο 1 κερί το 24ωρο");
     return;
   }
 
