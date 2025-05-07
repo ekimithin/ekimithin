@@ -14,23 +14,23 @@ const partnerCode = "A";
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const firstname = form.firstname.value.trim();
-  const lastname = form.lastname.value.trim().toLowerCase();
-  const birth = form.birth_date.value;
-  const death = form.death_date.value;
+  const first_name = form.firstname.value.trim();
+  const last_name = form.lastname.value.trim().toLowerCase();
+  const birth_date = form.birth_date.value;
+  const death_date = form.death_date.value;
   const gender = form.gender.value;
   const region = form.region.value.trim();
   const city = form.city.value.trim().toLowerCase();
   const message = form.message.value.trim();
-  const photoUrl = form.photoUrl.value.trim();
-  const video = form.video.value.trim();
+  const photo_url = form.photoUrl.value.trim();
+  const youtube_url = form.video.value.trim();
 
-  if (!firstname || !lastname || !city) {
+  if (!first_name || !last_name || !city) {
     alert("Συμπλήρωσε όλα τα βασικά πεδία (Όνομα, Επώνυμο, Πόλη).");
     return;
   }
 
-  if (birth && death && new Date(birth) > new Date(death)) {
+  if (birth_date && death_date && new Date(birth_date) > new Date(death_date)) {
     alert("❌ Η ημερομηνία γέννησης δεν μπορεί να είναι μετά τον θάνατο.");
     return;
   }
@@ -39,26 +39,26 @@ form?.addEventListener("submit", async (e) => {
     const { count } = await supabase
       .from("memorials")
       .select("*", { count: "exact", head: true })
-      .ilike("lastname", lastname)
+      .ilike("last_name", last_name)
       .ilike("city", city);
 
     const index = (count || 0) + 1;
-    const id = `${lastname}${city}${partnerCode}${index}`.replace(/\s+/g, '');
+    const id = `${last_name}${city}${partnerCode}${index}`.replace(/\s+/g, '');
     const memorialUrl = `${location.origin}/memorial.html?id=${id}`;
     console.log("Memorial ID:", id);
 
     const { error } = await supabase.from("memorials").upsert({
       id,
-      firstname,
-      lastname,
-      birth_date: birth,
-      death_date: death,
+      first_name,
+      last_name,
+      birth_date,
+      death_date,
       gender,
       region,
       city,
       message,
-      photo_url: photoUrl,
-      youtube_url: video,
+      photo_url,
+      youtube_url,
       candles: 0,
       created_at: new Date().toISOString()
     });
@@ -77,13 +77,13 @@ form?.addEventListener("submit", async (e) => {
 
     const downloadLink = document.createElement("a");
     downloadLink.href = qrUrl;
-    downloadLink.download = `${lastname}-${city}-qr.png`;
+    downloadLink.download = `${last_name}-${city}-qr.png`;
     downloadLink.textContent = "⬇️ Κατέβασε το QR Code";
     downloadLink.style.display = "inline-block";
     downloadLink.style.marginTop = "0.5rem";
 
     const qrPreview = document.getElementById("qr-preview");
-    qrPreview.innerHTML = ""; // clear previous
+    qrPreview.innerHTML = "";
     qrPreview.appendChild(qrImage);
     qrPreview.appendChild(linkDiv);
     qrPreview.appendChild(downloadLink);
@@ -109,9 +109,9 @@ searchForm?.addEventListener("submit", async (e) => {
   let query = supabase.from("memorials").select("*");
 
   if (lastname && city) {
-    query = query.ilike("lastname", lastname).ilike("city", city);
+    query = query.ilike("last_name", lastname).ilike("city", city);
   } else if (lastname) {
-    query = query.ilike("lastname", lastname);
+    query = query.ilike("last_name", lastname);
   } else if (city) {
     query = query.ilike("city", city);
   }
@@ -129,7 +129,7 @@ searchForm?.addEventListener("submit", async (e) => {
     div.style = "border:1px solid #ccc; padding:1rem; margin-bottom:1rem; border-radius:5px";
 
     div.innerHTML = `
-      <strong>${entry.firstname} ${entry.lastname}</strong><br/>
+      <strong>${entry.first_name} ${entry.last_name}</strong><br/>
       <small>${entry.city}, ${entry.region}</small><br/>
       <a href="/memorial.html?id=${entry.id}" target="_blank">➡️ Προβολή</a><br/>
       <button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
@@ -146,8 +146,8 @@ searchForm?.addEventListener("submit", async (e) => {
       const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
       if (error || !data) return alert("Δεν βρέθηκε το memorial");
 
-      form.firstname.value = data.firstname;
-      form.lastname.value = data.lastname;
+      form.firstname.value = data.first_name;
+      form.lastname.value = data.last_name;
       form.birth_date.value = data.birth_date;
       form.death_date.value = data.death_date;
       form.gender.value = data.gender;
