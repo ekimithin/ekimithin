@@ -4,19 +4,22 @@ import { supabase } from "./supabase.js";
 // Συνάρτηση για μετατροπή ελληνικών χαρακτήρων σε λατινικούς
 function toLatin(text) {
   const latinMap = {
-    'ά': 'a','Ά': 'A','έ': 'e','Έ': 'E','ή': 'i','Ή': 'I',
-    'ί': 'i','Ί': 'I','ό': 'o','Ό': 'O','ώ': 'o','Ώ': 'O',
-    'ύ': 'y','Ύ': 'Y','ϋ': 'y','Ϋ': 'Y',
-    'α': 'a','Α': 'A','β': 'b','Β': 'B','γ': 'g','Γ': 'G',
-    'δ': 'd','Δ': 'D','ε': 'e','Ε': 'E','ζ': 'z','Ζ': 'Z',
-    'η': 'i','Η': 'I','θ': 'th','Θ': 'Th','ι': 'i','Ι': 'I',
-    'κ': 'k','Κ': 'K','λ': 'l','Λ': 'L','μ': 'm','Μ': 'M',
-    'ν': 'n','Ν': 'N','ξ': 'x','Ξ': 'X','ο': 'o','Ο': 'O',
-    'π': 'p','Π': 'P','ρ': 'r','Ρ': 'R','σ': 's','Σ': 'S',
-    'ς': 's','τ': 't','υ': 'y','Υ': 'Y','φ': 'f','Φ': 'F',
-    'χ': 'ch','Χ': 'Ch','ψ': 'ps','Ψ': 'Ps','ω': 'o','Ω': 'O'
+    'ά': 'a', 'Ά': 'A', 'έ': 'e', 'Έ': 'E', 'ή': 'i', 'Ή': 'I',
+    'ί': 'i', 'Ί': 'I', 'ό': 'o', 'Ό': 'O', 'ώ': 'o', 'Ώ': 'O',
+    'ύ': 'y', 'Ύ': 'Y', 'ϋ': 'y', 'Ϋ': 'Y', 'α': 'a', 'Α': 'A',
+    'β': 'b', 'Β': 'B', 'γ': 'g', 'Γ': 'G', 'δ': 'd', 'Δ': 'D',
+    'ε': 'e', 'Ε': 'E', 'ζ': 'z', 'Ζ': 'Z', 'η': 'i', 'Η': 'I',
+    'θ': 'th','Θ': 'Th','ι': 'i', 'Ι': 'I', 'κ': 'k', 'Κ': 'K',
+    'λ': 'l', 'Λ': 'L', 'μ': 'm', 'Μ': 'M', 'ν': 'n', 'Ν': 'N',
+    'ξ': 'x', 'Ξ': 'X', 'ο': 'o', 'Ο': 'O', 'π': 'p', 'Π': 'P',
+    'ρ': 'r', 'Ρ': 'R', 'σ': 's', 'Σ': 'S', 'ς': 's', 'τ': 't',
+    'υ': 'y', 'Υ': 'Y', 'φ': 'f', 'Φ': 'F', 'χ': 'ch','Χ': 'Ch',
+    'ψ': 'ps','Ψ': 'Ps','ω': 'o', 'Ω': 'O'
   };
-  return text.split('').map(ch => latinMap[ch] || ch).join('');
+  return text
+    .split('')
+    .map(char => latinMap[char] || char)
+    .join('');
 }
 
 // 🔐 Redirect στο login εάν δεν υπάρχει ενεργή session
@@ -25,7 +28,6 @@ function toLatin(text) {
   if (!session) window.location.href = "/login.html";
 })();
 
-// 📥 Δημιουργία memorial
 const form = document.getElementById("memorialForm");
 const partnerCode = "A";
 
@@ -44,9 +46,9 @@ form?.addEventListener("submit", async (e) => {
   const photo_url    = form.photoUrl.value.trim();
   const youtube_url  = form.video.value.trim();
 
-  // 2. Έλεγχος υποχρεωτικών πεδίων
+  // 2. Έλεγχος υποχρεωτικών
   if (!rawFirstName || !rawLastName || !rawCity) {
-    alert("Συμπλήρωσε Όνομα, Επώνυμο και Πόλη.");
+    alert("Συμπλήρωσε όλα τα βασικά πεδία (Όνομα, Επώνυμο, Πόλη).");
     return;
   }
 
@@ -71,29 +73,24 @@ form?.addEventListener("submit", async (e) => {
 
     const index = (count || 0) + 1;
     const id    = `${last_name}${city}${partnerCode}${index}`.replace(/\s+/g, '');
-
     const memorialUrl = `${location.origin}/memorial.html?id=${id}`;
-    console.log("Memorial ID:", id);
 
     // 6. Αποθήκευση/upsert στη βάση
-    const { error: upsertError } = await supabase
-      .from("memorials")
-      .upsert({
-        id,
-        first_name: rawFirstName,
-        last_name,
-        birth_date,
-        death_date,
-        gender,
-        region,
-        city,
-        message,
-        photo_url,
-        youtube_url,
-        candles: 0,
-        created_at: new Date().toISOString()
-      });
-
+    const { error: upsertError } = await supabase.from("memorials").upsert({
+      id,
+      first_name: rawFirstName,
+      last_name,
+      birth_date,
+      death_date,
+      gender,
+      region,
+      city,
+      message,
+      photo_url,
+      youtube_url,
+      candles: 0,
+      created_at: new Date().toISOString()
+    });
     if (upsertError) throw upsertError;
 
     // 7. Δημιουργία QR μέσω εξωτερικού API
@@ -103,42 +100,51 @@ form?.addEventListener("submit", async (e) => {
 
     // 8. Upload στο Supabase Storage
     const fileName = `${id}.png`;
-    console.log("> Ανεβάζω QR στο Supabase Storage:", fileName);
+    console.log("Ανεβάζω QR στο Supabase Storage:", fileName);
     const { data: uploadData, error: uploadError } = await supabase
       .storage
       .from('qr-codes')
       .upload(fileName, qrBlob, { contentType: 'image/png' });
 
     if (uploadError) {
-      console.error("❌ Σφάλμα κατά το upload:", uploadError);
-      alert("❌ Αποτυχία αποθήκευσης του QR στο storage.");
+      console.error('❌ Αποτυχία αποθήκευσης του QR στο storage.', uploadError);
+      alert('❌ Αποτυχία αποθήκευσης του QR στο storage.');
       return;
     }
-    console.log("✅ Upload επιτυχές:", uploadData);
+    console.log('✅ Upload επιτυχές:', uploadData);
 
-    // 9. Λήψη public URL για preview & download
-    const { publicURL } = supabase
+    // 9. Απόκτηση public URL
+    const { data: publicUrlData, error: publicUrlError } = supabase
       .storage
       .from('qr-codes')
       .getPublicUrl(fileName);
 
-    // 10. Εμφάνιση QR & Link στο UI
+    if (publicUrlError) {
+      console.error('❌ Αποτυχία απόκτησης public URL.', publicUrlError);
+      alert('❌ Αδυναμία δημιουργίας download link.');
+      return;
+    }
+
+    const publicUrl = publicUrlData.publicUrl;
+    console.log('🔗 Public URL:', publicUrl);
+
+    // 10. Ενημέρωση preview εικόνας & download link
     const qrImage = document.getElementById("qr-image");
-    qrImage.src = publicURL;
+    qrImage.src = publicUrl;
     qrImage.style.display = "block";
 
     const qrPreview = document.getElementById("qr-preview");
     qrPreview.innerHTML = "";
 
-    // a) Link προβολής
+    // Link για προβολή σε νέο tab
     const linkDiv = document.createElement("div");
     linkDiv.innerHTML = `<a href="${memorialUrl}" target="_blank">${memorialUrl}</a>`;
     linkDiv.style.marginTop = "1rem";
 
-    // b) Download link
+    // Download link
     const downloadLink = document.createElement("a");
-    downloadLink.href = publicURL;
-    downloadLink.download = `${latinFirstName}-${last_name}-${city}-qr.png`;
+    downloadLink.href = publicUrl;
+    downloadLink.download = fileName;
     downloadLink.textContent = "⬇️ Κατέβασε το QR Code";
     downloadLink.style.display = "inline-block";
     downloadLink.style.marginTop = "0.5rem";
@@ -148,13 +154,11 @@ form?.addEventListener("submit", async (e) => {
     qrPreview.appendChild(downloadLink);
 
     alert("✅ Το memorial καταχωρήθηκε!");
-
-    // 11. Καθαρισμός φορμών
     form.reset();
 
   } catch (err) {
-    console.error("❌ Γενικό σφάλμα:", err);
-    alert("❌ Κάτι πήγε στραβά. Δοκίμασε ξανά.");
+    console.error("❌ Σφάλμα:", err);
+    alert("❌ Πρόβλημα κατά την αποθήκευση.");
   }
 });
 
@@ -200,16 +204,17 @@ searchForm?.addEventListener("submit", async (e) => {
       const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
       if (error || !data) return alert("Δεν βρέθηκε το memorial");
 
-      form.firstname.value = data.first_name;
-      form.lastname.value  = data.last_name;
-      form.birth_date.value= data.birth_date;
-      form.death_date.value= data.death_date;
-      form.gender.value    = data.gender;
-      form.region.value    = data.region;
-      form.city.value      = data.city;
-      form.message.value   = data.message;
-      form.photoUrl.value  = data.photo_url;
-      form.video.value     = data.youtube_url;
+      form.firstname.value   = data.first_name;
+      form.lastname.value    = data.last_name;
+      form.birth_date.value  = data.birth_date;
+      form.death_date.value  = data.death_date;
+      form.gender.value      = data.gender;
+      form.region.value      = data.region;
+      form.city.value        = data.city;
+      form.message.value     = data.message;
+      form.photoUrl.value    = data.photo_url;
+      form.video.value       = data.youtube_url;
+
       alert("Τα στοιχεία φορτώθηκαν. Πάτησε 'Καταχώρηση Memorial' για αποθήκευση.");
     });
   });
@@ -219,9 +224,6 @@ searchForm?.addEventListener("submit", async (e) => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
       if (confirm("Θες σίγουρα να διαγράψεις αυτό το memorial;")) {
-        // Διαγραφή QR από storage
-        await supabase.storage.from('qr-codes').remove([`${id}.png`]);
-        // Διαγραφή record
         const { error } = await supabase.from("memorials").delete().eq("id", id);
         if (!error) {
           btn.parentElement.remove();
