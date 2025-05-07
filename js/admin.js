@@ -35,36 +35,37 @@ const partnerCode = "A";
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Παίρνουμε πρώτα τα raw πεδία
-  const first_name = form.firstname.value.trim();
-  const rawLastName = form.lastname.value.trim();
-  const rawCity = form.city.value.trim();
-  const birth_date = form.birth_date.value;
-  const death_date = form.death_date.value;
-  const gender = form.gender.value;
-  const region = form.region.value.trim();
-  const message = form.message.value.trim();
-  const photo_url = form.photoUrl.value.trim();
-  const youtube_url = form.video.value.trim();
+  // 1. Παίρνουμε raw πεδία
+  const rawFirstName = form.firstname.value.trim();
+  const rawLastName  = form.lastname.value.trim();
+  const rawCity      = form.city.value.trim();
+  const birth_date   = form.birth_date.value;
+  const death_date   = form.death_date.value;
+  const gender       = form.gender.value;
+  const region       = form.region.value.trim();
+  const message      = form.message.value.trim();
+  const photo_url    = form.photoUrl.value.trim();
+  const youtube_url  = form.video.value.trim();
 
-  // Έλεγχος υποχρεωτικών
-  if (!first_name || !rawLastName || !rawCity) {
+  // 2. Έλεγχος υποχρεωτικών
+  if (!rawFirstName || !rawLastName || !rawCity) {
     alert("Συμπλήρωσε όλα τα βασικά πεδία (Όνομα, Επώνυμο, Πόλη).");
     return;
   }
 
-  // Έλεγχος ημ.γένεσης vs θανάτου
+  // 3. Έλεγχος ημερομηνιών
   if (birth_date && death_date && new Date(birth_date) > new Date(death_date)) {
     alert("❌ Η ημερομηνία γέννησης δεν μπορεί να είναι μετά τον θάνατο.");
     return;
   }
 
-  // Μετατροπή σε λατινικούς και lowercase για ID/URL
-  const last_name = toLatin(rawLastName).toLowerCase();
-  const city = toLatin(rawCity).toLowerCase();
+  // 4. Μετατροπή σε λατινικούς + lowercase για ID/URL/filename
+  const latinFirstName = toLatin(rawFirstName).toLowerCase();
+  const last_name      = toLatin(rawLastName).toLowerCase();
+  const city           = toLatin(rawCity).toLowerCase();
 
   try {
-    // Βρίσκουμε πόσα ήδη υπάρχουν με ίδιο επώνυμο+πόλη, για αύξουσα αρίθμηση
+    // 5. Υπολογισμός index για μοναδικότητα
     const { count } = await supabase
       .from("memorials")
       .select("*", { count: "exact", head: true })
@@ -72,15 +73,15 @@ form?.addEventListener("submit", async (e) => {
       .ilike("city", city);
 
     const index = (count || 0) + 1;
-    const id = `${last_name}${city}${partnerCode}${index}`.replace(/\s+/g, '');
+    const id    = `${last_name}${city}${partnerCode}${index}`.replace(/\s+/g, '');
 
     const memorialUrl = `${location.origin}/memorial.html?id=${id}`;
     console.log("Memorial ID:", id);
 
-    // Αποθήκευση/upsert
+    // 6. Αποθήκευση/upsert στη βάση
     const { error } = await supabase.from("memorials").upsert({
       id,
-      first_name,
+      first_name: rawFirstName,  // αποθηκεύουμε το πρωτότυπο όνομα
       last_name,
       birth_date,
       death_date,
@@ -96,22 +97,24 @@ form?.addEventListener("submit", async (e) => {
 
     if (error) throw error;
 
-    // Εμφάνιση QR & Link
+    // 7. Εμφάνιση QR & Link
     const qrImage = document.getElementById("qr-image");
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(memorialUrl)}`;
-    qrImage.src = qrUrl;
+    const qrUrl   = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(memorialUrl)}`;
+    qrImage.src   = qrUrl;
     qrImage.style.display = "block";
 
     const qrPreview = document.getElementById("qr-preview");
     qrPreview.innerHTML = "";
 
+    // 7a. Link για άνοιγμα
     const linkDiv = document.createElement("div");
     linkDiv.innerHTML = `<a href="${memorialUrl}" target="_blank">${memorialUrl}</a>`;
     linkDiv.style.marginTop = "1rem";
 
+    // 7b. Download link με latinFirstName
     const downloadLink = document.createElement("a");
-    downloadLink.href = qrUrl;
-    downloadLink.download = `${last_name}-${city}-qr.png`;
+    downloadLink.href    = qrUrl;
+    downloadLink.download = `${latinFirstName}-${last_name}-${city}-qr.png`;
     downloadLink.textContent = "⬇️ Κατέβασε το QR Code";
     downloadLink.style.display = "inline-block";
     downloadLink.style.marginTop = "0.5rem";
@@ -136,17 +139,12 @@ const resultsContainer = document.getElementById("resultsContainer");
 searchForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const lastname = document.getElementById("searchLastname").value.trim().toLowerCase();
-  const city = document.getElementById("searchCity").value.trim().toLowerCase();
+  const city     = document.getElementById("searchCity").value.trim().toLowerCase();
 
   let query = supabase.from("memorials").select("*");
-
-  if (lastname && city) {
-    query = query.ilike("last_name", lastname).ilike("city", city);
-  } else if (lastname) {
-    query = query.ilike("last_name", lastname);
-  } else if (city) {
-    query = query.ilike("city", city);
-  }
+  if (lastname && city) query = query.ilike("last_name", lastname).ilike("city", city);
+  else if (lastname)    query = query.ilike("last_name", lastname);
+  else if (city)        query = query.ilike("city", city);
 
   const { data, error } = await query;
   resultsContainer.innerHTML = "";
@@ -175,18 +173,16 @@ searchForm?.addEventListener("submit", async (e) => {
       const id = btn.dataset.id;
       const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
       if (error || !data) return alert("Δεν βρέθηκε το memorial");
-
       form.firstname.value = data.first_name;
-      form.lastname.value = data.last_name;
-      form.birth_date.value = data.birth_date;
-      form.death_date.value = data.death_date;
-      form.gender.value = data.gender;
-      form.region.value = data.region;
-      form.city.value = data.city;
-      form.message.value = data.message;
-      form.photoUrl.value = data.photo_url;
-      form.video.value = data.youtube_url;
-
+      form.lastname.value  = data.last_name;
+      form.birth_date.value= data.birth_date;
+      form.death_date.value= data.death_date;
+      form.gender.value    = data.gender;
+      form.region.value    = data.region;
+      form.city.value      = data.city;
+      form.message.value   = data.message;
+      form.photoUrl.value  = data.photo_url;
+      form.video.value     = data.youtube_url;
       alert("Τα στοιχεία φορτώθηκαν. Πάτησε 'Καταχώρηση Memorial' για αποθήκευση.");
     });
   });
