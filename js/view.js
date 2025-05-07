@@ -67,10 +67,10 @@ function updateCandleText(count) {
 
   if (birthStr && deathStr) {
     document.getElementById("dates").innerHTML = `
-      <p>Έζησε από</p>
-      <p>${birthStr} μέχρι ${deathStr}</p>
-      <p>Απεβίωσε σε ηλικία ${age} ετών</p>
-    `;
+  <p>Έζησε από</p>
+  <p><strong>${birthStr}</strong> μέχρι <strong>${deathStr}</strong></p>
+  <p>Απεβίωσε σε ηλικία <strong>${age}</strong> ετών</p>
+`;
   } else {
     document.getElementById("dates").innerHTML = "";
   }
