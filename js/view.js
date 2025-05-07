@@ -80,13 +80,24 @@ function updateCandleText(count) {
   
 // 🕯️ Άναψε κερί
 document.getElementById("lightCandleBtn").addEventListener("click", async () => {
+  const lastLitKey = `lastCandle_${id}`;
+  const lastLit = localStorage.getItem(lastLitKey);
+  const now = Date.now();
+
+  if (lastLit && now - parseInt(lastLit) < 24 * 60 * 60 * 1000) {
+    alert("Μπορείς να ανάψεις μόνο 1 κερί το 24ωρο για αυτό το μνημόσυνο.");
+    return;
+  }
+
   const { data, error } = await supabase.rpc("increment_candle", { memorial_id: id });
 
   if (error) {
-    alert("❌ Σφάλμα κατά την καταγραφή του κεριού.");
+    alert("❌ Σφάλμα κατά την καταγραφή του κεριού");
     console.error(error);
     return;
   }
 
-  updateCandleText(data);
+  localStorage.setItem(lastLitKey, now.toString());
+  updateCandleCount(data);
 });
+
