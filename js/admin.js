@@ -6,9 +6,10 @@ import { supabase } from "./supabase.js";
   if (!session) window.location.href = "/login.html";
 })();
 
-// 📥 Δημιουργία memorial
+// 📥 Δημιουργία ή ενημέρωση memorial
 const form = document.getElementById("memorialForm");
 const partnerCode = "A";
+let editingId = null;
 
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -35,28 +36,33 @@ form?.addEventListener("submit", async (e) => {
   }
 
   try {
-    const { count } = await supabase
-      .from("memorials")
-      .select("*", { count: "exact", head: true })
-      .ilike("last_name", last_name)
-      .ilike("city", city);
+    let id = editingId;
 
-    const index = (count || 0) + 1;
-    const id = `${last_name}${city}${partnerCode}${index}`.replace(/\s+/g, '');
+    if (!id) {
+      const { count } = await supabase
+        .from("memorials")
+        .select("*", { count: "exact", head: true })
+        .ilike("last_name", last_name)
+        .ilike("city", city);
+
+      const index = (count || 0) + 1;
+      id = `${last_name}${city}${partnerCode}${index}`.replace(/\s+/g, '');
+    }
+
     const memorialUrl = `${location.origin}/memorial.html?id=${id}`;
-
-    // 🧾 Δημιουργία QR εικόνας
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(memorialUrl)}`;
     const qrBlob = await (await fetch(qrUrl)).blob();
     const qrFile = new File([qrBlob], `${id}.png`, { type: "image/png" });
 
-    // ⬆️ Αποθήκευση QR στο Supabase Storage
-    const { error: uploadError } = await supabase.storage.from("qr-codes").upload(`${id}.png`, qrFile, { upsert: true });
+    const { error: uploadError } = await supabase
+      .storage
+      .from("qr-codes")
+      .upload(`${id}.png`, qrFile, { upsert: true });
+
     if (uploadError) throw uploadError;
 
     const qrPublicUrl = supabase.storage.from("qr-codes").getPublicUrl(`${id}.png`).data.publicUrl;
 
-    // 🔄 Αποθήκευση memorial με qr_url
     const { error } = await supabase.from("memorials").upsert({
       id,
       first_name,
@@ -76,21 +82,19 @@ form?.addEventListener("submit", async (e) => {
 
     if (error) throw error;
 
-    // ✅ Προεπισκόπηση
-    const qrImage = document.getElementById("qr-image");
-    qrImage.src = qrPublicUrl;
-    qrImage.style.display = "block";
+    document.getElementById("qr-image").src = qrPublicUrl;
+    document.getElementById("qr-image").style.display = "block";
 
-    const qrPreview = document.getElementById("qr-preview");
-    qrPreview.innerHTML += `
+    document.getElementById("qr-preview").innerHTML = `
       <div style="margin-top:1rem;">
         <a href="${memorialUrl}" target="_blank">${memorialUrl}</a><br/>
         <a href="${qrPublicUrl}" download="${id}-qr.png">⬇️ Κατέβασε το QR Code</a>
       </div>
     `;
 
-    alert("✅ Το memorial καταχωρήθηκε!");
+    alert(editingId ? "✅ Το memorial ενημερώθηκε!" : "✅ Το memorial καταχωρήθηκε!");
     form.reset();
+    editingId = null;
 
   } catch (err) {
     console.error("❌ Σφάλμα:", err);
@@ -104,18 +108,13 @@ const resultsContainer = document.getElementById("resultsContainer");
 
 searchForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const lastname = document.getElementById("searchLastname").value.trim().toLowerCase();
   const city = document.getElementById("searchCity").value.trim().toLowerCase();
 
   let query = supabase.from("memorials").select("*");
-
-  if (lastname && city) {
-    query = query.ilike("last_name", lastname).ilike("city", city);
-  } else if (lastname) {
-    query = query.ilike("last_name", lastname);
-  } else if (city) {
-    query = query.ilike("city", city);
-  }
+  if (lastname) query = query.ilike("last_name", lastname);
+  if (city) query = query.ilike("city", city);
 
   const { data, error } = await query;
   resultsContainer.innerHTML = "";
@@ -128,10 +127,9 @@ searchForm?.addEventListener("submit", async (e) => {
   data.forEach((entry, index) => {
     const div = document.createElement("div");
     div.style = "border:1px solid #ccc; padding:1rem; margin-bottom:1rem; border-radius:5px; display:flex; gap:1rem;";
-
     div.innerHTML = `
       <div style="flex:1;">
-        <strong>${index + 1}. ${entry.first_name} ${entry.last_name} 
+        <strong>${index + 1}. ${entry.first_name} ${entry.last_name}
           <span style="color: red;">(ID: ${entry.id})</span>
         </strong><br/>
         <small>${entry.city}, ${entry.region}</small><br/>
@@ -140,10 +138,9 @@ searchForm?.addEventListener("submit", async (e) => {
         <button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
       </div>
       <div style="width: 100px;">
-        ${entry.qr_url ? `<img src="${entry.qr_url}" alt="QR" style="width:100%;" />` : ''}
+        ${entry.qr_url ? `<img src="${entry.qr_url}" alt="QR" style="width:100%;" />` : ""}
       </div>
     `;
-
     resultsContainer.appendChild(div);
   });
 
@@ -164,23 +161,26 @@ searchForm?.addEventListener("submit", async (e) => {
       form.message.value = data.message;
       form.photoUrl.value = data.photo_url;
       form.video.value = data.youtube_url;
+      editingId = data.id;
 
       alert("Φόρτωσε τα στοιχεία. Πάτησε 'Καταχώρηση Memorial' για αποθήκευση.");
     });
   });
 
-  // 🗑️ Διαγραφή memorial + QR
+  // 🗑️ Διαγραφή
   document.querySelectorAll(".deleteBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
       if (!confirm("Θες σίγουρα να διαγράψεις αυτό το memorial;")) return;
 
       const { error: deleteError } = await supabase.from("memorials").delete().eq("id", id);
-      await supabase.storage.from("qr-codes").remove([`${id}.png`]);
+      const { error: qrError } = await supabase.storage.from("qr-codes").remove([`${id}.png`]);
 
-      if (!deleteError) {
+      if (!deleteError && !qrError) {
         btn.closest("div").remove();
         alert("Το memorial διαγράφηκε.");
+      } else {
+        alert("❌ Κάτι πήγε στραβά κατά τη διαγραφή.");
       }
     });
   });
