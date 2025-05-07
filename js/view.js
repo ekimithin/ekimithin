@@ -53,29 +53,12 @@ function updateCandleText(count) {
   document.getElementById("message").textContent = data.message || "";
   document.getElementById("photo").src = data.photo_url || "";
 
-  // 🎞️ YouTube embed
-function embedYouTube(url) {
-  try {
-    const videoId = new URL(url).searchParams.get("v");
-    if (!videoId) return;
-
-    const iframe = document.createElement("iframe");
-    iframe.width = "100%";
-    iframe.height = "315";
-    iframe.src = `https://www.youtube.com/embed/${videoId}`;
-    iframe.frameBorder = "0";
-    iframe.allowFullscreen = true;
-
-    iframe.onerror = () => {
-      document.getElementById("videoContainer").innerHTML = "<p>⚠️ Δεν είναι δυνατή η εμφάνιση του video.</p>";
-    };
-
-    document.getElementById("videoContainer").appendChild(iframe);
-  } catch (e) {
-    document.getElementById("videoContainer").innerHTML = "<p>⚠️ Δεν βρέθηκε έγκυρο video.</p>";
+  // YouTube video (αν υπάρχει)
+  if (data.youtube_url) {
+    const videoContainer = document.getElementById("videoContainer");
+    const embedUrl = data.youtube_url.replace("watch?v=", "embed/");
+    videoContainer.innerHTML = `<iframe width="100%" height="315" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
   }
-}
-
 
   // Ημερομηνίες και ηλικία
   const birthStr = formatDate(data.birth_date);
@@ -117,4 +100,3 @@ document.getElementById("lightCandleBtn").addEventListener("click", async () => 
   localStorage.setItem(lastLitKey, now.toString());
   updateCandleCount(data);
 });
-
