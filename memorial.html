@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Σελίδα Μνήμης</title>
   <link rel="stylesheet" href="css/style.css" />
-
+  <style>
     .memorial-container {
       max-width: 600px;
       margin: 2rem auto;
@@ -53,8 +53,58 @@
     </div>
   </main>
 
-  <!-- 📦 Scripts -->
   <script type="module" src="js/supabase.js"></script>
-  <script type="module" src="js/view.js"></script>
+  <script type="module">
+    import { supabase } from "./js/supabase.js";
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+
+    const fullName = document.getElementById("fullName");
+    const dates = document.getElementById("dates");
+    const locationText = document.getElementById("location");
+    const photo = document.getElementById("photo");
+    const message = document.getElementById("message");
+    const videoContainer = document.getElementById("videoContainer");
+    const candleCount = document.getElementById("candleCount");
+    const lightCandleBtn = document.getElementById("lightCandleBtn");
+
+    const loadMemorial = async () => {
+      const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
+      if (error || !data) {
+        fullName.textContent = "Memorial not found.";
+        return;
+      }
+
+      fullName.textContent = `${data.first_name} ${data.last_name}`;
+      dates.textContent = `🗓️ ${data.birth_date || "?"} – ${data.death_date || "?"}`;
+      locationText.textContent = `${data.city}, ${data.region}`;
+      message.textContent = data.message;
+      candleCount.textContent = data.candles || 0;
+
+      if (data.photo_url) photo.src = data.photo_url;
+      if (data.youtube_url) {
+        videoContainer.innerHTML = `
+          <iframe width="100%" height="315"
+            src="https://www.youtube.com/embed/${extractYouTubeID(data.youtube_url)}"
+            frameborder="0" allowfullscreen>
+          </iframe>`;
+      }
+    };
+
+    const extractYouTubeID = (url) => {
+      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+      return match ? match[1] : null;
+    };
+
+    lightCandleBtn?.addEventListener("click", async () => {
+      const { data, error } = await supabase.rpc("increment_candles", { memorial_id: id });
+      if (!error && data) {
+        candleCount.textContent = data;
+      }
+    });
+
+    loadMemorial();
+  </script>
 </body>
 </html>
