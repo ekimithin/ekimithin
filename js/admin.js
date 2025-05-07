@@ -1,5 +1,13 @@
 import { supabase } from "./supabase.js";
 
+// 🔧 Καθαρισμός ονόματος αρχείου (αφαίρεση ελληνικών, συμβόλων κλπ)
+function sanitizeFilename(name) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '-')
+    .replace(/-+/g, '-');
+}
+
 // 🔐 Έλεγχος σύνδεσης
 (async () => {
   const { data: { session } } = await supabase.auth.getSession();
@@ -50,18 +58,24 @@ form?.addEventListener("submit", async (e) => {
     }
 
     const memorialUrl = `${location.origin}/memorial.html?id=${id}`;
+
+    // Δημιουργία QR Code
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(memorialUrl)}`;
     const qrBlob = await (await fetch(qrUrl)).blob();
-    const qrFile = new File([qrBlob], `${id}.png`, { type: "image/png" });
 
+    // Καθαρό όνομα αρχείου QR
+    const qrFilename = `${sanitizeFilename(last_name)}_${sanitizeFilename(first_name)}_${crypto.randomUUID()}.png`;
+    const qrFile = new File([qrBlob], qrFilename, { type: "image/png" });
+
+    // Ανεβάζουμε το QR στο Supabase
     const { error: uploadError } = await supabase
       .storage
       .from("qr-codes")
-      .upload(`${id}.png`, qrFile, { upsert: true });
+      .upload(qrFilename, qrFile, { upsert: true });
 
     if (uploadError) throw uploadError;
 
-    const qrPublicUrl = supabase.storage.from("qr-codes").getPublicUrl(`${id}.png`).data.publicUrl;
+    const qrPublicUrl = supabase.storage.from("qr-codes").getPublicUrl(qrFilename).data.publicUrl;
 
     const { error } = await supabase.from("memorials").upsert({
       id,
@@ -82,6 +96,7 @@ form?.addEventListener("submit", async (e) => {
 
     if (error) throw error;
 
+    // Εμφάνιση QR & preview
     document.getElementById("qr-image").src = qrPublicUrl;
     document.getElementById("qr-image").style.display = "block";
 
