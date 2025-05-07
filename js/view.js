@@ -97,6 +97,10 @@ document.getElementById("lightCandleBtn").addEventListener("click", async () => 
     return;
   }
 
+  if (data !== null) {
   localStorage.setItem(lastLitKey, now.toString());
   updateCandleCount(data);
+} else {
+  alert("❌ Το κερί δεν καταγράφηκε. Δοκίμασε ξανά.");
+}
 });
