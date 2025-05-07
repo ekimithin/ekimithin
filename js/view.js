@@ -66,11 +66,16 @@ function embedYouTube(url) {
     iframe.frameBorder = "0";
     iframe.allowFullscreen = true;
 
+    iframe.onerror = () => {
+      document.getElementById("videoContainer").innerHTML = "<p>⚠️ Δεν είναι δυνατή η εμφάνιση του video.</p>";
+    };
+
     document.getElementById("videoContainer").appendChild(iframe);
   } catch (e) {
-    console.warn("Μη έγκυρο YouTube URL", url);
+    document.getElementById("videoContainer").innerHTML = "<p>⚠️ Δεν βρέθηκε έγκυρο video.</p>";
   }
 }
+
 
   // Ημερομηνίες και ηλικία
   const birthStr = formatDate(data.birth_date);
