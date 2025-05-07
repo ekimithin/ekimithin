@@ -51,11 +51,12 @@ form?.addEventListener("submit", async (e) => {
     const qrFile = new File([qrBlob], `${id}.png`, { type: "image/png" });
 
     // ⬆️ Αποθήκευση QR στο Supabase Storage
-    await supabase.storage.from("qr-codes").upload(`${id}.png`, qrFile, { upsert: true });
+    const { error: uploadError } = await supabase.storage.from("qr-codes").upload(`${id}.png`, qrFile, { upsert: true });
+    if (uploadError) throw uploadError;
 
     const qrPublicUrl = supabase.storage.from("qr-codes").getPublicUrl(`${id}.png`).data.publicUrl;
 
-    // 🔄 Αποθήκευση memorial
+    // 🔄 Αποθήκευση memorial με qr_url
     const { error } = await supabase.from("memorials").upsert({
       id,
       first_name,
@@ -76,8 +77,9 @@ form?.addEventListener("submit", async (e) => {
     if (error) throw error;
 
     // ✅ Προεπισκόπηση
-    document.getElementById("qr-image").src = qrPublicUrl;
-    document.getElementById("qr-image").style.display = "block";
+    const qrImage = document.getElementById("qr-image");
+    qrImage.src = qrPublicUrl;
+    qrImage.style.display = "block";
 
     const qrPreview = document.getElementById("qr-preview");
     qrPreview.innerHTML += `
@@ -167,7 +169,7 @@ searchForm?.addEventListener("submit", async (e) => {
     });
   });
 
-  // 🗑️ Διαγραφή
+  // 🗑️ Διαγραφή memorial + QR
   document.querySelectorAll(".deleteBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
