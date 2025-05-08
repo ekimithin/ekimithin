@@ -46,6 +46,19 @@ main, .memorial-container {
   text-decoration: none;
   border-radius: 5px;
 }
+/* Προσθέτουμε padding στο container γενικά */
+main.container,
+section.container {
+  padding: 1rem;        /* 16px εσωτερικό κενό γύρω-γύρω */
+}
+
+/* Για πολύ μικρές οθόνες, λίγο μεγαλύτερη απόσταση */
+@media (max-width: 480px) {
+  main.container,
+  section.container {
+    padding: 1.25rem;   /* 20px */
+  }
+}
 
 /* Πλοήγηση (π.χ. footer ή πάνω links) */
 nav {
