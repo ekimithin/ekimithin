@@ -6,6 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Διαχειριστικό Panel - ekimithin.gr</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+  <script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
+
 </head>
 <body>
 
@@ -37,6 +46,19 @@
           <option value="male">Άνδρας</option>
           <option value="female">Γυναίκα</option>
         </select>
+        
+          <!-- 1. Autocomplete διεύθυνσης -->
+  <label for="addressInput">Διεύθυνση / Τοποθεσία:</label>
+  <input
+    id="addressInput"
+    type="text"
+    placeholder="Πληκτρολόγησε διεύθυνση ή τόπο..."
+  />
+  <ul id="suggestions" class="suggestions-list"></ul>
+
+  <!-- 2. Χάρτης -->
+  <div id="map" style="height:200px; margin:0.5rem 0;"></div>
+
 
         <label for="region">Περιοχή:</label>
         <input type="text" id="region" />
