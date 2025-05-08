@@ -49,22 +49,25 @@
         
           <!-- 1. Autocomplete διεύθυνσης -->
   <label for="addressInput">Διεύθυνση / Τοποθεσία:</label>
+<div class="autocomplete-wrapper">
   <input
     id="addressInput"
     type="text"
     placeholder="Πληκτρολόγησε διεύθυνση ή τόπο..."
+    autocomplete="off"
   />
   <ul id="suggestions" class="suggestions-list"></ul>
+</div>
 
   <!-- 2. Χάρτης -->
   <div id="map" style="height:200px; margin:0.5rem 0;"></div>
 
-
+        <label for="city">Πόλη:</label>
+        <input type="text" id="city" />
+        
         <label for="region">Περιοχή:</label>
         <input type="text" id="region" />
 
-        <label for="city">Πόλη:</label>
-        <input type="text" id="city" />
 
         <label for="message">Μήνυμα Μνήμης:</label>
         <textarea id="message" rows="4"></textarea>
