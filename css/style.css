@@ -6,6 +6,22 @@
 */
 
 /* Βασικά Στυλ */
+
+/* ---------------------------------------------
+   Flex layout για sticky footer χωρίς masking 
+--------------------------------------------- */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Το main (ή το κύριο wrapper) καταλαμβάνει όλο το διαθέσιμο ύψος */
+main, .memorial-container, section {
+  flex: 1;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
@@ -78,16 +94,15 @@ nav a:hover {
 
 /* Footer: κολλητό στο κάτω μέρος */
 footer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 20px;          /* 20px πάνω από το κάτω άκρο της οθόνης */
+  /* Καθαρίζουμε το fixed */
+  position: static;
+  margin-top: auto;      /* σπρώχνει το footer στο τέλος του flex container */
   background: #222;
   color: #fff;
   text-align: center;
-  padding: 1rem;         /* μικρότερο padding γιατί είναι καρφωμένο */
-  z-index: 1000;         /* πάνω από το υπόλοιπο περιεχόμενο */
+  padding: 1rem;
 }
+
 footer nav {
   margin-top: 1rem;
 }
