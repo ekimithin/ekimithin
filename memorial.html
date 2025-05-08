@@ -4,8 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Σελίδα Μνήμης – ekimithin.gr</title>
-  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί, μήνυμα και κουμπί τοποθεσίας." />
+  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί, μήνυμα και διαδραστικό χάρτη." />
+
+  <!-- Leaflet CSS & JS για τον διαδραστικό χάρτη -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <link rel="stylesheet" href="css/style.css" />
+
   <style>
     .message-box {
       background: #f9f9f9;
@@ -16,19 +25,44 @@
       max-width: 100%;
       border-radius: 6px;
     }
-    /* Στυλ για το κουμπί τοποθεσίας */
-    #mapLink a {
-      display: inline-block;
-      padding: 0.5rem 1rem;
+
+    /* Στυλ κουμπιών τοποθεσίας */
+    #mapLink button {
       background: gold;
-      color: black;
-      text-decoration: none;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
       border-radius: 4px;
       font-weight: bold;
       margin-bottom: 1rem;
     }
-    #mapLink a:hover {
+    #mapLink button:hover {
       opacity: 0.9;
+    }
+
+    /* Container για slide-down χάρτη */
+    #mapContainer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    #mapContainer.open {
+      max-height: 80vh;
+    }
+
+    /* Κουμπί κλεισίματος πάνω-δεξιά */
+    #closeMapBtn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: #ffc107;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      z-index: 1000;
+      border-radius: 4px;
     }
   </style>
 </head>
@@ -42,15 +76,27 @@
   </header>
 
   <!-- Κεντρικό περιεχόμενο -->
-  <main class="memorial-container" style="max-width:600px; margin:2rem auto; text-align:center; background:#fff; padding:2rem; border-radius:8px;">
-    <h1 id="fullName">...</h1>
+  <main class="memorial-container"
+        style="max-width:600px; margin:2rem auto; text-align:center;
+               background:#fff; padding:2rem; border-radius:8px;">
+    <h1 id="fullName">…</h1>
     <div id="dates" style="margin-bottom: 1rem;"></div>
+
     <p id="location" style="font-weight: bold;"></p>
 
-    <!-- Εδώ θα μπει το κουμπί “Δες τοποθεσία” -->
-    <div id="mapLink"></div>
+    <!-- Κουμπί για άνοιγμα χάρτη -->
+    <div id="mapLink">
+      <button id="openMapBtn">🗺️ Δες τοποθεσία</button>
+    </div>
 
-    <img id="photo" class="photo" src="" alt="Φωτογραφία" style="max-width:100%; border-radius:8px; margin: 1rem 0;" />
+    <!-- Slide-down container με το map -->
+    <div id="mapContainer">
+      <button id="closeMapBtn">✖️ Κλείσιμο χάρτη</button>
+      <div id="map" style="width:100%; height:300px;"></div>
+    </div>
+
+    <img id="photo" class="photo" src="" alt="Φωτογραφία"
+         style="max-width:100%; border-radius:8px; margin: 1rem 0;" />
 
     <div class="message-box">
       <p id="message"></p>
@@ -61,7 +107,9 @@
     <div class="candle" style="margin-top:2rem;">
       <p id="candleText">🕯️ 0 κεριά έχουν ανάψει</p>
       <button id="lightCandleBtn"
-              style="background:orange; border:none; padding:0.8rem 1.5rem; font-size:1rem; color:white; cursor:pointer; border-radius:5px;">
+              style="background:orange; border:none;
+                     padding:0.8rem 1.5rem; font-size:1rem;
+                     color:white; cursor:pointer; border-radius:5px;">
         Άναψε ένα κερί
       </button>
     </div>
@@ -78,7 +126,7 @@
     </nav>
   </footer>
 
-  <!-- 📦 Scripts -->
+  <!-- Scripts -->
   <script type="module" src="js/supabase.js"></script>
   <script type="module" src="js/view.js"></script>
 </body>
