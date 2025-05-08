@@ -2,7 +2,7 @@
   ΑΡΧΕΙΟ: css/style.css
   ΠΕΡΙΓΡΑΦΗ: Κύριο αρχείο CSS για το frontend του ekimithin.gr
   Περιέχει καθαρό, μοντέρνο και responsive design.
-  Φόρτωση από όλα τα δημόσια HTML (π.χ. index.html, login.html κλπ)
+  Φόρτωση από όλα τα δημόσια HTML (π.χ. index.html, admin.html, memorial.html κλπ.)
 */
 
 /* Βασικά Στυλ */
@@ -32,6 +32,9 @@ section {
   max-width: 800px;
   margin: auto;
 }
+main, .memorial-container {
+  padding-bottom: 100px; /* για να μην κρύβεται το περιεχόμενο πίσω από το footer */
+}
 
 /* Κουμπί CTA */
 .cta {
@@ -60,27 +63,33 @@ nav a:hover {
   text-decoration: underline;
 }
 
+/* Footer: κολλητό στο κάτω μέρος */
 footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 20px;          /* 20px πάνω από το κάτω άκρο της οθόνης */
   background: #222;
   color: #fff;
   text-align: center;
-  padding: 2rem 1rem;
-  margin-top: 4rem;
+  padding: 1rem;         /* μικρότερο padding γιατί είναι καρφωμένο */
+  z-index: 1000;         /* πάνω από το υπόλοιπο περιεχόμενο */
 }
 footer nav {
   margin-top: 1rem;
 }
 footer a {
-  color: #ccc;
+  color: #000;           /* πιο μαύρο χρώμα για καλύτερη ανάγνωση */
   text-decoration: none;
   margin: 0 1rem;
   font-weight: normal;
 }
 footer a:hover {
-  color: white;
+  color: #333;           /* ελαφρώς ανοιχτότερο στο hover */
   text-decoration: underline;
 }
 
+/* Φόρμες */
 form {
   display: flex;
   flex-direction: column;
@@ -105,6 +114,7 @@ button:hover {
   background: #555;
 }
 
+/* Αποτελέσματα αναζήτησης memorials */
 #resultsContainer > div {
   background: #fff;
   border: 1px solid #ddd;
@@ -113,9 +123,10 @@ button:hover {
   border-radius: 5px;
 }
 
+/* Autocomplete (χάρτης, περιοχές κλπ) */
 .autocomplete-wrapper {
   position: relative;
-  width: 100%; /* αν θες, περιορίζει τη διάταξη */
+  width: 100%;
 }
 
 .suggestions-list {
