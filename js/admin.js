@@ -136,12 +136,10 @@ form?.addEventListener("submit", async (e) => {
     const qrPreview = document.getElementById("qr-preview");
     qrPreview.innerHTML = "";
 
-    // Link για προβολή σε νέο tab
     const linkDiv = document.createElement("div");
     linkDiv.innerHTML = `<a href="${memorialUrl}" target="_blank">${memorialUrl}</a>`;
     linkDiv.style.marginTop = "1rem";
 
-    // Download link
     const downloadLink = document.createElement("a");
     downloadLink.href = publicUrl;
     downloadLink.download = fileName;
@@ -156,13 +154,61 @@ form?.addEventListener("submit", async (e) => {
     alert("✅ Το memorial καταχωρήθηκε!");
     form.reset();
 
+    // --- Εδώ καθαρίζουμε τυχόν προηγούμενη λίστα delete-buttons ---
+    attachDeleteListeners();
+
   } catch (err) {
     console.error("❌ Σφάλμα:", err);
     alert("❌ Πρόβλημα κατά την αποθήκευση.");
   }
 });
 
-// 🔍 Αναζήτηση memorials (χωρίς αλλαγές)
+// Συνάρτηση που φτιάχνει τα listeners για τα delete-buttons
+function attachDeleteListeners() {
+  document.querySelectorAll(".deleteBtn").forEach(btn => {
+    btn.replaceWith(btn.cloneNode(true)); // reset listeners
+  });
+  document.querySelectorAll(".deleteBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      if (!confirm("Θες σίγουρα να διαγράψεις αυτό το memorial;")) return;
+
+      // 1) Διαγραφή PNG από το storage
+      const { data: removed, error: removeError } = await supabase
+        .storage
+        .from('qr-codes')
+        .remove([`${id}.png`]);
+
+      if (removeError) {
+        console.error("❌ Σφάλμα στο remove():", removeError);
+        alert("❌ Δεν σβήθηκε το αρχείο PNG. Κοίτα στο Console.");
+        return;
+      }
+      console.log("✅ PNG removed from storage:", removed);
+
+      // 2) Διαγραφή της εγγραφής από τη βάση
+      const { error: deleteError } = await supabase
+        .from('memorials')
+        .delete()
+        .eq('id', id);
+
+      if (deleteError) {
+        console.error("❌ Σφάλμα στο delete DB:", deleteError);
+        alert("❌ Δεν σβήστηκε η εγγραφή στη βάση. Κοίτα στο Console.");
+        return;
+      }
+
+      // 3) Αφαίρεση από το UI
+      btn.parentElement.remove();
+      alert("✅ Το memorial και το PNG διαγράφηκαν.");
+    });
+  });
+}
+
+// Κλήση της attachDeleteListeners και για την πρώτη φόρτωση
+attachDeleteListeners();
+
+// Αναζήτηση memorials (χωρίς αλλαγές)
 const searchForm = document.getElementById("searchForm");
 const resultsContainer = document.getElementById("resultsContainer");
 
@@ -191,13 +237,16 @@ searchForm?.addEventListener("submit", async (e) => {
       <strong>${entry.first_name} ${entry.last_name}</strong><br/>
       <small>${entry.city}, ${entry.region}</small><br/>
       <a href="/memorial.html?id=${entry.id}" target="_blank">➡️ Προβολή</a><br/>
-      <button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
-      <button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
+      <button class="editBtn"    data-id="${entry.id}">✏️ Επεξεργασία</button>
+      <button class="deleteBtn"  data-id="${entry.id}">🗑️ Διαγραφή</button>
     `;
     resultsContainer.appendChild(div);
   });
 
-  // Επεξεργασία
+  // μετά την ανανέωση των αποτελεσμάτων, ξαναδέσε τα delete listeners
+  attachDeleteListeners();
+
+  // edit-buttons (παραμένουν όπως πριν)
   document.querySelectorAll(".editBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
@@ -216,20 +265,6 @@ searchForm?.addEventListener("submit", async (e) => {
       form.video.value       = data.youtube_url;
 
       alert("Τα στοιχεία φορτώθηκαν. Πάτησε 'Καταχώρηση Memorial' για αποθήκευση.");
-    });
-  });
-
-  // Διαγραφή
-  document.querySelectorAll(".deleteBtn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.id;
-      if (confirm("Θες σίγουρα να διαγράψεις αυτό το memorial;")) {
-        const { error } = await supabase.from("memorials").delete().eq("id", id);
-        if (!error) {
-          btn.parentElement.remove();
-          alert("Το memorial διαγράφηκε.");
-        }
-      }
     });
   });
 });
