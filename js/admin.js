@@ -31,6 +31,57 @@ function toLatin(text) {
 const form = document.getElementById("memorialForm");
 const partnerCode = "A";
 
+// ===== START: Address autocomplete & map =====
+const addrIn      = document.getElementById('addressInput');
+const suggList    = document.getElementById('suggestions');
+let   suggestTmr;
+
+addrIn.addEventListener('input', () => {
+  clearTimeout(suggestTmr);
+  const q = addrIn.value.trim();
+  if (q.length < 3) {
+    suggList.innerHTML = '';
+    return;
+  }
+  suggestTmr = setTimeout(async () => {
+    const url    = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`;
+    const res    = await fetch(url);
+    const places = await res.json();
+    suggList.innerHTML = places
+      .slice(0,5)
+      .map(p =>
+        `<li data-lat="${p.lat}" data-lon="${p.lon}">
+           ${p.display_name}
+         </li>`
+      ).join('');
+  }, 300);
+});
+
+suggList.addEventListener('click', (e) => {
+  if (e.target.tagName !== 'LI') return;
+  const { lat, lon } = e.target.dataset;
+  const text = e.target.textContent;
+  // 1) Περιοχή / Πόλη
+  const parts = text.split(',');
+  document.getElementById('region').value = parts[1]?.trim() || '';
+  document.getElementById('city'  ).value = parts[0]?.trim() || '';
+  // 2) Χάρτης
+  map.setView([lat, lon], 14);
+  marker.setLatLng([lat, lon]);
+  // 3) Καθάρισμα προτάσεων
+  addrIn.value      = text;
+  suggList.innerHTML = '';
+});
+
+// Leaflet map initialization
+const map = L.map('map').setView([37.9838, 23.7275], 6); // default Αθήνα
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
+const marker = L.marker([37.9838, 23.7275]).addTo(map);
+// =====  END: Address autocomplete & map  =====
+
+
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
