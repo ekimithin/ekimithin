@@ -52,10 +52,24 @@ function updateCandleText(count) {
     return;
   }
 
+  // Γεμίζουμε τα βασικά πεδία
   document.getElementById("fullName").textContent = `${data.first_name} ${data.last_name}`;
-  document.getElementById("location").textContent = `${data.city}, ${data.region}`;
-  document.getElementById("message").textContent = data.message || "";
+
+  const locText = `${data.city}, ${data.region}`;
+  document.getElementById("location").textContent = locText;
+
+  // Δημιουργούμε το κουμπί "Δες τοποθεσία"
+  document.getElementById("mapLink").innerHTML = `
+    <a
+      href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locText)}"
+      target="_blank"
+    >
+      🗺️ Δες τοποθεσία
+    </a>
+  `;
+
   document.getElementById("photo").src = data.photo_url || "";
+  document.getElementById("message").textContent = data.message || "";
 
   // 🎞️ YouTube video (αν υπάρχει)
   if (data.youtube_url) {
