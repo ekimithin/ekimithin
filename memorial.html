@@ -4,21 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Σελίδα Μνήμης – ekimithin.gr</title>
-  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί και μήνυμα." />
+  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί, μήνυμα και κουμπί τοποθεσίας." />
   <link rel="stylesheet" href="css/style.css" />
-  
   <style>
-  .message-box {
-    background: #f9f9f9;
-    border-left: 5px solid #ccc;
-    padding: 1rem;
-    margin: 1.5rem auto;
-    font-style: italic;
-    max-width: 100%;
-    border-radius: 6px;
-  }
-</style>
-
+    .message-box {
+      background: #f9f9f9;
+      border-left: 5px solid #ccc;
+      padding: 1rem;
+      margin: 1.5rem auto;
+      font-style: italic;
+      max-width: 100%;
+      border-radius: 6px;
+    }
+    /* Στυλ για το κουμπί τοποθεσίας */
+    #mapLink a {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: gold;
+      color: black;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    #mapLink a:hover {
+      opacity: 0.9;
+    }
+  </style>
 </head>
 <body>
 
@@ -34,15 +46,22 @@
     <h1 id="fullName">...</h1>
     <div id="dates" style="margin-bottom: 1rem;"></div>
     <p id="location" style="font-weight: bold;"></p>
+
+    <!-- Εδώ θα μπει το κουμπί “Δες τοποθεσία” -->
+    <div id="mapLink"></div>
+
     <img id="photo" class="photo" src="" alt="Φωτογραφία" style="max-width:100%; border-radius:8px; margin: 1rem 0;" />
+
     <div class="message-box">
-  <p id="message"></p>
-</div>
+      <p id="message"></p>
+    </div>
+
     <div id="videoContainer"></div>
 
     <div class="candle" style="margin-top:2rem;">
       <p id="candleText">🕯️ 0 κεριά έχουν ανάψει</p>
-      <button id="lightCandleBtn" style="background:orange; border:none; padding:0.8rem 1.5rem; font-size:1rem; color:white; cursor:pointer; border-radius:5px;">
+      <button id="lightCandleBtn"
+              style="background:orange; border:none; padding:0.8rem 1.5rem; font-size:1rem; color:white; cursor:pointer; border-radius:5px;">
         Άναψε ένα κερί
       </button>
     </div>
