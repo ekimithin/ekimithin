@@ -12,9 +12,7 @@
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  ></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -105,8 +103,13 @@
         <!-- 5) Γενεαλογικό Πλαίσιο -->
         <details>
           <summary>➤ Γενεαλογικό Πλαίσιο</summary>
-          <textarea id="genealogy" name="genealogy" rows="3"
-            placeholder="π.χ. Παππούς: …; Πατέρας: …; Προπάππους: …"></textarea>
+          <textarea
+            id="genealogy"
+            name="genealogy"
+            rows="3"
+            readonly
+            placeholder="Όλες οι σχέσεις θα εμφανιστούν εδώ…"
+          ></textarea>
         </details>
 
         <!-- 6) Γενεαλογικές Σχέσεις -->
