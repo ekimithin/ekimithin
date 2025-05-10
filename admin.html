@@ -124,11 +124,22 @@
           />
 
           <label for="relationType">Σχέση:</label>
-          <input
-            type="text"
-            id="relationType"
-            placeholder="π.χ. πατέρας, κόρη"
-          />
+<select id="relationType" required>
+  <option value="" disabled selected>Επίλεξε σχέση</option>
+  <option value="Πατέρας">Πατέρας</option>
+  <option value="Μητέρα">Μητέρα</option>
+  <option value="Υιός">Υιός</option>
+  <option value="Κόρη">Κόρη</option>
+  <option value="Παππούς">Παππούς</option>
+  <option value="Γιαγιά">Γιαγιά</option>
+  <option value="Αδελφός">Αδελφός</option>
+  <option value="Αδελφή">Αδελφή</option>
+  <option value="Θείος">Θείος</option>
+  <option value="Θεία">Θεία</option>
+  <option value="Ανιψιός">Ανιψιός</option>
+  <option value="Ανιψιά">Ανιψιά</option>
+</select>
+
 
           <button type="button" id="addRelationshipBtn">
             ➕ Πρόσθεσε Σχέση
