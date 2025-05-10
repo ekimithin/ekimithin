@@ -116,13 +116,25 @@
         <details>
           <summary>➤ Γενεαλογικές Σχέσεις</summary>
 
-          <label for="relativeInput">Αναζήτηση Συγγενή:</label>
-          <input
-            type="text"
-            id="relativeInput"
-            placeholder="Πληκτρολόγησε μέρος του ID ή επώνυμο…"
-            autocomplete="off"
-          />
+          <div class="relationship-search">
+            <label for="searchBy">Αναζήτηση με:</label>
+            <select id="searchBy">
+              <option value="id">Memorial ID</option>
+              <option value="lastname">Επώνυμο</option>
+              <option value="firstname">Όνομα</option>
+              <option value="city">Πόλη</option>
+            </select>
+
+            <label for="relativeSearchInput">Όρος αναζήτησης:</label>
+            <input
+              type="text"
+              id="relativeSearchInput"
+              placeholder="Πληκτρολόγησε..."
+              autocomplete="off"
+            />
+          </div>
+
+          <ul id="relativeResults" class="suggestions-list"></ul>
 
           <label for="relationType">Σχέση:</label>
           <select id="relationType" required>
@@ -149,7 +161,7 @@
             <thead>
               <tr>
                 <th>Σχέση</th>
-                <th>Όνομα Συγγενή (ID – Όνομα)</th>
+                <th>Συγγενής</th>
                 <th>Διαγραφή</th>
               </tr>
             </thead>
