@@ -8,36 +8,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Διαχειριστικό Panel – ekimithin.gr</title>
   <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Leaflet CSS & JS για το χάρτη -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    /* Grid για τα 4 πεδία αναζήτησης */
+    .relationship-search-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+      margin-bottom: 0.5rem;
+    }
+    /* Λίστα αποτελεσμάτων αναζήτησης συγγενών */
+    #relativeResults {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem 0;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #relativeResults li {
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+    #relativeResults li:hover {
+      background: #f0f0f0;
+    }
+  </style>
 </head>
 <body>
 
   <main class="container">
 
+    <!-- Header -->
     <section class="header">
       <h1>Διαχείριση Memorials</h1>
       <button id="logoutBtn" class="logout-btn">🚪 Αποσύνδεση</button>
     </section>
 
+    <!-- Δημιουργία / Επεξεργασία Memorial -->
     <section class="section">
       <h2>➕ Δημιουργία / Επεξεργασία Memorial</h2>
       <form id="memorialForm">
+
+        <!-- Ονοματεπώνυμο -->
         <label for="firstname">Όνομα:</label>
         <input type="text" id="firstname" required />
 
         <label for="lastname">Επώνυμο:</label>
         <input type="text" id="lastname" required />
 
+        <!-- Ημερομηνίες -->
         <label for="birth_date">Ημ. Γέννησης:</label>
         <input type="date" id="birth_date" />
 
         <label for="death_date">Ημ. Θανάτου:</label>
         <input type="date" id="death_date" />
 
+        <!-- Φύλο -->
         <label for="gender">Φύλο:</label>
         <select id="gender">
           <option value="">Επιλογή</option>
@@ -60,6 +95,7 @@
         <!-- Χάρτης -->
         <div id="map" style="height:200px; margin:0.5rem 0;"></div>
 
+        <!-- Πόλη -->
         <label for="city">Πόλη:</label>
         <input type="text" id="city" />
 
@@ -116,41 +152,38 @@
         <details>
           <summary>➤ Γενεαλογικές Σχέσεις</summary>
 
-          <div class="relationship-search">
-            <label for="searchBy">Αναζήτηση με:</label>
-            <select id="searchBy">
-              <option value="id">Memorial ID</option>
-              <option value="lastname">Επώνυμο</option>
-              <option value="firstname">Όνομα</option>
-              <option value="city">Πόλη</option>
-            </select>
-
-            <label for="relativeSearchInput">Όρος αναζήτησης:</label>
-            <input
-              type="text"
-              id="relativeSearchInput"
-              placeholder="Πληκτρολόγησε..."
-              autocomplete="off"
-            />
+          <!-- 4 πεδία αναζήτησης σε grid -->
+          <div class="relationship-search-grid">
+            <div>
+              <label for="relativeIdInput">Memorial ID:</label>
+              <input type="text" id="relativeIdInput" placeholder="π.χ. menikouA1" />
+            </div>
+            <div>
+              <label for="relativeLastnameInput">Επώνυμο:</label>
+              <input type="text" id="relativeLastnameInput" placeholder="π.χ. Παπαδόπουλος" />
+            </div>
+            <div>
+              <label for="relativeFirstnameInput">Όνομα:</label>
+              <input type="text" id="relativeFirstnameInput" placeholder="π.χ. Γιώργος" />
+            </div>
+            <div>
+              <label for="relativeCityInput">Πόλη:</label>
+              <input type="text" id="relativeCityInput" placeholder="π.χ. Αθήνα" />
+            </div>
           </div>
 
-          <ul id="relativeResults" class="suggestions-list"></ul>
+          <!-- Δυναμική λίστα αποτελεσμάτων -->
+          <ul id="relativeResults"></ul>
 
           <label for="relationType">Σχέση:</label>
           <select id="relationType" required>
             <option value="" disabled selected>Επίλεξε σχέση</option>
-            <option value="Πατέρας">Πατέρας</option>
-            <option value="Μητέρα">Μητέρα</option>
-            <option value="Υιός">Υιός</option>
-            <option value="Κόρη">Κόρη</option>
-            <option value="Παππούς">Παππούς</option>
-            <option value="Γιαγιά">Γιαγιά</option>
-            <option value="Αδελφός">Αδελφός</option>
-            <option value="Αδελφή">Αδελφή</option>
-            <option value="Θείος">Θείος</option>
-            <option value="Θεία">Θεία</option>
-            <option value="Ανιψιός">Ανιψιός</option>
-            <option value="Ανιψιά">Ανιψιά</option>
+            <option>Πατέρας</option><option>Μητέρα</option>
+            <option>Υιός</option><option>Κόρη</option>
+            <option>Παππούς</option><option>Γιαγιά</option>
+            <option>Αδελφός</option><option>Αδελφή</option>
+            <option>Θείος</option><option>Θεία</option>
+            <option>Ανιψιός</option><option>Ανιψιά</option>
           </select>
 
           <button type="button" id="addRelationshipBtn">
@@ -166,27 +199,32 @@
               </tr>
             </thead>
             <tbody>
-              <!-- θα γεμίζει δυναμικά από admin.js -->
+              <!-- θα γεμίζει δυναμικά από js -->
             </tbody>
           </table>
         </details>
-        <!-- ============================================= -->
 
+        <!-- Περιοχή -->
         <label for="region">Περιοχή:</label>
         <input type="text" id="region" />
 
+        <!-- Μήνυμα Μνήμης -->
         <label for="message">Μήνυμα Μνήμης:</label>
         <textarea id="message" rows="4"></textarea>
 
+        <!-- Φωτογραφία (URL) -->
         <label for="photoUrl">Φωτογραφία (URL):</label>
         <input type="text" id="photoUrl" placeholder="π.χ. από Blogger" />
 
+        <!-- YouTube Video -->
         <label for="video">YouTube Video (προαιρετικό):</label>
         <input type="text" id="video" placeholder="https://www.youtube.com/watch?v=…" />
 
+        <!-- Υποβολή -->
         <button type="submit" class="btn-primary">📌 Καταχώρηση Memorial</button>
       </form>
 
+      <!-- QR Preview -->
       <div id="qr-preview" style="margin-top:2rem;">
         <h3>QR Code:</h3>
         <img id="qr-image" alt="QR Code" style="display:none; max-width:300px;" />
@@ -195,6 +233,7 @@
 
     <hr />
 
+    <!-- Αναζήτηση Memorials -->
     <section class="section">
       <h2>🔍 Αναζήτηση Memorials</h2>
       <form id="searchForm">
@@ -202,7 +241,6 @@
         <input type="text" id="searchCity" placeholder="Αναζήτηση με Πόλη" />
         <button type="submit">Αναζήτηση</button>
       </form>
-
       <div id="resultsContainer" style="margin-top:2rem;"></div>
     </section>
 
