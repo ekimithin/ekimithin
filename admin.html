@@ -1,23 +1,20 @@
-<!-- public/admin.html -->
 <!DOCTYPE html>
 <html lang="el">
 <head>
   <!-- favicon -->
-<link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Διαχειριστικό Panel - ekimithin.gr</title>
   <link rel="stylesheet" href="css/style.css" />
   <link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
   <script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-></script>
-
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  ></script>
 </head>
 <body>
 
@@ -50,27 +47,107 @@
           <option value="female">Γυναίκα</option>
         </select>
         
-          <!-- 1. Autocomplete διεύθυνσης -->
-  <label for="addressInput">Διεύθυνση / Τοποθεσία:</label>
-<div class="autocomplete-wrapper">
-  <input
-    id="addressInput"
-    type="text"
-    placeholder="Πληκτρολόγησε διεύθυνση ή τόπο..."
-    autocomplete="off"
-  />
-  <ul id="suggestions" class="suggestions-list"></ul>
-</div>
+        <!-- 1. Autocomplete διεύθυνσης -->
+        <label for="addressInput">Διεύθυνση / Τοποθεσία:</label>
+        <div class="autocomplete-wrapper">
+          <input
+            id="addressInput"
+            type="text"
+            placeholder="Πληκτρολόγησε διεύθυνση ή τόπο..."
+            autocomplete="off"
+          />
+          <ul id="suggestions" class="suggestions-list"></ul>
+        </div>
 
-  <!-- 2. Χάρτης -->
-  <div id="map" style="height:200px; margin:0.5rem 0;"></div>
+        <!-- 2. Χάρτης -->
+        <div id="map" style="height:200px; margin:0.5rem 0;"></div>
 
         <label for="city">Πόλη:</label>
         <input type="text" id="city" />
-        
+
+        <!-- ===== ΝΕΑ SECTIONS για επιπλέον πεδία ===== -->
+
+        <!-- 1) Βασικά Βιογραφικά -->
+        <details>
+          <summary>➤ Βασικά Βιογραφικά</summary>
+          <label for="birth_place">Τόπος Γέννησης:</label>
+          <input type="text" id="birth_place" name="birth_place" />
+
+          <label for="profession">Επάγγελμα / Σταδιοδρομία:</label>
+          <input type="text" id="profession" name="profession" />
+
+          <label for="education">Εκπαίδευση:</label>
+          <input type="text" id="education" name="education" />
+        </details>
+
+        <!-- 2) Δημόσιες Διακρίσεις -->
+        <details>
+          <summary>➤ Δημόσιες Διακρίσεις</summary>
+          <textarea id="awards" name="awards" rows="3"
+            placeholder="π.χ. Βραβείο Διονύσιος Σολωμός 2010"></textarea>
+        </details>
+
+        <!-- 3) Προσωπικά Ενδιαφέροντα & Χόμπι -->
+        <details>
+          <summary>➤ Προσωπικά Ενδιαφέροντα & Χόμπι</summary>
+          <textarea id="interests" name="interests" rows="3"
+            placeholder="π.χ. Λάτρης της ποίησης, Φωτογράφος αστικής ζωής"></textarea>
+        </details>
+
+        <!-- 4) Τοποθεσία Ταφής -->
+        <details>
+          <summary>➤ Τοποθεσία Ταφής</summary>
+          <label for="cemetery">Κοιμητήριο / Σορός:</label>
+          <input type="text" id="cemetery" name="cemetery"
+            placeholder="π.χ. Νεκροταφείο Ζωγράφου" />
+        </details>
+
+        <!-- 5) Γενεαλογικό Πλαίσιο -->
+        <details>
+          <summary>➤ Γενεαλογικό Πλαίσιο</summary>
+          <textarea id="genealogy" name="genealogy" rows="3"
+            placeholder="π.χ. Παππούς: …; Πατέρας: …; Προπάππους: …"></textarea>
+        </details>
+
+        <!-- 6) Γενεαλογικές Σχέσεις -->
+        <details>
+          <summary>➤ Γενεαλογικές Σχέσεις</summary>
+          <label for="relativeInput">Αναζήτηση Συγγενή:</label>
+          <input
+            type="text"
+            id="relativeInput"
+            placeholder="Πληκτρολόγησε επώνυμο..."
+            autocomplete="off"
+          />
+
+          <label for="relationType">Σχέση:</label>
+          <input
+            type="text"
+            id="relationType"
+            placeholder="π.χ. πατέρας, κόρη"
+          />
+
+          <button type="button" id="addRelationshipBtn">
+            ➕ Πρόσθεσε Σχέση
+          </button>
+
+          <table id="relationshipsTable" style="width:100%; margin-top:1rem;">
+            <thead>
+              <tr>
+                <th>Σχέση</th>
+                <th>Όνομα Συγγενή</th>
+                <th>Διαγραφή</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- θα γεμίζει δυναμικά από admin.js -->
+            </tbody>
+          </table>
+        </details>
+        <!-- ============================================= -->
+
         <label for="region">Περιοχή:</label>
         <input type="text" id="region" />
-
 
         <label for="message">Μήνυμα Μνήμης:</label>
         <textarea id="message" rows="4"></textarea>
