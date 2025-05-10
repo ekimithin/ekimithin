@@ -99,6 +99,10 @@
         <label for="city">Πόλη:</label>
         <input type="text" id="city" />
 
+        <!-- Περιοχή -->
+        <label for="region">Περιοχή:</label>
+        <input type="text" id="region" />
+
         <!-- ===== ΝΕΑ SECTIONS για επιπλέον πεδία ===== -->
 
         <!-- 1) Βασικά Βιογραφικά -->
@@ -175,6 +179,7 @@
           <!-- Δυναμική λίστα αποτελεσμάτων -->
           <ul id="relativeResults"></ul>
 
+          <!-- Επιλογή σχέσης -->
           <label for="relationType">Σχέση:</label>
           <select id="relationType" required>
             <option value="" disabled selected>Επίλεξε σχέση</option>
@@ -186,9 +191,7 @@
             <option>Ανιψιός</option><option>Ανιψιά</option>
           </select>
 
-          <button type="button" id="addRelationshipBtn">
-            ➕ Πρόσθεσε Σχέση
-          </button>
+          <button type="button" id="addRelationshipBtn">➕ Πρόσθεσε Σχέση</button>
 
           <table id="relationshipsTable" style="width:100%; margin-top:1rem;">
             <thead>
@@ -199,14 +202,10 @@
               </tr>
             </thead>
             <tbody>
-              <!-- θα γεμίζει δυναμικά από js -->
+              <!-- θα γεμίζει δυναμικά από js/sections/relationships.js -->
             </tbody>
           </table>
         </details>
-
-        <!-- Περιοχή -->
-        <label for="region">Περιοχή:</label>
-        <input type="text" id="region" />
 
         <!-- Μήνυμα Μνήμης -->
         <label for="message">Μήνυμα Μνήμης:</label>
@@ -248,6 +247,7 @@
 
   <!-- 📦 Scripts -->
   <script type="module" src="js/supabase.js"></script>
+  <script type="module" src="js/sections/relationships.js"></script>
   <script type="module" src="js/admin.js"></script>
   <script type="module" src="js/logout.js"></script>
 </body>
