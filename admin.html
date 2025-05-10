@@ -6,7 +6,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Διαχειριστικό Panel - ekimithin.gr</title>
+  <title>Διαχειριστικό Panel – ekimithin.gr</title>
   <link rel="stylesheet" href="css/style.css" />
   <link
     rel="stylesheet"
@@ -24,7 +24,7 @@
     </section>
 
     <section class="section">
-      <h2>➕ Δημιουργία Memorial</h2>
+      <h2>➕ Δημιουργία / Επεξεργασία Memorial</h2>
       <form id="memorialForm">
         <label for="firstname">Όνομα:</label>
         <input type="text" id="firstname" required />
@@ -44,20 +44,20 @@
           <option value="male">Άνδρας</option>
           <option value="female">Γυναίκα</option>
         </select>
-        
-        <!-- 1. Autocomplete διεύθυνσης -->
+
+        <!-- Autocomplete διεύθυνσης -->
         <label for="addressInput">Διεύθυνση / Τοποθεσία:</label>
         <div class="autocomplete-wrapper">
           <input
             id="addressInput"
             type="text"
-            placeholder="Πληκτρολόγησε διεύθυνση ή τόπο..."
+            placeholder="Πληκτρολόγησε διεύθυνση ή τόπο…"
             autocomplete="off"
           />
           <ul id="suggestions" class="suggestions-list"></ul>
         </div>
 
-        <!-- 2. Χάρτης -->
+        <!-- Χάρτης -->
         <div id="map" style="height:200px; margin:0.5rem 0;"></div>
 
         <label for="city">Πόλη:</label>
@@ -115,31 +115,31 @@
         <!-- 6) Γενεαλογικές Σχέσεις -->
         <details>
           <summary>➤ Γενεαλογικές Σχέσεις</summary>
+
           <label for="relativeInput">Αναζήτηση Συγγενή:</label>
           <input
             type="text"
             id="relativeInput"
-            placeholder="Πληκτρολόγησε επώνυμο..."
+            placeholder="Πληκτρολόγησε μέρος του ID ή επώνυμο…"
             autocomplete="off"
           />
 
           <label for="relationType">Σχέση:</label>
-<select id="relationType" required>
-  <option value="" disabled selected>Επίλεξε σχέση</option>
-  <option value="Πατέρας">Πατέρας</option>
-  <option value="Μητέρα">Μητέρα</option>
-  <option value="Υιός">Υιός</option>
-  <option value="Κόρη">Κόρη</option>
-  <option value="Παππούς">Παππούς</option>
-  <option value="Γιαγιά">Γιαγιά</option>
-  <option value="Αδελφός">Αδελφός</option>
-  <option value="Αδελφή">Αδελφή</option>
-  <option value="Θείος">Θείος</option>
-  <option value="Θεία">Θεία</option>
-  <option value="Ανιψιός">Ανιψιός</option>
-  <option value="Ανιψιά">Ανιψιά</option>
-</select>
-
+          <select id="relationType" required>
+            <option value="" disabled selected>Επίλεξε σχέση</option>
+            <option value="Πατέρας">Πατέρας</option>
+            <option value="Μητέρα">Μητέρα</option>
+            <option value="Υιός">Υιός</option>
+            <option value="Κόρη">Κόρη</option>
+            <option value="Παππούς">Παππούς</option>
+            <option value="Γιαγιά">Γιαγιά</option>
+            <option value="Αδελφός">Αδελφός</option>
+            <option value="Αδελφή">Αδελφή</option>
+            <option value="Θείος">Θείος</option>
+            <option value="Θεία">Θεία</option>
+            <option value="Ανιψιός">Ανιψιός</option>
+            <option value="Ανιψιά">Ανιψιά</option>
+          </select>
 
           <button type="button" id="addRelationshipBtn">
             ➕ Πρόσθεσε Σχέση
@@ -149,7 +149,7 @@
             <thead>
               <tr>
                 <th>Σχέση</th>
-                <th>Όνομα Συγγενή</th>
+                <th>Όνομα Συγγενή (ID – Όνομα)</th>
                 <th>Διαγραφή</th>
               </tr>
             </thead>
@@ -167,10 +167,10 @@
         <textarea id="message" rows="4"></textarea>
 
         <label for="photoUrl">Φωτογραφία (URL):</label>
-        <input type="text" id="photoUrl" placeholder="Π.χ. από Blogger" />
+        <input type="text" id="photoUrl" placeholder="π.χ. από Blogger" />
 
         <label for="video">YouTube Video (προαιρετικό):</label>
-        <input type="text" id="video" placeholder="https://www.youtube.com/watch?v=..." />
+        <input type="text" id="video" placeholder="https://www.youtube.com/watch?v=…" />
 
         <button type="submit" class="btn-primary">📌 Καταχώρηση Memorial</button>
       </form>
