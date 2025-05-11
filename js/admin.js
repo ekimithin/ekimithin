@@ -1,4 +1,5 @@
 // js/admin.js
+
 import { supabase } from "./supabase.js";
 import { initBioSection } from "./sections/biography.js";
 import { initAwardsSection } from "./sections/awards.js";
@@ -185,31 +186,52 @@ searchForm.addEventListener("submit", async e => {
 // initial delete listeners
 attachDeleteListeners();
 
-// ================= Submit handler =================
+// ================= Submit handler with date‐checks =================
 form.addEventListener("submit", async e => {
   e.preventDefault();
 
-  // Gather + validate
+  // Gather + basic validation
   const rawFirst  = form.firstname.value.trim();
   const rawLast   = form.lastname.value.trim();
   const rawCity   = form.city.value.trim();
-  const birth     = form.birth_date.value;
-  const death     = form.death_date.value;
+  const birthDate = form.birth_date.value.trim() === "" ? null : form.birth_date.value;
+  const deathDate = form.death_date.value.trim() === "" ? null : form.death_date.value;
 
   if (!rawFirst || !rawLast || !rawCity) {
     return alert("Συμπλήρωσε Όνομα, Επώνυμο, Πόλη.");
   }
-  if (birth && death && new Date(birth) > new Date(death)) {
-    return alert("Η ημερομηνία γέννησης δεν μπορεί να είναι μετά τον θάνατο.");
+  // γέννηση μετά θανάτου
+  if (birthDate && deathDate && new Date(birthDate) > new Date(deathDate)) {
+    return alert("❌ Η ημερομηνία γέννησης δεν μπορεί να είναι μετά τον θάνατο.");
+  }
+  // θάνατος μελλοντικός
+  if (deathDate && new Date(deathDate) > new Date()) {
+    return alert("❗ Η ημερομηνία θανάτου δεν μπορεί να είναι στο μέλλον.");
+  }
+  // μόνο θάνατος
+  if (birthDate === null && deathDate !== null) {
+    return alert("❗ Δεν έχεις καταχωρήσει ημερομηνία γέννησης.");
+  }
+  // μόνο γέννηση
+  if (deathDate === null && birthDate !== null) {
+    return alert("❗ Δεν έχεις καταχωρήσει ημερομηνία θανάτου.");
+  }
+  // κανένα
+  if (birthDate === null && deathDate === null) {
+    const ok = confirm(
+      "❗ Δεν έχεις καταχωρήσει ούτε ημερομηνία γέννησης ούτε ημερομηνία θανάτου.\n" +
+      "Θέλεις να συνεχίσεις χωρίς αυτές;"
+    );
+    if (!ok) return;
   }
 
-  // Latin + lowercase
+  // Latin + lowercase for id
   const latinFirst = toLatin(rawFirst).toLowerCase();
   const last_name  = toLatin(rawLast).toLowerCase();
   const city       = toLatin(rawCity).toLowerCase();
 
   try {
-    // Compute ID
+    // Compute unique ID
     const { count } = await supabase
       .from("memorials")
       .select("*", { head: true, count: "exact" })
@@ -223,8 +245,8 @@ form.addEventListener("submit", async e => {
       id,
       first_name:  rawFirst,
       last_name,
-      birth_date:  birth,
-      death_date:  death,
+      birth_date:  birthDate,
+      death_date:  deathDate,
       gender:      form.gender.value,
       region:      form.region.value.trim(),
       city,
@@ -236,33 +258,26 @@ form.addEventListener("submit", async e => {
     });
     if (upErr) throw upErr;
 
-    // Collect relationships (attributes injected by sections/relationships.js)
-    const relTBody = document.querySelector("#relationshipsTable tbody");
-    const relRows  = Array.from(relTBody.children);
-    // delete old
+    // Relationships
+    const rows = Array.from(document.querySelectorAll("#relationshipsTable tbody tr"));
     await supabase.from("relationships").delete().eq("memorial_id", id);
-    // insert new
-    if (relRows.length) {
-      const inserts = relRows.map(tr => ({
+    if (rows.length) {
+      const toInsert = rows.map(tr => ({
         memorial_id:   id,
         relative_id:   tr.children[1].textContent,
         relation_type: tr.children[0].textContent
       }));
-      await supabase.from("relationships").insert(inserts);
+      await supabase.from("relationships").insert(toInsert);
     }
 
-    // Generate & upload QR
+    // QR code
     const url    = `${location.origin}/memorial.html?id=${id}`;
     const qrBlob = await (await fetch(
       `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(url)}`
     )).blob();
     const fn     = `${id}.png`;
-    await supabase.storage
-      .from("qr-codes")
-      .upload(fn, qrBlob, { contentType: "image/png" });
-    const { data: pu } = supabase.storage
-      .from("qr-codes")
-      .getPublicUrl(fn);
+    await supabase.storage.from("qr-codes").upload(fn, qrBlob, { contentType: "image/png" });
+    const { data: pu } = supabase.storage.from("qr-codes").getPublicUrl(fn);
 
     // Preview
     qrPreview.innerHTML = `
