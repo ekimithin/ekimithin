@@ -59,10 +59,21 @@
       z-index: 1000; border-radius: 4px;
     }
 
-    /* Νέα sections */
-    .extra-section { margin: 1rem 0; text-align: left; }
-    .extra-section h3 { margin-bottom: 0.5rem; }
-    .extra-section p { margin: 0.25rem 0; }
+    /* Extra sections */
+    .extra-section {
+      margin: 1rem 0;
+      text-align: left;
+      display: none;
+    }
+    .extra-section h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.25rem;
+    }
+    .extra-section p {
+      margin: 0.25rem 0;
+    }
   </style>
 </head>
 <body>
@@ -85,7 +96,7 @@
     <p id="location" style="font-weight: bold;"></p>
 
     <!-- --- Extra Βασικά Βιογραφικά --- -->
-    <div id="bioSection" class="extra-section" style="display:none;">
+    <div id="bioSection" class="extra-section">
       <h3>Βασικά Βιογραφικά</h3>
       <p id="birthPlaceLine"><strong>Τόπος γέννησης:</strong> <span id="birthPlace"></span></p>
       <p id="professionLine"><strong>Επάγγελμα:</strong> <span id="profession"></span></p>
@@ -93,21 +104,27 @@
     </div>
 
     <!-- --- Διακρίσεις --- -->
-    <div id="awardsSection" class="extra-section" style="display:none;">
+    <div id="awardsSection" class="extra-section">
       <h3>Διακρίσεις</h3>
       <p id="awards"></p>
     </div>
 
     <!-- --- Ενδιαφέροντα & Χόμπι --- -->
-    <div id="interestsSection" class="extra-section" style="display:none;">
+    <div id="interestsSection" class="extra-section">
       <h3>Προσωπικά Ενδιαφέροντα & Χόμπι</h3>
       <p id="interests"></p>
     </div>
 
     <!-- --- Τοποθεσία Ταφής --- -->
-    <div id="burialSection" class="extra-section" style="display:none;">
+    <div id="burialSection" class="extra-section">
       <h3>Τοποθεσία Ταφής</h3>
       <p id="cemetery"></p>
+    </div>
+
+    <!-- --- Γενεαλογικό Πλαίσιο (προαιρετικό) --- -->
+    <div id="genealogySection" class="extra-section">
+      <h3>Γενεαλογικό Πλαίσιο</h3>
+      <p id="genealogy"></p>
     </div>
 
     <!-- Κουμπί & Slide-down Χάρτης -->
