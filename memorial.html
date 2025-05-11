@@ -65,8 +65,18 @@
       text-align: left;
       display: none;
     }
+    /* Container για το βιογραφικό */
+    #bioContainer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+      margin-bottom: 1rem;
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 0 1rem;
+    }
     #bioContainer.open {
-  max-height: 1000px;   /* αρκετό για όλα τα sections */
+      max-height: 1000px; /* αρκετό ύψος για όλα */
     }
     .extra-section h3 {
       margin-bottom: 0.5rem;
@@ -98,7 +108,7 @@
     <!-- Τοποθεσία -->
     <p id="location" style="font-weight: bold;"></p>
 
-     <!-- Κουμπί & Slide-down Χάρτης -->
+    <!-- Map toggle -->
     <div id="mapLink">
       <button id="openMapBtn">🗺️ Δες τοποθεσία</button>
     </div>
@@ -107,11 +117,11 @@
       <div id="map" style="width:100%; height:300px;"></div>
     </div>
 
-        <!-- Φωτογραφία -->
+    <!-- Φωτογραφία -->
     <img id="photo" class="photo" src="" alt="Φωτογραφία"
          style="max-width:100%; border-radius:8px; margin: 1rem 0;" />
 
-    <!-- ⇩⇩⇩ Toggle βιογραφικού ⇩⇩⇩ -->
+    <!-- ⇩⇩⇩ Toggle Βιογραφικού ⇩⇩⇩ -->
     <div id="bioToggle" style="text-align:center; margin:1rem 0;">
       <button id="toggleBioBtn"
               style="background:#333;color:#fff;
@@ -120,45 +130,35 @@
         📖 Βιογραφικό
       </button>
     </div>
-    <div id="bioContainer"
-         style="max-height:0; overflow:hidden;
-                transition:max-height 0.5s ease;
-                margin-bottom:1rem; background:#fafafa;
-                border-radius:8px; padding:0 1rem;">
+    <div id="bioContainer">
       <!-- Extra sections -->
-      <div id="bioSection" class="extra-section" style="display:none;">
+      <div id="bioSection" class="extra-section">
         <h3>Βασικά Βιογραφικά</h3>
-        <p id="birthPlaceLine" style="display:none;"><strong>Τόπος γέννησης:</strong> <span id="birthPlace"></span></p>
-        <p id="professionLine" style="display:none;"><strong>Επάγγελμα:</strong> <span id="profession"></span></p>
-        <p id="educationLine" style="display:none;"><strong>Εκπαίδευση:</strong> <span id="education"></span></p>
+        <p id="birthPlaceLine"><strong>Τόπος γέννησης:</strong> <span id="birthPlace"></span></p>
+        <p id="professionLine"><strong>Επάγγελμα:</strong> <span id="profession"></span></p>
+        <p id="educationLine"><strong>Εκπαίδευση:</strong> <span id="education"></span></p>
       </div>
 
-      <div id="awardsSection" class="extra-section" style="display:none;">
+      <div id="awardsSection" class="extra-section">
         <h3>Διακρίσεις</h3>
         <p id="awards"></p>
       </div>
 
-      <div id="interestsSection" class="extra-section" style="display:none;">
+      <div id="interestsSection" class="extra-section">
         <h3>Προσωπικά Ενδιαφέροντα &amp; Χόμπι</h3>
         <p id="interests"></p>
       </div>
 
-      <div id="burialSection" class="extra-section" style="display:none;">
+      <div id="burialSection" class="extra-section">
         <h3>Τοποθεσία Ταφής</h3>
         <p id="cemetery"></p>
       </div>
 
-      <div id="genealogySection" class="extra-section" style="display:none;">
+      <div id="genealogySection" class="extra-section">
         <h3>Γενεαλογικό Πλαίσιο</h3>
         <p id="genealogy"></p>
       </div>
     </div>
-
-    <!-- Μήνυμα -->
-    <div class="message-box">
-      <p id="message"></p>
-    </div>
-
 
     <!-- Μήνυμα -->
     <div class="message-box">
