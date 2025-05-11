@@ -1,68 +1,90 @@
-<!-- 
-  ΑΡΧΕΙΟ: index.html
-  ΠΕΡΙΓΡΑΦΗ: Αρχική σελίδα του ekimithin.gr με παρουσίαση της υπηρεσίας
-  Περιλαμβάνει περιγραφή, SEO meta, και πλοήγηση σε άλλες ενότητες.
--->
-
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <!-- favicon -->
-<link rel="icon" href="/favicon.ico" type="image/x-icon" />
-
+  <!-- Base Meta -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   <title>ekimithin.gr – Ψηφιακή Μνήμη με QR και Ηλεκτρονικό Κερί</title>
-  <meta name="description" content="Δημιουργούμε προσωπικές σελίδες μνήμης με QR code και ηλεκτρονικό κερί για τα αγαπημένα σας πρόσωπα. Τιμή και μνήμη με σεβασμό." />
-  <meta name="keywords" content="ψηφιακή μνήμη, ηλεκτρονικό κερί, QR μνήμα, σελίδα memorial, μνημόσυνο online" />
+  <meta name="description"
+        content="Δημιουργήστε μία ολοκληρωμένη ψηφιακή σελίδα μνήμης με QR code, ηλεκτρονικό κερί, φωτογραφίες και βιογραφικά στοιχεία – η διακριτική λύση που εμπιστεύονται γραφεία τελετών και οικογένειες για σεβασμό στη μνήμη." />
+  <meta name="keywords"
+        content="ψηφιακή μνήμη, ηλεκτρονικό κερί, QR code μνήματος, ψηφιακή σελίδα μνήμης, online μνημόσυνο" />
   <meta name="author" content="ekimithin.gr" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://ekimithin.gr/" />
+  <meta name="theme-color" content="#222222" />
+
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- Open Graph Tags -->
-  <meta property="og:title" content="ekimithin.gr – Ψηφιακή Μνήμη με QR και Κερί" />
-  <meta property="og:description" content="Αφήστε το ψηφιακό σας κερί σε ειδική σελίδα μνήμης. Με QR πάνω στο μνήμα." />
-  <meta property="og:image" content="https://ekimithin.gr/images/logo.png" />
-  <meta property="og:url" content="https://ekimithin.gr" />
+  <!-- Open Graph -->
+  <meta property="og:locale" content="el_GR" />
   <meta property="og:type" content="website" />
+  <meta property="og:title" content="ekimithin.gr – Ψηφιακή Μνήμη με QR και Κερί" />
+  <meta property="og:description"
+        content="Δημιουργήστε ψηφιακή σελίδα μνήμης με QR code, ηλεκτρονικό κερί, φωτογραφίες & βιογραφικά στοιχεία – η διακριτική επιλογή για γραφεία τελετών & οικογένειες." />
+  <meta property="og:url" content="https://ekimithin.gr/" />
+  <meta property="og:site_name" content="ekimithin.gr" />
+  <meta property="og:image" content="https://ekimithin.gr/ekimithin.png" />
+  <meta property="og:image:alt" content="ekimithin – Ψηφιακή Σελίδα Μνήμης με QR & Κερί" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
-  <!-- Προαιρετικό: Firebase SDK για μελλοντική χρήση -->
-  <!--
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script>
-    const firebaseConfig = {
-      // TODO: Πρόσθεσε το project config σου εδώ
-    };
-    firebase.initializeApp(firebaseConfig);
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ekimithin.gr – Ψηφιακή Μνήμη με QR και Κερί" />
+  <meta name="twitter:description"
+        content="Δημιουργήστε ψηφιακή σελίδα μνήμης με QR code, ηλεκτρονικό κερί, φωτογραφίες & βιογραφικά στοιχεία – η διακριτική επιλογή για γραφεία τελετών & οικογένειες." />
+  <meta name="twitter:image" content="https://ekimithin.gr/ekimithin.png" />
+  <meta name="twitter:site" content="@ekimithin" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "ekimithin.gr",
+    "url": "https://ekimithin.gr/",
+    "logo": "https://ekimithin.gr/ekimithin.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "ekimithingr@gmail.com",
+      "contactType": "Customer Support"
+    }
+  }
   </script>
-  -->
 </head>
 <body>
   <header>
-    <img src="images/logo.png" alt="Λογότυπο ekimithin – Ψηφιακή Μνήμη" />
+    <img src="images/logo.png" alt="ekimithin – Ψηφιακή Μνήμη" />
   </header>
 
-  <section>
+  <section style="padding: 2rem; max-width: 800px; margin: auto; text-align: center;">
     <h1>ekimithin – Ψηφιακή Μνήμη με QR</h1>
     <p>Η μνήμη των αγαπημένων μας προσώπων δεν σβήνει ποτέ. Το ekimithin.gr προσφέρει έναν σύγχρονο και διακριτικό τρόπο να τιμούμε όσους έφυγαν από τη ζωή.</p>
 
     <h2>Τι προσφέρουμε</h2>
-    <ul>
-      <li>Δημιουργία προσωποποιημένης σελίδας memorial</li>
-      <li>QR code για τοποθέτηση στο μνήμα</li>
-      <li>Ηλεκτρονικό κερί με ημερήσιο μετρητή</li>
-      <li>Αναμνηστικές φωτογραφίες, βίντεο, και ευχές</li>
+    <ul style="list-style: none; padding: 0; display: inline-block; text-align: left;">
+      <li>● Δημιουργία προσωποποιημένης σελίδας memorial</li>
+      <li>● QR code για τοποθέτηση στο μνήμα</li>
+      <li>● Ηλεκτρονικό κερί με ημερήσιο μετρητή</li>
+      <li>● Αναμνηστικές φωτογραφίες, βίντεο και ευχές</li>
     </ul>
 
-    <p style="font-weight: bold;">Για πληροφορίες επικοινωνήστε μαζί μας: <a href="mailto:ekimithingr@gmail.com">ekimithingr@gmail.com</a></p>
+    <p style="font-weight: bold; margin-top: 1.5rem;">
+      Για πληροφορίες: <a href="mailto:ekimithingr@gmail.com">ekimithingr@gmail.com</a>
+    </p>
   </section>
 
-  <footer>
+  <footer style="background: #222; color: #fff; padding: 1.5rem; text-align: center;">
     <p>&copy; 2025 ekimithin.gr – Με σεβασμό στη μνήμη</p>
     <nav>
-      <a href="index.html">Αρχική</a>
-      <a href="psifiaki-mnimi.html">Τι είναι η Ψηφιακή Μνήμη</a>
-       <a href="privacy.html">Προσωπικά Δεδομένα</a>
-      <a href="contact.html">Επικοινωνία</a>
+      <a href="index.html" style="color: #ccc; margin: 0 0.5rem;">Αρχική</a> |
+      <a href="psifiaki-mnimi.html" style="color: #ccc; margin: 0 0.5rem;">Τι είναι η Ψηφιακή Μνήμη</a> |
+      <a href="privacy.html" style="color: #ccc; margin: 0 0.5rem;">Προσωπικά Δεδομένα</a> |
+      <a href="contact.html" style="color: #ccc; margin: 0 0.5rem;">Επικοινωνία</a>
     </nav>
   </footer>
 </body>
