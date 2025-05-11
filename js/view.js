@@ -14,7 +14,7 @@ function formatDate(isoString) {
   if (!isoString) return null;
   const d = new Date(isoString);
   const day   = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth()+1).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
   const year  = d.getFullYear();
   return `${day}-${month}-${year}`;
 }
@@ -38,7 +38,7 @@ function updateCandleText(count) {
 }
 
 (async () => {
-  // Φόρτωση απ’ το Supabase
+  // Φόρτωση από Supabase
   const { data, error } = await supabase
     .from("memorials")
     .select("*")
@@ -49,11 +49,12 @@ function updateCandleText(count) {
     return;
   }
 
-  // ─── Βασικά ─────────────────────────────────────────
-  document.getElementById("fullName").textContent = `${data.first_name} ${data.last_name}`;
-  const locText = `${data.city}${data.region ? ", " + data.region : ""}`;
+  // ─── Βασικά ─────────────────────────────────
+  document.getElementById("fullName").textContent =
+    `${data.first_name} ${data.last_name}`;
+  const locText = `${data.city}, ${data.region}`;
   document.getElementById("location").textContent = locText;
-  document.getElementById("photo").src         = data.photo_url || "";
+  document.getElementById("photo").src      = data.photo_url || "";
   document.getElementById("message").textContent = data.message || "";
 
   // YouTube embed
@@ -75,32 +76,53 @@ function updateCandleText(count) {
       <p>Απεβίωσε σε ηλικία <strong>${age}</strong> ετών</p>
     `;
   } else {
-    document.getElementById("dates").textContent = "";
+    document.getElementById("dates").innerHTML = "";
   }
   updateCandleText(data.candles || 0);
 
-  // ─── Extra sections (εμφάνιση μόνο αν υπάρχει περιεχόμενο) ──
-  const extras = [
-    { field: "birth_place",    section: "birthPlaceSection",    element: "birthPlace" },
-    { field: "profession",     section: "professionSection",    element: "profession" },
-    { field: "education",      section: "educationSection",     element: "education" },
-    { field: "awards",         section: "awardsSection",        element: "awardsText" },
-    { field: "interests",      section: "interestsSection",     element: "interestsText" },
-    { field: "cemetery",       section: "cemeterySection",      element: "cemetery" },
-    { field: "genealogy",      section: "genealogySection",     element: "genealogy" }
-  ];
-  extras.forEach(({ field, section, element }) => {
-    if (data[field]) {
-      const sec = document.getElementById(section);
-      const el  = document.getElementById(element);
-      if (sec && el) {
-        el.textContent = data[field];
-        sec.style.display = "block";
-      }
+  // ─── Extra Sections (εμφάνιση μόνο αν υπάρχει τιμή) ───
+  // 1) Bio Section
+  if (data.birth_place || data.profession || data.education) {
+    document.getElementById("bioSection").style.display = "block";
+    if (data.birth_place) {
+      document.getElementById("birthPlace").textContent = data.birth_place;
+      document.getElementById("birthPlaceLine").style.display = "block";
     }
-  });
+    if (data.profession) {
+      document.getElementById("profession").textContent = data.profession;
+      document.getElementById("professionLine").style.display = "block";
+    }
+    if (data.education) {
+      document.getElementById("education").textContent = data.education;
+      document.getElementById("educationLine").style.display = "block";
+    }
+  }
 
-  // ─── Slide-down map setup ───────────────────────────
+  // 2) Awards
+  if (data.awards) {
+    document.getElementById("awardsSection").style.display = "block";
+    document.getElementById("awards").textContent = data.awards;
+  }
+
+  // 3) Interests
+  if (data.interests) {
+    document.getElementById("interestsSection").style.display = "block";
+    document.getElementById("interests").textContent = data.interests;
+  }
+
+  // 4) Burial
+  if (data.cemetery) {
+    document.getElementById("burialSection").style.display = "block";
+    document.getElementById("cemetery").textContent = data.cemetery;
+  }
+
+  // 5) Genealogy (αν το έχετε στο σχήμα)
+  if (data.genealogy) {
+    document.getElementById("genealogySection").style.display = "block";
+    document.getElementById("genealogy").textContent = data.genealogy;
+  }
+
+  // ─── Slide-down χάρτης ────────────────────────
   const openBtn  = document.getElementById("openMapBtn");
   const closeBtn = document.getElementById("closeMapBtn");
   const mapCont  = document.getElementById("mapContainer");
@@ -108,15 +130,12 @@ function updateCandleText(count) {
 
   openBtn.addEventListener("click", async () => {
     if (!leafletMap) {
-      // geocode με Nominatim
-      const resp   = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locText)}`);
-      const places = await resp.json();
-      if (!places[0]) {
-        return alert("Δεν βρέθηκε η τοποθεσία στο χάρτη.");
-      }
-      const lat = parseFloat(places[0].lat),
-            lon = parseFloat(places[0].lon);
-      // init Leaflet
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locText)}`
+      );
+      const places = await res.json();
+      if (!places[0]) return alert("Δεν βρέθηκε η τοποθεσία στο χάρτη.");
+      const lat = parseFloat(places[0].lat), lon = parseFloat(places[0].lon);
       leafletMap = L.map("map").setView([lat, lon], 15);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
@@ -130,26 +149,29 @@ function updateCandleText(count) {
 
   closeBtn.addEventListener("click", () => {
     mapCont.classList.remove("open");
-    document.querySelector(".memorial-container").scrollIntoView({ behavior: "smooth" });
+    document.querySelector(".memorial-container")
+      .scrollIntoView({ behavior: "smooth" });
   });
-  // ────────────────────────────────────────────────────
+  // ───────────────────────────────────────────────
 
 })();
 
 // 🕯️ Άναψε κερί
-document.getElementById("lightCandleBtn").addEventListener("click", async () => {
-  const key  = `lastCandle_${id}`;
-  const last = localStorage.getItem(key);
-  const now  = Date.now();
-  if (last && now - parseInt(last) < 24*60*60*1000) {
-    return alert("Μπορείς να ανάψεις μόνο 1 κερί το 24ωρο");
-  }
-  const { data, error } = await supabase.rpc("increment_candle", { memorial_id: id });
-  if (error || data === null) {
-    alert("❌ Το κερί δεν καταγράφηκε. Δοκίμασε ξανά.");
-    console.error(error);
-    return;
-  }
-  localStorage.setItem(key, now.toString());
-  updateCandleText(data);
-});
+document.getElementById("lightCandleBtn")
+  .addEventListener("click", async () => {
+    const key = `lastCandle_${id}`;
+    const last = localStorage.getItem(key);
+    const now  = Date.now();
+    if (last && now - parseInt(last) < 24 * 60 * 60 * 1000) {
+      return alert("Μπορείς να ανάψεις μόνο 1 κερί το 24ωρο");
+    }
+    const { data, error } = await supabase
+      .rpc("increment_candle", { memorial_id: id });
+    if (error || data === null) {
+      alert("❌ Το κερί δεν καταγράφηκε. Δοκίμασε ξανά.");
+      console.error(error);
+      return;
+    }
+    localStorage.setItem(key, now.toString());
+    updateCandleText(data);
+  });
