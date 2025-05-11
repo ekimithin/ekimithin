@@ -121,23 +121,35 @@
         <!-- 2) Δημόσιες Διακρίσεις -->
         <details>
           <summary>➤ Δημόσιες Διακρίσεις</summary>
-          <textarea id="awards" name="awards" rows="3"
-            placeholder="π.χ. Βραβείο Διονύσιος Σολωμός 2010"></textarea>
+          <textarea
+            id="awards"
+            name="awards"
+            rows="3"
+            placeholder="π.χ. Βραβείο Διονύσιος Σολωμός 2010"
+          ></textarea>
         </details>
 
         <!-- 3) Προσωπικά Ενδιαφέροντα & Χόμπι -->
         <details>
           <summary>➤ Προσωπικά Ενδιαφέροντα & Χόμπι</summary>
-          <textarea id="interests" name="interests" rows="3"
-            placeholder="π.χ. Λάτρης της ποίησης, Φωτογράφος αστικής ζωής"></textarea>
+          <textarea
+            id="interests"
+            name="interests"
+            rows="3"
+            placeholder="π.χ. Λάτρης της ποίησης, Φωτογράφος αστικής ζωής"
+          ></textarea>
         </details>
 
         <!-- 4) Τοποθεσία Ταφής -->
         <details>
           <summary>➤ Τοποθεσία Ταφής</summary>
           <label for="cemetery">Κοιμητήριο / Σορός:</label>
-          <input type="text" id="cemetery" name="cemetery"
-            placeholder="π.χ. Νεκροταφείο Ζωγράφου" />
+          <input
+            type="text"
+            id="cemetery"
+            name="cemetery"
+            placeholder="π.χ. Νεκροταφείο Ζωγράφου"
+          />
         </details>
 
         <!-- 5) Γενεαλογικό Πλαίσιο -->
@@ -153,26 +165,42 @@
         </details>
 
         <!-- 6) Γενεαλογικές Σχέσεις -->
-        <details>
+        <details id="relationshipDetails">
           <summary>➤ Γενεαλογικές Σχέσεις</summary>
 
           <!-- 4 πεδία αναζήτησης σε grid -->
           <div class="relationship-search-grid">
             <div>
               <label for="relativeIdInput">Memorial ID:</label>
-              <input type="text" id="relativeIdInput" placeholder="π.χ. menikouA1" />
+              <input
+                type="text"
+                id="relativeIdInput"
+                placeholder="π.χ. menikouA1"
+              />
             </div>
             <div>
               <label for="relativeLastnameInput">Επώνυμο:</label>
-              <input type="text" id="relativeLastnameInput" placeholder="π.χ. Παπαδόπουλος" />
+              <input
+                type="text"
+                id="relativeLastnameInput"
+                placeholder="π.χ. Παπαδόπουλος"
+              />
             </div>
             <div>
               <label for="relativeFirstnameInput">Όνομα:</label>
-              <input type="text" id="relativeFirstnameInput" placeholder="π.χ. Γιώργος" />
+              <input
+                type="text"
+                id="relativeFirstnameInput"
+                placeholder="π.χ. Γιώργος"
+              />
             </div>
             <div>
               <label for="relativeCityInput">Πόλη:</label>
-              <input type="text" id="relativeCityInput" placeholder="π.χ. Αθήνα" />
+              <input
+                type="text"
+                id="relativeCityInput"
+                placeholder="π.χ. Αθήνα"
+              />
             </div>
           </div>
 
@@ -181,7 +209,7 @@
 
           <!-- Επιλογή σχέσης -->
           <label for="relationType">Σχέση:</label>
-          <select id="relationType" required>
+          <select id="relationType">
             <option value="" disabled selected>Επίλεξε σχέση</option>
             <option>Πατέρας</option><option>Μητέρα</option>
             <option>Υιός</option><option>Κόρη</option>
@@ -191,9 +219,14 @@
             <option>Ανιψιός</option><option>Ανιψιά</option>
           </select>
 
-          <button type="button" id="addRelationshipBtn">➕ Πρόσθεσε Σχέση</button>
+          <button type="button" id="addRelationshipBtn">
+            ➕ Πρόσθεσε Σχέση
+          </button>
 
-          <table id="relationshipsTable" style="width:100%; margin-top:1rem;">
+          <table
+            id="relationshipsTable"
+            style="width:100%; margin-top:1rem;"
+          >
             <thead>
               <tr>
                 <th>Σχέση</th>
@@ -213,20 +246,34 @@
 
         <!-- Φωτογραφία (URL) -->
         <label for="photoUrl">Φωτογραφία (URL):</label>
-        <input type="text" id="photoUrl" placeholder="π.χ. από Blogger" />
+        <input
+          type="text"
+          id="photoUrl"
+          placeholder="π.χ. από Blogger"
+        />
 
         <!-- YouTube Video -->
         <label for="video">YouTube Video (προαιρετικό):</label>
-        <input type="text" id="video" placeholder="https://www.youtube.com/watch?v=…" />
+        <input
+          type="text"
+          id="video"
+          placeholder="https://www.youtube.com/watch?v=…"
+        />
 
         <!-- Υποβολή -->
-        <button type="submit" class="btn-primary">📌 Καταχώρηση Memorial</button>
+        <button type="submit" class="btn-primary">
+          📌 Καταχώρηση Memorial
+        </button>
       </form>
 
       <!-- QR Preview -->
       <div id="qr-preview" style="margin-top:2rem;">
         <h3>QR Code:</h3>
-        <img id="qr-image" alt="QR Code" style="display:none; max-width:300px;" />
+        <img
+          id="qr-image"
+          alt="QR Code"
+          style="display:none; max-width:300px;"
+        />
       </div>
     </section>
 
@@ -236,8 +283,16 @@
     <section class="section">
       <h2>🔍 Αναζήτηση Memorials</h2>
       <form id="searchForm">
-        <input type="text" id="searchLastname" placeholder="Αναζήτηση με Επώνυμο" />
-        <input type="text" id="searchCity" placeholder="Αναζήτηση με Πόλη" />
+        <input
+          type="text"
+          id="searchLastname"
+          placeholder="Αναζήτηση με Επώνυμο"
+        />
+        <input
+          type="text"
+          id="searchCity"
+          placeholder="Αναζήτηση με Πόλη"
+        />
         <button type="submit">Αναζήτηση</button>
       </form>
       <div id="resultsContainer" style="margin-top:2rem;"></div>
@@ -245,7 +300,7 @@
 
   </main>
 
-   <!-- 📦 Scripts -->
+  <!-- 📦 Scripts -->
   <script type="module" src="js/supabase.js"></script>
   <script type="module" src="js/sections/biography.js"></script>
   <script type="module" src="js/sections/awards.js"></script>
