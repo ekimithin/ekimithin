@@ -2,12 +2,12 @@
 <html lang="el">
 <head>
   <!-- favicon -->
-<link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Σελίδα Μνήμης – ekimithin.gr</title>
-  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί, μήνυμα και διαδραστικό χάρτη." />
+  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί, μήνυμα, χάρτη και επιπλέον βιογραφικά στοιχεία." />
 
   <!-- Leaflet CSS & JS για τον διαδραστικό χάρτη -->
   <link
@@ -28,7 +28,14 @@
       max-width: 100%;
       border-radius: 6px;
     }
-
+    .info-section {
+      margin: 0.5rem 0;
+      text-align: left;
+    }
+    .info-section strong {
+      display: inline-block;
+      width: 180px;
+    }
     /* Στυλ κουμπιών τοποθεσίας */
     #mapLink button {
       background: gold;
@@ -42,7 +49,6 @@
     #mapLink button:hover {
       opacity: 0.9;
     }
-
     /* Container για slide-down χάρτη */
     #mapContainer {
       max-height: 0;
@@ -54,15 +60,14 @@
     #mapContainer.open {
       max-height: 80vh;
     }
-
-    /* Κουμπί κλεισίματος πάνω-δεξιά */
+    /* Κουμπί κλεισίματος χάρτη */
     #closeMapBtn {
       position: absolute;
       top: 0.5rem;
       right: 0.5rem;
       background: #ffc107;
       border: none;
-      padding: 0.5rem 1rem;
+      padding: 0.3rem 0.6rem;
       cursor: pointer;
       z-index: 1000;
       border-radius: 4px;
@@ -82,12 +87,42 @@
   <main class="memorial-container"
         style="max-width:600px; margin:2rem auto; text-align:center;
                background:#fff; padding:2rem; border-radius:8px;">
+    <!-- Όνομα -->
     <h1 id="fullName">…</h1>
-    <div id="dates" style="margin-bottom: 1rem;"></div>
 
-    <p id="location" style="font-weight: bold;"></p>
+    <!-- Ημερομηνίες & Ηλικία -->
+    <div id="dates" style="margin-bottom:1rem;"></div>
 
-    <!-- Κουμπί για άνοιγμα χάρτη -->
+    <!-- Τοποθεσία -->
+    <p id="location" style="font-weight:bold; margin-bottom:1rem;"></p>
+
+    <!-- ─── Extra Βιογραφικά ─────────── -->
+    <div id="extraInfo">
+      <div id="birthPlaceSection" class="info-section" style="display:none;">
+        <strong>Τόπος Γέννησης:</strong> <span id="birthPlace"></span>
+      </div>
+      <div id="professionSection" class="info-section" style="display:none;">
+        <strong>Επάγγελμα / Σταδιοδρομία:</strong> <span id="profession"></span>
+      </div>
+      <div id="educationSection" class="info-section" style="display:none;">
+        <strong>Εκπαίδευση:</strong> <span id="education"></span>
+      </div>
+      <div id="awardsSection" class="info-section" style="display:none;">
+        <strong>Δημόσιες Διακρίσεις:</strong> <span id="awards"></span>
+      </div>
+      <div id="interestsSection" class="info-section" style="display:none;">
+        <strong>Προσωπικά Ενδιαφέροντα & Χόμπι:</strong> <span id="interests"></span>
+      </div>
+      <div id="cemeterySection" class="info-section" style="display:none;">
+        <strong>Τοποθεσία Ταφής:</strong> <span id="cemetery"></span>
+      </div>
+      <div id="genealogySection" class="info-section" style="display:none;">
+        <strong>Γενεαλογικό Πλαίσιο:</strong> <span id="genealogy"></span>
+      </div>
+    </div>
+    <!-- ────────────────────────────────── -->
+
+    <!-- Κουμπί για άνοιγμα slide-map -->
     <div id="mapLink">
       <button id="openMapBtn">🗺️ Δες τοποθεσία</button>
     </div>
@@ -98,15 +133,19 @@
       <div id="map" style="width:100%; height:300px;"></div>
     </div>
 
+    <!-- Φωτογραφία -->
     <img id="photo" class="photo" src="" alt="Φωτογραφία"
-         style="max-width:100%; border-radius:8px; margin: 1rem 0;" />
+         style="max-width:100%; border-radius:8px; margin:1rem 0;" />
 
+    <!-- Μήνυμα Μνήμης -->
     <div class="message-box">
       <p id="message"></p>
     </div>
 
+    <!-- Βίντεο (YouTube embed) -->
     <div id="videoContainer"></div>
 
+    <!-- Ηλεκτρονικό κερί -->
     <div class="candle" style="margin-top:2rem;">
       <p id="candleText">🕯️ 0 κεριά έχουν ανάψει</p>
       <button id="lightCandleBtn"
