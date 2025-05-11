@@ -7,7 +7,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Σελίδα Μνήμης – ekimithin.gr</title>
-  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί, μήνυμα, χάρτη και επιπλέον βιογραφικά στοιχεία." />
+  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί, μήνυμα και επιπλέον στοιχεία." />
 
   <!-- Leaflet CSS & JS για τον διαδραστικό χάρτη -->
   <link
@@ -28,14 +28,6 @@
       max-width: 100%;
       border-radius: 6px;
     }
-    .info-section {
-      margin: 0.5rem 0;
-      text-align: left;
-    }
-    .info-section strong {
-      display: inline-block;
-      width: 180px;
-    }
     /* Στυλ κουμπιών τοποθεσίας */
     #mapLink button {
       background: gold;
@@ -46,9 +38,8 @@
       font-weight: bold;
       margin-bottom: 1rem;
     }
-    #mapLink button:hover {
-      opacity: 0.9;
-    }
+    #mapLink button:hover { opacity: 0.9; }
+
     /* Container για slide-down χάρτη */
     #mapContainer {
       max-height: 0;
@@ -57,77 +48,72 @@
       margin-bottom: 1rem;
       position: relative;
     }
-    #mapContainer.open {
-      max-height: 80vh;
-    }
-    /* Κουμπί κλεισίματος χάρτη */
+    #mapContainer.open { max-height: 80vh; }
+
+    /* Κουμπί κλεισίματος πάνω-δεξιά */
     #closeMapBtn {
       position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      background: #ffc107;
-      border: none;
-      padding: 0.3rem 0.6rem;
-      cursor: pointer;
-      z-index: 1000;
-      border-radius: 4px;
+      top: 0.5rem; right: 0.5rem;
+      background: #ffc107; border: none;
+      padding: 0.5rem 1rem; cursor: pointer;
+      z-index: 1000; border-radius: 4px;
     }
+
+    /* Νέα sections */
+    .extra-section { margin: 1rem 0; text-align: left; }
+    .extra-section h3 { margin-bottom: 0.5rem; }
+    .extra-section p { margin: 0.25rem 0; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
   <header>
     <a href="index.html">
       <img src="images/logo.png" alt="ekimithin logo" style="cursor:pointer;" />
     </a>
   </header>
 
-  <!-- Κεντρικό περιεχόμενο -->
   <main class="memorial-container"
         style="max-width:600px; margin:2rem auto; text-align:center;
                background:#fff; padding:2rem; border-radius:8px;">
-    <!-- Όνομα -->
-    <h1 id="fullName">…</h1>
 
-    <!-- Ημερομηνίες & Ηλικία -->
-    <div id="dates" style="margin-bottom:1rem;"></div>
+    <!-- Όνομα & Ημερομηνίες -->
+    <h1 id="fullName">…</h1>
+    <div id="dates" style="margin-bottom: 1rem;"></div>
 
     <!-- Τοποθεσία -->
-    <p id="location" style="font-weight:bold; margin-bottom:1rem;"></p>
+    <p id="location" style="font-weight: bold;"></p>
 
-    <!-- ─── Extra Βιογραφικά ─────────── -->
-    <div id="extraInfo">
-      <div id="birthPlaceSection" class="info-section" style="display:none;">
-        <strong>Τόπος Γέννησης:</strong> <span id="birthPlace"></span>
-      </div>
-      <div id="professionSection" class="info-section" style="display:none;">
-        <strong>Επάγγελμα / Σταδιοδρομία:</strong> <span id="profession"></span>
-      </div>
-      <div id="educationSection" class="info-section" style="display:none;">
-        <strong>Εκπαίδευση:</strong> <span id="education"></span>
-      </div>
-      <div id="awardsSection" class="info-section" style="display:none;">
-        <strong>Δημόσιες Διακρίσεις:</strong> <span id="awards"></span>
-      </div>
-      <div id="interestsSection" class="info-section" style="display:none;">
-        <strong>Προσωπικά Ενδιαφέροντα & Χόμπι:</strong> <span id="interests"></span>
-      </div>
-      <div id="cemeterySection" class="info-section" style="display:none;">
-        <strong>Τοποθεσία Ταφής:</strong> <span id="cemetery"></span>
-      </div>
-      <div id="genealogySection" class="info-section" style="display:none;">
-        <strong>Γενεαλογικό Πλαίσιο:</strong> <span id="genealogy"></span>
-      </div>
+    <!-- --- Extra Βασικά Βιογραφικά --- -->
+    <div id="bioSection" class="extra-section" style="display:none;">
+      <h3>Βασικά Βιογραφικά</h3>
+      <p id="birthPlaceLine"><strong>Τόπος γέννησης:</strong> <span id="birthPlace"></span></p>
+      <p id="professionLine"><strong>Επάγγελμα:</strong> <span id="profession"></span></p>
+      <p id="educationLine"><strong>Εκπαίδευση:</strong> <span id="education"></span></p>
     </div>
-    <!-- ────────────────────────────────── -->
 
-    <!-- Κουμπί για άνοιγμα slide-map -->
+    <!-- --- Διακρίσεις --- -->
+    <div id="awardsSection" class="extra-section" style="display:none;">
+      <h3>Διακρίσεις</h3>
+      <p id="awards"></p>
+    </div>
+
+    <!-- --- Ενδιαφέροντα & Χόμπι --- -->
+    <div id="interestsSection" class="extra-section" style="display:none;">
+      <h3>Προσωπικά Ενδιαφέροντα & Χόμπι</h3>
+      <p id="interests"></p>
+    </div>
+
+    <!-- --- Τοποθεσία Ταφής --- -->
+    <div id="burialSection" class="extra-section" style="display:none;">
+      <h3>Τοποθεσία Ταφής</h3>
+      <p id="cemetery"></p>
+    </div>
+
+    <!-- Κουμπί & Slide-down Χάρτης -->
     <div id="mapLink">
       <button id="openMapBtn">🗺️ Δες τοποθεσία</button>
     </div>
-
-    <!-- Slide-down container με το map -->
     <div id="mapContainer">
       <button id="closeMapBtn">✖️ Κλείσιμο χάρτη</button>
       <div id="map" style="width:100%; height:300px;"></div>
@@ -135,17 +121,17 @@
 
     <!-- Φωτογραφία -->
     <img id="photo" class="photo" src="" alt="Φωτογραφία"
-         style="max-width:100%; border-radius:8px; margin:1rem 0;" />
+         style="max-width:100%; border-radius:8px; margin: 1rem 0;" />
 
-    <!-- Μήνυμα Μνήμης -->
+    <!-- Μήνυμα -->
     <div class="message-box">
       <p id="message"></p>
     </div>
 
-    <!-- Βίντεο (YouTube embed) -->
+    <!-- Βίντεο -->
     <div id="videoContainer"></div>
 
-    <!-- Ηλεκτρονικό κερί -->
+    <!-- Κερί -->
     <div class="candle" style="margin-top:2rem;">
       <p id="candleText">🕯️ 0 κεριά έχουν ανάψει</p>
       <button id="lightCandleBtn"
@@ -155,9 +141,9 @@
         Άναψε ένα κερί
       </button>
     </div>
+
   </main>
 
-  <!-- Footer -->
   <footer style="margin-top:3rem; text-align:center; font-size:0.9rem; color:#666;">
     <p>&copy; 2025 ekimithin.gr – Με σεβασμό στη μνήμη</p>
     <nav style="margin-top:1rem;">
