@@ -33,11 +33,11 @@ function toLatin(text) {
 })();
 
 // ================= DOM elements =================
-const form       = document.getElementById("memorialForm");
-const logoutBtn  = document.getElementById("logoutBtn");
-const qrPreview  = document.getElementById("qr-preview");
+const form      = document.getElementById("memorialForm");
+const logoutBtn = document.getElementById("logoutBtn");
+const qrPreview = document.getElementById("qr-preview");
 
-// ================= Address autocomplete & map =================
+// ================= Address autocomplete & Leaflet map =================
 const addrIn   = document.getElementById("addressInput");
 const suggList = document.getElementById("suggestions");
 let addrTimer;
@@ -58,8 +58,7 @@ addrIn.addEventListener("input", () => {
 suggList.addEventListener("click", e => {
   if (e.target.tagName !== "LI") return;
   const { lat, lon } = e.target.dataset;
-  const txt = e.target.textContent;
-  const parts = txt.split(",");
+  const parts = e.target.textContent.split(",");
   document.getElementById("region").value = parts[1]?.trim() || "";
   document.getElementById("city").value   = parts[0]?.trim() || "";
   map.setView([lat, lon], 14);
@@ -68,11 +67,10 @@ suggList.addEventListener("click", e => {
   suggList.innerHTML = "";
 });
 
-// Leaflet map init
+// Leaflet init
 const map    = L.map("map").setView([37.9838, 23.7275], 6);
 const marker = L.marker([37.9838, 23.7275]).addTo(map);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 })
- .addTo(map);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
 
 // ================= Delete‐buttons helper =================
 function attachDeleteListeners() {
@@ -119,7 +117,7 @@ searchForm.addEventListener("submit", async e => {
       <strong>${entry.first_name} ${entry.last_name}</strong><br/>
       <small>${entry.city}, ${entry.region}</small><br/>
       <a href="/memorial.html?id=${entry.id}" target="_blank">➡️ Προβολή</a><br/>
-      <button class="editBtn"   data-id="${entry.id}">✏️ Επεξεργασία</button>
+      <button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
       <button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
     `;
     resultsContainer.appendChild(div);
@@ -128,10 +126,14 @@ searchForm.addEventListener("submit", async e => {
 
   document.querySelectorAll(".editBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
-      const { data, error } = await supabase.from("memorials").select("*").eq("id", btn.dataset.id).single();
+      const { data, error } = await supabase
+        .from("memorials")
+        .select("*")
+        .eq("id", btn.dataset.id)
+        .single();
       if (error || !data) return alert("Δεν βρέθηκε.");
 
-      // Fill βασικά πεδία
+      // fill βασικά πεδία
       form.firstname.value   = data.first_name;
       form.lastname.value    = data.last_name;
       form.birth_date.value  = data.birth_date;
@@ -143,7 +145,7 @@ searchForm.addEventListener("submit", async e => {
       form.photoUrl.value    = data.photo_url;
       form.video.value       = data.youtube_url;
 
-      // Fill extra πεδία
+      // fill extra fields
       form.birth_place.value = data.birth_place || "";
       form.profession.value  = data.profession  || "";
       form.education.value   = data.education   || "";
@@ -152,8 +154,11 @@ searchForm.addEventListener("submit", async e => {
       form.cemetery.value    = data.cemetery    || "";
       form.genealogy.value   = data.genealogy   || "";
 
-      // Load relationships
-      const { data: rels } = await supabase.from("relationships").select("*").eq("memorial_id", data.id);
+      // load relationships
+      const { data: rels } = await supabase
+        .from("relationships")
+        .select("*")
+        .eq("memorial_id", data.id);
       const tbody = document.querySelector("#relationshipsTable tbody");
       tbody.innerHTML = "";
       rels.forEach(r => {
@@ -176,7 +181,7 @@ searchForm.addEventListener("submit", async e => {
 // αρχικοί delete‐listeners
 attachDeleteListeners();
 
-// ================= Submit handler με debug =================
+// ================= Submit handler με debug & extra fields =================
 form.addEventListener("submit", async e => {
   e.preventDefault();
 
@@ -184,8 +189,8 @@ form.addEventListener("submit", async e => {
   const rawFirst  = form.firstname.value.trim();
   const rawLast   = form.lastname.value.trim();
   const rawCity   = form.city.value.trim();
-  const birthDate = form.birth_date.value.trim() === "" ? null : form.birth_date.value;
-  const deathDate = form.death_date.value.trim() === "" ? null : form.death_date.value;
+  const birthDate = form.birth_date.value || null;
+  const deathDate = form.death_date.value || null;
   if (!rawFirst || !rawLast || !rawCity) {
     return alert("Συμπλήρωσε Όνομα, Επώνυμο, Πόλη.");
   }
@@ -195,27 +200,28 @@ form.addEventListener("submit", async e => {
   if (deathDate && new Date(deathDate) > new Date()) {
     return alert("❗ Η ημερομηνία θανάτου δεν μπορεί να είναι στο μέλλον.");
   }
-  if (birthDate === null && deathDate !== null) {
+  if (!birthDate && deathDate) {
     return alert("❗ Δεν έχεις καταχωρήσει ημερομηνία γέννησης.");
   }
-  if (deathDate === null && birthDate !== null) {
+  if (!deathDate && birthDate) {
     return alert("❗ Δεν έχεις καταχωρήσει ημερομηνία θανάτου.");
   }
-  if (birthDate === null && deathDate === null) {
-    const ok = confirm("❗ Δεν έχεις καταχωρήσει ούτε ημερομηνία γέννησης ούτε θανάτου.\nΘέλεις να συνεχίσεις χωρίς αυτές;");
-    if (!ok) return;
+  if (!birthDate && !deathDate) {
+    if (!confirm("❗ Δεν έχεις καταχωρήσει ούτε ημερομηνία γέννησης ούτε θανάτου.\nΘέλεις να συνεχίσεις χωρίς αυτές;")) {
+      return;
+    }
   }
 
   // latinise + ID
   const latinFirst = toLatin(rawFirst).toLowerCase();
   const last_name  = toLatin(rawLast).toLowerCase();
-  const city       = toLatin(rawCity).toLowerCase();
+  const citySlug   = toLatin(rawCity).toLowerCase();
   const { count }  = await supabase
     .from("memorials")
     .select("*", { head: true, count: "exact" })
     .ilike("last_name", last_name)
-    .ilike("city", city);
-  const id = `${last_name}${city}A${(count||0)+1}`.replace(/\s+/g,'');
+    .ilike("city", citySlug);
+  const id = `${last_name}${citySlug}A${(count||0)+1}`.replace(/\s+/g,'');
 
   // extra fields
   const birth_place = form.birth_place.value.trim();
@@ -226,7 +232,6 @@ form.addEventListener("submit", async e => {
   const cemetery    = form.cemetery.value.trim();
   const genealogy   = form.genealogy.value.trim();
 
-  // debug
   console.log("Extra fields before upsert:", {
     birth_place, profession, education,
     awards, interests, cemetery, genealogy
@@ -242,7 +247,7 @@ form.addEventListener("submit", async e => {
       death_date:  deathDate,
       gender:      form.gender.value,
       region:      form.region.value.trim(),
-      city,
+      city:        citySlug,
       message:     form.message.value.trim(),
       photo_url:   form.photoUrl.value.trim(),
       youtube_url: form.video.value.trim(),
@@ -270,7 +275,7 @@ form.addEventListener("submit", async e => {
       await supabase.from("relationships").insert(toInsert);
     }
 
-    // qr code
+    // QR code
     const url    = `${location.origin}/memorial.html?id=${id}`;
     const qrBlob = await (await fetch(
       `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(url)}`
