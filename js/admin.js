@@ -5,7 +5,7 @@ import { initBioSection } from "./sections/biography.js";
 import { initAwardsSection } from "./sections/awards.js";
 import { initInterestsSection } from "./sections/interests.js";
 import { initBurialSection } from "./sections/burial.js";
-// το relationships.js έχει ήδη listeners/DOM setup
+// το relationships.js φροντίζει μόνο του το UI & listeners
 import "./sections/relationships.js";
 
 // ================= Utility: Greek → Latin =================
@@ -74,7 +74,7 @@ const marker = L.marker([37.9838, 23.7275]).addTo(map);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 })
  .addTo(map);
 
-// ================= Attach delete-buttons helper =================
+// ================= Delete‐buttons helper =================
 function attachDeleteListeners() {
   document.querySelectorAll(".deleteBtn").forEach(btn => {
     btn.replaceWith(btn.cloneNode(true));
@@ -86,15 +86,9 @@ function attachDeleteListeners() {
       // remove QR
       await supabase.storage.from("qr-codes").remove([`${id}.png`]);
       // remove relationships
-      await supabase
-        .from("relationships")
-        .delete()
-        .eq("memorial_id", id);
+      await supabase.from("relationships").delete().eq("memorial_id", id);
       // remove memorial
-      const { error } = await supabase
-        .from("memorials")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("memorials").delete().eq("id", id);
       if (error) return alert("❌ Σφάλμα διαγραφής.");
       btn.closest("div").remove();
       alert("✅ Διαγράφηκε memorial, σχέσεις & QR.");
@@ -183,10 +177,10 @@ searchForm.addEventListener("submit", async e => {
   });
 });
 
-// initial delete listeners
+// αρχικοί delete‐listeners
 attachDeleteListeners();
 
-// ================= Submit handler with date‐checks =================
+// ================= Submit handler με date‐checks =================
 form.addEventListener("submit", async e => {
   e.preventDefault();
 
@@ -204,7 +198,7 @@ form.addEventListener("submit", async e => {
   if (birthDate && deathDate && new Date(birthDate) > new Date(deathDate)) {
     return alert("❌ Η ημερομηνία γέννησης δεν μπορεί να είναι μετά τον θάνατο.");
   }
-  // θάνατος μελλοντικός
+  // θάνατος στο μέλλον
   if (deathDate && new Date(deathDate) > new Date()) {
     return alert("❗ Η ημερομηνία θανάτου δεν μπορεί να είναι στο μέλλον.");
   }
@@ -216,10 +210,10 @@ form.addEventListener("submit", async e => {
   if (deathDate === null && birthDate !== null) {
     return alert("❗ Δεν έχεις καταχωρήσει ημερομηνία θανάτου.");
   }
-  // κανένα
+  // ούτε
   if (birthDate === null && deathDate === null) {
     const ok = confirm(
-      "❗ Δεν έχεις καταχωρήσει ούτε ημερομηνία γέννησης ούτε ημερομηνία θανάτου.\n" +
+      "❗ Δεν έχεις καταχωρήσει ούτε ημερομηνία γέννησης ούτε θανάτου.\n" +
       "Θέλεις να συνεχίσεις χωρίς αυτές;"
     );
     if (!ok) return;
