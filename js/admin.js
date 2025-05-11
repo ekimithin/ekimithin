@@ -239,7 +239,11 @@ form.addEventListener("submit", async e => {
 
   try {
     // upsert με όλα τα πεδία
-    const { error: upErr } = await supabase.from("memorials").upsert({
+    // νέα εκδοχή με onConflict
+const { error: upErr } = await supabase
+  .from("memorials")
+  .upsert(
+    {
       id,
       first_name:  rawFirst,
       last_name,
@@ -247,12 +251,13 @@ form.addEventListener("submit", async e => {
       death_date:  deathDate,
       gender:      form.gender.value,
       region:      form.region.value.trim(),
-      city:        citySlug,
+      city,
       message:     form.message.value.trim(),
       photo_url:   form.photoUrl.value.trim(),
       youtube_url: form.video.value.trim(),
       candles:     0,
       created_at:  new Date().toISOString(),
+      // — νέα πεδία —
       birth_place,
       profession,
       education,
@@ -260,8 +265,12 @@ form.addEventListener("submit", async e => {
       interests,
       cemetery,
       genealogy
-    });
-    if (upErr) throw upErr;
+    },
+    {
+      onConflict: ['id']   // <–– εδώ λέμε “αν υπάρχει ήδη εγγραφή με αυτό το id, κάνε UPDATE”
+    }
+  );
+if (upErr) throw upErr;
 
     // relationships
     await supabase.from("relationships").delete().eq("memorial_id", id);
