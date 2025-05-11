@@ -83,11 +83,8 @@ function attachDeleteListeners() {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
       if (!confirm("Θες σίγουρα να διαγράψεις αυτό το memorial;")) return;
-      // remove QR
       await supabase.storage.from("qr-codes").remove([`${id}.png`]);
-      // remove relationships
       await supabase.from("relationships").delete().eq("memorial_id", id);
-      // remove memorial
       const { error } = await supabase.from("memorials").delete().eq("id", id);
       if (error) return alert("❌ Σφάλμα διαγραφής.");
       btn.closest("div").remove();
@@ -111,12 +108,10 @@ searchForm.addEventListener("submit", async e => {
 
   const { data, error } = await q;
   resultsContainer.innerHTML = "";
-
   if (error || !data.length) {
     resultsContainer.innerHTML = "<p>❌ Δεν βρέθηκαν αποτελέσματα.</p>";
     return;
   }
-
   data.forEach(entry => {
     const div = document.createElement("div");
     div.style = "border:1px solid #ccc;padding:1rem;margin-bottom:1rem;border-radius:5px";
@@ -129,29 +124,24 @@ searchForm.addEventListener("submit", async e => {
     `;
     resultsContainer.appendChild(div);
   });
-
   attachDeleteListeners();
 
   document.querySelectorAll(".editBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
-      const { data, error } = await supabase
-        .from("memorials")
-        .select("*")
-        .eq("id", btn.dataset.id)
-        .single();
+      const { data, error } = await supabase.from("memorials").select("*").eq("id", btn.dataset.id).single();
       if (error || !data) return alert("Δεν βρέθηκε.");
 
-      // Fill form (βασικά πεδία)
-      form.firstname.value  = data.first_name;
-      form.lastname.value   = data.last_name;
-      form.birth_date.value = data.birth_date;
-      form.death_date.value = data.death_date;
-      form.gender.value     = data.gender;
-      form.region.value     = data.region;
-      form.city.value       = data.city;
-      form.message.value    = data.message;
-      form.photoUrl.value   = data.photo_url;
-      form.video.value      = data.youtube_url;
+      // Fill βασικά πεδία
+      form.firstname.value   = data.first_name;
+      form.lastname.value    = data.last_name;
+      form.birth_date.value  = data.birth_date;
+      form.death_date.value  = data.death_date;
+      form.gender.value      = data.gender;
+      form.region.value      = data.region;
+      form.city.value        = data.city;
+      form.message.value     = data.message;
+      form.photoUrl.value    = data.photo_url;
+      form.video.value       = data.youtube_url;
 
       // Fill extra πεδία
       form.birth_place.value = data.birth_place || "";
@@ -160,13 +150,10 @@ searchForm.addEventListener("submit", async e => {
       form.awards.value      = data.awards      || "";
       form.interests.value   = data.interests   || "";
       form.cemetery.value    = data.cemetery    || "";
-      if (form.genealogy) form.genealogy.value = data.genealogy || "";
+      form.genealogy.value   = data.genealogy   || "";
 
       // Load relationships
-      const { data: rels } = await supabase
-        .from("relationships")
-        .select("*")
-        .eq("memorial_id", data.id);
+      const { data: rels } = await supabase.from("relationships").select("*").eq("memorial_id", data.id);
       const tbody = document.querySelector("#relationshipsTable tbody");
       tbody.innerHTML = "";
       rels.forEach(r => {
@@ -177,8 +164,7 @@ searchForm.addEventListener("submit", async e => {
           <td><button class="remove-relationship">✖️</button></td>
         `;
         tbody.appendChild(tr);
-        tr.querySelector('.remove-relationship')
-          .addEventListener('click', () => tr.remove());
+        tr.querySelector('.remove-relationship').addEventListener('click', () => tr.remove());
       });
 
       alert("Φορτώθηκαν τα στοιχεία. Πάτησε ‘Καταχώρηση’ για αποθήκευση.");
@@ -190,11 +176,11 @@ searchForm.addEventListener("submit", async e => {
 // αρχικοί delete‐listeners
 attachDeleteListeners();
 
-// ================= Submit handler με ενσωματωμένο debug =================
+// ================= Submit handler με debug =================
 form.addEventListener("submit", async e => {
   e.preventDefault();
 
-  // === basic validation ===
+  // gather + validation
   const rawFirst  = form.firstname.value.trim();
   const rawLast   = form.lastname.value.trim();
   const rawCity   = form.city.value.trim();
@@ -216,69 +202,63 @@ form.addEventListener("submit", async e => {
     return alert("❗ Δεν έχεις καταχωρήσει ημερομηνία θανάτου.");
   }
   if (birthDate === null && deathDate === null) {
-    const ok = confirm(
-      "❗ Δεν έχεις καταχωρήσει ούτε ημερομηνία γέννησης ούτε θανάτου.\n" +
-      "Θέλεις να συνεχίσεις χωρίς αυτές;"
-    );
+    const ok = confirm("❗ Δεν έχεις καταχωρήσει ούτε ημερομηνία γέννησης ούτε θανάτου.\nΘέλεις να συνεχίσεις χωρίς αυτές;");
     if (!ok) return;
   }
 
-  // === Latinise + ID ===
+  // latinise + ID
   const latinFirst = toLatin(rawFirst).toLowerCase();
   const last_name  = toLatin(rawLast).toLowerCase();
   const city       = toLatin(rawCity).toLowerCase();
-  const { count } = await supabase
+  const { count }  = await supabase
     .from("memorials")
     .select("*", { head: true, count: "exact" })
     .ilike("last_name", last_name)
     .ilike("city", city);
-  const id  = `${last_name}${city}A${(count||0)+1}`.replace(/\s+/g,'');
+  const id = `${last_name}${city}A${(count||0)+1}`.replace(/\s+/g,'');
 
-  // === Extra fields ===
+  // extra fields
   const birth_place = form.birth_place.value.trim();
   const profession  = form.profession.value.trim();
   const education   = form.education.value.trim();
   const awards      = form.awards.value.trim();
   const interests   = form.interests.value.trim();
   const cemetery    = form.cemetery.value.trim();
-  const genealogy   = form.genealogy ? form.genealogy.value.trim() : "";
+  const genealogy   = form.genealogy.value.trim();
 
-  // === Debug log ===
+  // debug
   console.log("Extra fields before upsert:", {
     birth_place, profession, education,
     awards, interests, cemetery, genealogy
   });
 
   try {
-    // === Upsert memorial με extra fields ===
-    const { error: upErr } = await supabase
-      .from("memorials")
-      .upsert({
-        id,
-        first_name:  rawFirst,
-        last_name,
-        birth_date:  birthDate,
-        death_date:  deathDate,
-        gender:      form.gender.value,
-        region:      form.region.value.trim(),
-        city,
-        message:     form.message.value.trim(),
-        photo_url:   form.photoUrl.value.trim(),
-        youtube_url: form.video.value.trim(),
-        candles:     0,
-        created_at:  new Date().toISOString(),
-        // — νέα πεδία —
-        birth_place,
-        profession,
-        education,
-        awards,
-        interests,
-        cemetery,
-        genealogy
-      });
+    // upsert με όλα τα πεδία
+    const { error: upErr } = await supabase.from("memorials").upsert({
+      id,
+      first_name:  rawFirst,
+      last_name,
+      birth_date:  birthDate,
+      death_date:  deathDate,
+      gender:      form.gender.value,
+      region:      form.region.value.trim(),
+      city,
+      message:     form.message.value.trim(),
+      photo_url:   form.photoUrl.value.trim(),
+      youtube_url: form.video.value.trim(),
+      candles:     0,
+      created_at:  new Date().toISOString(),
+      birth_place,
+      profession,
+      education,
+      awards,
+      interests,
+      cemetery,
+      genealogy
+    });
     if (upErr) throw upErr;
 
-    // === Relationships ===
+    // relationships
     await supabase.from("relationships").delete().eq("memorial_id", id);
     const relRows = Array.from(document.querySelectorAll("#relationshipsTable tbody tr"));
     if (relRows.length) {
@@ -290,7 +270,7 @@ form.addEventListener("submit", async e => {
       await supabase.from("relationships").insert(toInsert);
     }
 
-    // === QR code ===
+    // qr code
     const url    = `${location.origin}/memorial.html?id=${id}`;
     const qrBlob = await (await fetch(
       `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(url)}`
