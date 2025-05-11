@@ -54,14 +54,14 @@ function updateCandleText(count) {
     `${data.first_name} ${data.last_name}`;
   const locText = `${data.city}, ${data.region}`;
   document.getElementById("location").textContent = locText;
-  document.getElementById("photo").src      = data.photo_url || "";
+  document.getElementById("photo").src        = data.photo_url || "";
   document.getElementById("message").textContent = data.message || "";
 
   // YouTube embed
   if (data.youtube_url) {
     const container = document.getElementById("videoContainer");
     const embedUrl  = data.youtube_url.replace("watch?v=", "embed/");
-    container.innerHTML = 
+    container.innerHTML =
       `<iframe width="100%" height="315" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
   }
 
@@ -130,12 +130,15 @@ function updateCandleText(count) {
 
   openBtn.addEventListener("click", async () => {
     if (!leafletMap) {
-      const res = await fetch(
+      const res    = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locText)}`
       );
       const places = await res.json();
-      if (!places[0]) return alert("Δεν βρέθηκε η τοποθεσία στο χάρτη.");
-      const lat = parseFloat(places[0].lat), lon = parseFloat(places[0].lon);
+      if (!places[0]) {
+        return alert("Δεν βρέθηκε η τοποθεσία στο χάρτη.");
+      }
+      const lat = parseFloat(places[0].lat),
+            lon = parseFloat(places[0].lon);
       leafletMap = L.map("map").setView([lat, lon], 15);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
@@ -154,7 +157,21 @@ function updateCandleText(count) {
   });
   // ───────────────────────────────────────────────
 
-})();
+})(); // <-- τέλος async IIFE
+
+// ─── Toggle Βιογραφικού ─────────────────────────
+const bioBtn  = document.getElementById("toggleBioBtn");
+const bioCont = document.getElementById("bioContainer");
+
+if (bioBtn && bioCont) {
+  bioBtn.addEventListener("click", () => {
+    bioCont.classList.toggle("open");
+    bioBtn.textContent = bioCont.classList.contains("open")
+      ? "✖️ Κλείσε Βιογραφικό"
+      : "📖 Βιογραφικό";
+  });
+}
+// ────────────────────────────────────────────────
 
 // 🕯️ Άναψε κερί
 document.getElementById("lightCandleBtn")
