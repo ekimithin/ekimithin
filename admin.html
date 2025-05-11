@@ -168,7 +168,6 @@
         <details id="relationshipDetails">
           <summary>➤ Γενεαλογικές Σχέσεις</summary>
 
-          <!-- 4 πεδία αναζήτησης σε grid -->
           <div class="relationship-search-grid">
             <div>
               <label for="relativeIdInput">Memorial ID:</label>
@@ -204,10 +203,8 @@
             </div>
           </div>
 
-          <!-- Δυναμική λίστα αποτελεσμάτων -->
           <ul id="relativeResults"></ul>
 
-          <!-- Επιλογή σχέσης -->
           <label for="relationType">Σχέση:</label>
           <select id="relationType">
             <option value="" disabled selected>Επίλεξε σχέση</option>
@@ -235,7 +232,7 @@
               </tr>
             </thead>
             <tbody>
-              <!-- θα γεμίζει δυναμικά από js/sections/relationships.js -->
+              <!-- Θα γεμίζει δυναμικά από js/sections/relationships.js -->
             </tbody>
           </table>
         </details>
@@ -302,11 +299,6 @@
 
   <!-- 📦 Scripts -->
   <script type="module" src="js/supabase.js"></script>
-  <script type="module" src="js/sections/biography.js"></script>
-  <script type="module" src="js/sections/awards.js"></script>
-  <script type="module" src="js/sections/interests.js"></script>
-  <script type="module" src="js/sections/burial.js"></script>
-  <script type="module" src="js/sections/relationships.js"></script>
   <script type="module" src="js/admin.js"></script>
   <script type="module" src="js/logout.js"></script>
 
