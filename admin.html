@@ -185,6 +185,41 @@
           <textarea id="genealogy" name="genealogy" rows="3" readonly placeholder="Όλες οι σχέσεις…"></textarea>
         </details>
 
+        <!-- Βασικά Βιογραφικά -->
+        <details>
+          <summary>➤ Βασικά Βιογραφικά</summary>
+          <div>
+            <label for="birth_place">Τόπος Γέννησης</label>
+            <input id="birth_place"/>
+          </div>
+          <div>
+            <label for="profession">Επάγγελμα</label>
+            <input id="profession"/>
+          </div>
+          <div>
+            <label for="education">Εκπαίδευση</label>
+            <input id="education"/>
+          </div>
+        </details>
+
+        <!-- Δημόσιες Διακρίσεις -->
+        <details>
+          <summary>➤ Δημόσιες Διακρίσεις</summary>
+          <textarea id="awards" rows="3" placeholder="π.χ. Βραβείο …"></textarea>
+        </details>
+
+        <!-- Ενδιαφέροντα & Χόμπι -->
+        <details>
+          <summary>➤ Ενδιαφέροντα & Χόμπι</summary>
+          <textarea id="interests" rows="3"></textarea>
+        </details>
+
+        <!-- Τοποθεσία Ταφής -->
+        <details>
+          <summary>➤ Τοποθεσία Ταφής</summary>
+          <input id="cemetery" placeholder="π.χ. Κοιμητήριο …"/>
+        </details>
+
         <!-- Γενεαλογικές Σχέσεις -->
         <details>
           <summary>➤ Γενεαλογικές Σχέσεις</summary>
@@ -200,7 +235,7 @@
               <option value="" disabled selected>Επίλεξε σχέση</option>
               <option>Πατέρας</option><option>Μητέρα</option>
               <option>Υιός</option><option>Κόρη</option>
-              <option>Παππούς</option><option>Γιαγιά</option>
+              <option>Πανπούς</option><option>Γιαγιά</option>
               <option>Αδελφός</option><option>Αδελφή</option>
               <option>Θείος</option><option>Θεία</option>
               <option>Ανιψιός</option><option>Ανιψιά</option>
@@ -249,14 +284,14 @@
       <h2>🔍 Αναζήτηση Memorials</h2>
       <div style="display:flex;gap:var(--gap);flex-wrap:wrap;margin:var(--gap) 0;">
         <input id="searchLastname" placeholder="Επώνυμο" style="flex:1"/>
-        <input id="searchCity"     placeholder="Πόλη"   style="flex:1"/>
+        <input id="searchCity" placeholder="Πόλη" style="flex:1"/>
       </div>
       <div id="resultsContainer"></div>
     </section>
 
   </main>
 
-  <!-- JS Modules -->
+  <!-- JS Modules (all deferred by default) -->
   <script type="module" src="js/supabase.js"></script>
   <script type="module" src="js/sections/biography.js"></script>
   <script type="module" src="js/sections/awards.js"></script>
@@ -265,5 +300,6 @@
   <script type="module" src="js/sections/relationships.js"></script>
   <script type="module" src="js/logout.js"></script>
   <script type="module" src="js/admin.js"></script>
+
 </body>
 </html>
