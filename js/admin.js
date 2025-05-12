@@ -22,6 +22,39 @@ import { initInterestsSection } from "./sections/interests.js";
 import { initBurialSection } from "./sections/burial.js";
 import "./sections/relationships.js"; // φορτώνει UI & listeners
 
+// js/admin.js
+
+// ─── 1. Utility: Greek → Latin slug ──────────────────
+/**
+ * Μετατρέπει ελληνικούς χαρακτήρες σε λατινικούς για δημιουργία safe IDs
+ */
+function toLatin(text) {
+  const map = {
+    'ά':'a','Ά':'A','έ':'e','Έ':'E','ή':'i','Ή':'I','ί':'i','Ί':'I',
+    'ό':'o','Ό':'O','ώ':'o','Ώ':'O','ύ':'y','Ύ':'Y','ϋ':'y','Ϋ':'Y',
+    'α':'a','Α':'A','β':'b','Β':'B','γ':'g','Γ':'G','δ':'d','Δ':'D',
+    'ε':'e','Ε':'E','ζ':'z','Ζ':'Z','η':'i','Η':'I','θ':'th','Θ':'Th',
+    'ι':'i','Ι':'I','κ':'k','Κ':'K','λ':'l','Λ':'L','μ':'m','Μ':'M',
+    'ν':'n','Ν':'N','ξ':'x','Ξ':'X','ο':'o','Ο':'O','π':'p','Π':'P',
+    'ρ':'r','Ρ':'R','σ':'s','Σ':'S','ς':'s','τ':'t','υ':'y','Υ':'Y',
+    'φ':'f','Φ':'F','χ':'ch','Χ':'Ch','ψ':'ps','Ψ':'Ps','ω':'o','Ω':'O'
+  };
+  return text.split('').map(c => map[c] || c).join('');
+}
+
+console.debug("[MODULE LOAD]", { module: "admin.js" });
+
+// ─── 2. Import Supabase & Sections ─────────────────
+import { supabase } from "./supabase.js";
+import { initBioSection }    from "./sections/biography.js";
+import { initAwardsSection } from "./sections/awards.js";
+import { initInterestsSection } from "./sections/interests.js";
+import { initBurialSection } from "./sections/burial.js";
+import "./sections/relationships.js";
+
+// … υπόλοιπος κώδικας, και μετά ο submit handler όπου καλείται η toLatin() …
+
+
 // --------------------------------------------------
 // 1. Έλεγχος authentication
 // --------------------------------------------------
