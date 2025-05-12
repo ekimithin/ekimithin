@@ -2,58 +2,47 @@
 
 /**
  * Module: admin.js
- * Διάφορες λειτουργίες για το admin panel:
- * 1. Έλεγχος authentication
- * 2. Init sections (bio, awards, interests, burial)
- * 3. Address autocomplete + Leaflet map
- * 4. Ζωντανή αναζήτηση memorials
- * 5. Φόρμα δημιουργίας/επεξεργασίας memorial
- * 6. Διαγραφή & επεξεργασία καταχωρήσεων
- * 7. Δημιουργία & εμφάνιση QR code
- * 8. Logout
+ * Διαχειρίζεται το admin panel:
+ * - Έλεγχος authentication
+ * - Φόρμα δημιουργίας/επεξεργασίας memorial
+ * - Address autocomplete + Leaflet map
+ * - Live αναζήτηση memorials
+ * - Διαγραφή & επεξεργασία καταχωρήσεων
+ * - Δημιουργία & εμφάνιση QR code
+ * - Logout
  */
 
 console.debug("[MODULE LOAD]", { module: "admin.js" });
 
-import { supabase } from "./supabase.js";
-import { initBioSection }    from "./sections/biography.js";
-import { initAwardsSection } from "./sections/awards.js";
-import { initInterestsSection } from "./sections/interests.js";
-import { initBurialSection } from "./sections/burial.js";
-import "./sections/relationships.js"; // φορτώνει UI & listeners
-
-// js/admin.js
-
-// ─── 1. Utility: Greek → Latin slug ──────────────────
+/* ─── Utility: Greek → Latin slug ────────────────── */
 /**
- * Μετατρέπει ελληνικούς χαρακτήρες σε λατινικούς για δημιουργία safe IDs
+ * Μετατρέπει ελληνικούς χαρακτήρες σε λατινικούς
+ * για τη δημιουργία URL-safe IDs.
  */
 function toLatin(text) {
   const map = {
-    'ά':'a','Ά':'A','έ':'e','Έ':'E','ή':'i','Ή':'I','ί':'i','Ί':'I',
-    'ό':'o','Ό':'O','ώ':'o','Ώ':'O','ύ':'y','Ύ':'Y','ϋ':'y','Ϋ':'Y',
-    'α':'a','Α':'A','β':'b','Β':'B','γ':'g','Γ':'G','δ':'d','Δ':'D',
-    'ε':'e','Ε':'E','ζ':'z','Ζ':'Z','η':'i','Η':'I','θ':'th','Θ':'Th',
-    'ι':'i','Ι':'I','κ':'k','Κ':'K','λ':'l','Λ':'L','μ':'m','Μ':'M',
-    'ν':'n','Ν':'N','ξ':'x','Ξ':'X','ο':'o','Ο':'O','π':'p','Π':'P',
-    'ρ':'r','Ρ':'R','σ':'s','Σ':'S','ς':'s','τ':'t','υ':'y','Υ':'Y',
-    'φ':'f','Φ':'F','χ':'ch','Χ':'Ch','ψ':'ps','Ψ':'Ps','ω':'o','Ω':'O'
+    'ά':'a','Ά':'A','έ':'e','Έ':'E','ή':'i','Ή':'I',
+    'ί':'i','Ί':'I','ό':'o','Ό':'O','ώ':'o','Ώ':'O',
+    'ύ':'y','Ύ':'Y','ϋ':'y','Ϋ':'Y',
+    'α':'a','Α':'A','β':'b','Β':'B','γ':'g','Γ':'G',
+    'δ':'d','Δ':'D','ε':'e','Ε':'E','ζ':'z','Ζ':'Z',
+    'η':'i','Η':'I','θ':'th','Θ':'Th','ι':'i','Ι':'I',
+    'κ':'k','Κ':'K','λ':'l','Λ':'L','μ':'m','Μ':'M',
+    'ν':'n','Ν':'N','ξ':'x','Ξ':'X','ο':'o','Ο':'O',
+    'π':'p','Π':'P','ρ':'r','Ρ':'R','σ':'s','Σ':'S',
+    'ς':'s','τ':'t','υ':'y','Υ':'Y','φ':'f','Φ':'F',
+    'χ':'ch','Χ':'Ch','ψ':'ps','Ψ':'Ps','ω':'o','Ω':'O'
   };
   return text.split('').map(c => map[c] || c).join('');
 }
 
-console.debug("[MODULE LOAD]", { module: "admin.js" });
-
-// ─── 2. Import Supabase & Sections ─────────────────
+// ─── Imports ───────────────────────────────────────
 import { supabase } from "./supabase.js";
-import { initBioSection }    from "./sections/biography.js";
-import { initAwardsSection } from "./sections/awards.js";
-import { initInterestsSection } from "./sections/interests.js";
-import { initBurialSection } from "./sections/burial.js";
-import "./sections/relationships.js";
-
-// … υπόλοιπος κώδικας, και μετά ο submit handler όπου καλείται η toLatin() …
-
+import { initBioSection }      from "./sections/biography.js";
+import { initAwardsSection }   from "./sections/awards.js";
+import { initInterestsSection }from "./sections/interests.js";
+import { initBurialSection }   from "./sections/burial.js";
+import "./sections/relationships.js"; // UI & listeners for relationships
 
 // --------------------------------------------------
 // 1. Έλεγχος authentication
@@ -63,7 +52,7 @@ import "./sections/relationships.js";
   const { data: { session }, error: authError } = await supabase.auth.getSession();
   console.debug("[API CALL RESULT]", { data: session, error: authError });
   if (authError || !session) {
-    console.warn("[AUTH FAIL]", "Χωρίς ενεργή συνεδρία – ανακατεύθυνση σε login.");
+    console.warn("[AUTH FAIL]", "Χωρίς ενεργή συνεδρία – redirect to login");
     window.location.href = "/login.html";
     return;
   }
@@ -74,20 +63,20 @@ import "./sections/relationships.js";
 // 2. DOM Elements & initial checks
 // --------------------------------------------------
 console.debug("[DOM INIT] Fetching DOM elements");
-const memorialForm   = document.getElementById("memorialForm");
-const hiddenIdInput  = document.getElementById("memorialId");
-const logoutBtn      = document.getElementById("logoutBtn");
-const qrPreview      = document.getElementById("qr-preview");
-const firstInput     = document.getElementById("firstname");
-const lastInput      = document.getElementById("lastname");
-const birthDateInput = document.getElementById("birth_date");
-const deathDateInput = document.getElementById("death_date");
-const genderSelect   = document.getElementById("gender");
-const regionInput    = document.getElementById("region");
-const cityInput      = document.getElementById("city");
-const messageInput   = document.getElementById("message");
-const photoUrlInput  = document.getElementById("photoUrl");
-const videoInput     = document.getElementById("video");
+const memorialForm    = document.getElementById("memorialForm");
+const hiddenIdInput   = document.getElementById("memorialId");
+const logoutBtn       = document.getElementById("logoutBtn");
+const qrPreview       = document.getElementById("qr-preview");
+const firstInput      = document.getElementById("firstname");
+const lastInput       = document.getElementById("lastname");
+const birthDateInput  = document.getElementById("birth_date");
+const deathDateInput  = document.getElementById("death_date");
+const genderSelect    = document.getElementById("gender");
+const regionInput     = document.getElementById("region");
+const cityInput       = document.getElementById("city");
+const messageInput    = document.getElementById("message");
+const photoUrlInput   = document.getElementById("photoUrl");
+const videoInput      = document.getElementById("video");
 const birthPlaceInput = document.getElementById("birth_place");
 const professionInput = document.getElementById("profession");
 const educationInput  = document.getElementById("education");
@@ -97,9 +86,9 @@ const cemeteryInput   = document.getElementById("cemetery");
 const genealogyInput  = document.getElementById("genealogy");
 const addrIn          = document.getElementById("addressInput");
 const suggList        = document.getElementById("suggestions");
-const searchLastname   = document.getElementById("searchLastname");
-const searchCity       = document.getElementById("searchCity");
-const resultsContainer = document.getElementById("resultsContainer");
+const searchLastname  = document.getElementById("searchLastname");
+const searchCity      = document.getElementById("searchCity");
+const resultsContainer= document.getElementById("resultsContainer");
 
 [
   ["memorialForm", memorialForm],
@@ -138,7 +127,7 @@ const resultsContainer = document.getElementById("resultsContainer");
 // --------------------------------------------------
 console.debug("[MODULE LOAD]", { module: "leaflet-map" });
 const map = L.map("map").setView([37.9838, 23.7275], 6);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19 }).addTo(map);
 const marker = L.marker([37.9838, 23.7275]).addTo(map);
 console.debug("[DOM UPDATE]", { selector: "#map", action: "initialized" });
 
@@ -150,7 +139,7 @@ addrIn?.addEventListener("input", () => {
   clearTimeout(addrTimer);
   const q = addrIn.value.trim();
   if (q.length < 3) {
-    console.debug("[AUTOCOMPLETE]", "query too short, clearing suggestions");
+    console.debug("[AUTOCOMPLETE]", "query too short");
     suggList.innerHTML = "";
     return;
   }
@@ -169,19 +158,18 @@ addrIn?.addEventListener("input", () => {
     }
   }, 300);
 });
-
 suggList?.addEventListener("click", e => {
   if (e.target.tagName !== "LI") return;
-  console.debug("[EVENT]", "click", { id: e.target.tagName, text: e.target.textContent });
+  console.debug("[EVENT]", "click", { item: e.target.textContent });
   const { lat, lon } = e.target.dataset;
-  const parts = e.target.textContent.split(",");
-  regionInput.value = parts[1]?.trim() || "";
-  cityInput.value   = parts[0]?.trim() || "";
+  const [city, region] = e.target.textContent.split(",").map(s=>s.trim());
+  cityInput.value   = city;
+  regionInput.value = region;
   map.setView([lat, lon], 14);
   marker.setLatLng([lat, lon]);
   addrIn.value = "";
   suggList.innerHTML = "";
-  console.debug("[DOM UPDATE]", { selector: "#map & #inputs", action: "location set" });
+  console.debug("[DOM UPDATE]", { selector: "#map & inputs", action: "location set" });
 });
 
 // --------------------------------------------------
@@ -219,7 +207,7 @@ async function searchMemorials() {
       `;
       resultsContainer.appendChild(div);
     });
-    console.debug("[DOM UPDATE]", { selector: "#resultsContainer", action: "results rendered" });
+    console.debug("[DOM UPDATE]", { selector: "#resultsContainer", action: "rendered" });
     attachDeleteListeners();
     document.querySelectorAll(".editBtn").forEach(btn => btn.addEventListener("click", loadForEdit));
   }, 300);
@@ -236,7 +224,7 @@ function attachDeleteListeners() {
   });
   document.querySelectorAll(".deleteBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
-      console.debug("[EVENT]", "click", { id: btn.dataset.id, action: "delete" });
+      console.debug("[EVENT]", "delete click", { id: btn.dataset.id });
       if (!confirm("Θέλετε σίγουρα να διαγράψετε;")) return;
       console.debug("[API CALL START]", { query: "delete memorial & related", params: btn.dataset.id });
       await supabase.storage.from("qr-codes").remove([`${btn.dataset.id}.png`]);
@@ -248,7 +236,7 @@ function attachDeleteListeners() {
         alert("Σφάλμα κατά τη διαγραφή.");
       } else {
         btn.closest("div").remove();
-        console.debug("[DOM UPDATE]", { selector: `div[data-id=${btn.dataset.id}]`, action: "removed" });
+        console.debug("[DOM UPDATE]", { action: "removed element" });
         alert("Διαγράφηκε επιτυχώς.");
       }
     });
@@ -260,12 +248,12 @@ function attachDeleteListeners() {
 // --------------------------------------------------
 async function loadForEdit() {
   const id = this.dataset.id;
-  console.debug("[EVENT]", "click", { id, action: "loadForEdit" });
+  console.debug("[EVENT]", "edit click", { id });
   console.debug("[API CALL START]", { query: "select memorial", params: id });
   const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
   console.debug("[API CALL RESULT]", { data, error });
   if (error || !data) {
-    console.error("[API ERROR]", error || "No data");
+    console.error("[API ERROR]", error);
     return alert("Δεν βρέθηκε η καταχώρηση.");
   }
 
@@ -273,39 +261,48 @@ async function loadForEdit() {
   hiddenIdInput.value        = data.id;
   firstInput.value           = data.first_name;
   lastInput.value            = data.last_name;
-  birthDateInput.value       = data.birth_date || "";
-  deathDateInput.value       = data.death_date || "";
-  genderSelect.value         = data.gender || "";
-  regionInput.value          = data.region || "";
-  cityInput.value            = data.city || "";
-  messageInput.value         = data.message || "";
-  photoUrlInput.value        = data.photo_url || "";
+  birthDateInput.value       = data.birth_date  || "";
+  deathDateInput.value       = data.death_date  || "";
+  genderSelect.value         = data.gender      || "";
+  regionInput.value          = data.region      || "";
+  cityInput.value            = data.city        || "";
+  messageInput.value         = data.message     || "";
+  photoUrlInput.value        = data.photo_url   || "";
   videoInput.value           = data.youtube_url || "";
   birthPlaceInput.value      = data.birth_place || "";
-  professionInput.value      = data.profession || "";
-  educationInput.value       = data.education || "";
-  awardsInput.value          = data.awards || "";
-  interestsInput.value       = data.interests || "";
-  cemeteryInput.value        = data.cemetery || "";
-  genealogyInput.value       = data.genealogy || "";
-  console.debug("[DOM UPDATE]", { selector: "#memorialForm", action: "fields populated" });
+  professionInput.value      = data.profession  || "";
+  educationInput.value       = data.education   || "";
+  awardsInput.value          = data.awards      || "";
+  interestsInput.value       = data.interests   || "";
+  cemeteryInput.value        = data.cemetery    || "";
+  genealogyInput.value       = data.genealogy   || "";
+  console.debug("[DOM UPDATE]", { action: "fields populated" });
 
-  // Load relationships
+  // Load relationships into table with id "relations-table"
   console.debug("[API CALL START]", { query: "select relationships", params: id });
-  const { data: rels, error: relErr } = await supabase.from("relationships").select("*").eq("memorial_id", id);
+  const { data: rels, error: relErr } = await supabase
+    .from("relationships")
+    .select("*")
+    .eq("memorial_id", id);
   console.debug("[API CALL RESULT]", { data: rels, error: relErr });
-  const tbody = document.querySelector("#relationshipsTable tbody");
-  tbody.innerHTML = "";
-  if (!rels.length) {
-    tbody.innerHTML = `<tr id="noRelationshipsRow"><td colspan="2" style="text-align:center">Δεν υπάρχουν.</td></tr>`;
+
+  const table = document.getElementById("relations-table");
+  if (!table) {
+    console.warn("[DOM MISSING]", "relations-table");
   } else {
-    rels.forEach(r => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${r.relative_first_name} ${r.relative_last_name}</td><td>${r.relation_type}</td>`;
-      tbody.appendChild(tr);
-    });
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = "";
+    if (!rels.length) {
+      tbody.innerHTML = `<tr id="noRelationshipsRow"><td colspan="2" style="text-align:center">Δεν υπάρχουν.</td></tr>`;
+    } else {
+      rels.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${r.relative_id}</td><td>${r.relation_type}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    console.debug("[DOM UPDATE]", { action: "relationships populated" });
   }
-  console.debug("[DOM UPDATE]", { selector: "#relationshipsTable tbody", action: "relationships populated" });
   attachDeleteListeners();
 }
 
@@ -316,9 +313,9 @@ memorialForm?.addEventListener("submit", async e => {
   e.preventDefault();
   console.debug("[EVENT]", "submit", {
     firstname: firstInput.value,
-    lastname: lastInput.value,
-    city: cityInput.value,
-    id: hiddenIdInput.value
+    lastname:  lastInput.value,
+    city:      cityInput.value,
+    id:        hiddenIdInput.value
   });
 
   // Basic validation
@@ -335,53 +332,51 @@ memorialForm?.addEventListener("submit", async e => {
   }
 
   // Determine ID
-  // js/admin.js  (μέσα στο submit handler)
-let id = hiddenIdInput.value.trim() || null;
-const isNew = !id;
-if (isNew) {
-  // Μετατρέπουμε το επώνυμο και την πόλη σε “Latin” slug χωρίς κενά
-  const latinLast = toLatin(rawLast).toLowerCase().replace(/\s+/g, '');
-  const citySlug  = toLatin(rawCity).toLowerCase().replace(/\s+/g, '');
-  console.debug("[SLUGIZE]", { latinLast, citySlug });
+  let id = hiddenIdInput.value.trim() || null;
+  const isNew = !id;
+  const rawLast = lastInput.value.trim();
+  const rawCity = cityInput.value.trim();
 
-  // Υπολογίζουμε πόσες ήδη υπάρχουν εγγραφές με το ίδιο pattern
-  const { count } = await supabase
-    .from("memorials")
-    .select('*', { head: true, count: 'exact' })
-    .ilike('last_name', `%${latinLast}%`)
-    .ilike('city',     `%${citySlug}%`);
-  console.debug("[COUNT]", { count });
+  if (isNew) {
+    // generate slug ID
+    const latinLast = toLatin(rawLast).toLowerCase().replace(/\s+/g, '');
+    const citySlug  = toLatin(rawCity).toLowerCase().replace(/\s+/g, '');
+    console.debug("[SLUGIZE]", { latinLast, citySlug });
 
-  // Δημιουργούμε ένα μοναδικό ID με αύξοντα αριθμό
-  id = `${latinLast}${citySlug}A${(count || 0) + 1}`;
-  console.debug("[ID GEN]", { id });
-}
+    const { count } = await supabase
+      .from("memorials")
+      .select('*', { head: true, count: 'exact' })
+      .ilike('last_name', `%${latinLast}%`)
+      .ilike('city',     `%${citySlug}%`);
+    console.debug("[COUNT]", { count });
 
-
+    id = `${latinLast}${citySlug}A${(count || 0) + 1}`;
+    console.debug("[ID GEN]", { id });
+  }
 
   // Upsert memorial
   console.debug("[API CALL START]", { query: "upsert memorial", params: { id } });
   const { error: upErr } = await supabase.from("memorials").upsert({
     id,
     first_name: firstInput.value,
-    last_name: lastInput.value,
+    last_name:  lastInput.value,
     birth_date: birthDateInput.value || null,
     death_date: deathDateInput.value || null,
-    gender: genderSelect.value,
-    region: regionInput.value,
-    city: cityInput.value,
-    message: messageInput.value,
-    photo_url: photoUrlInput.value,
-    youtube_url: videoInput.value,
-    candles: 0,
+    gender:     genderSelect.value,
+    region:     regionInput.value,
+    city:       cityInput.value,
+    message:    messageInput.value,
+    photo_url:  photoUrlInput.value,
+    youtube_url:videoInput.value,
+    candles:    0,
     created_at: new Date().toISOString(),
     birth_place: birthPlaceInput.value,
     profession: professionInput.value,
-    education: educationInput.value,
-    awards: awardsInput.value,
-    interests: interestsInput.value,
-    cemetery: cemeteryInput.value,
-    genealogy: genealogyInput.value
+    education:  educationInput.value,
+    awards:     awardsInput.value,
+    interests:  interestsInput.value,
+    cemetery:   cemeteryInput.value,
+    genealogy:  genealogyInput.value
   }, { onConflict: ['id'] });
   console.debug("[API CALL RESULT]", { error: upErr });
   if (upErr) {
@@ -389,15 +384,15 @@ if (isNew) {
     return alert("Σφάλμα κατά την αποθήκευση.");
   }
 
-  // Relationships: delete old, insert new
+  // Relationships: refresh
   console.debug("[API CALL START]", { query: "refresh relationships", params: id });
   await supabase.from("relationships").delete().eq("memorial_id", id);
-  const relRows = Array.from(document.querySelectorAll("#relationshipsTable tbody tr"))
+  const relRows = Array.from(document.querySelectorAll("#relations-table tbody tr"))
     .filter(tr => tr.id !== "noRelationshipsRow");
   if (relRows.length) {
     const toInsert = relRows.map(tr => ({
-      memorial_id: id,
-      relative_id: tr.children[0].dataset.id,
+      memorial_id:  id,
+      relative_id:  tr.children[0].textContent.trim(),
       relation_type: tr.children[1].textContent.trim()
     }));
     console.debug("[API CALL START]", { query: "insert relationships", params: toInsert });
@@ -413,7 +408,7 @@ if (isNew) {
       `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(url)}`
     )).blob();
     console.debug("[API CALL RESULT]", { data: "QR blob fetched" });
-    console.debug("[API CALL START]", { query: "upload QR to storage", params: `${id}.png` });
+    console.debug("[API CALL START]", { query: "upload QR", params: `${id}.png` });
     await supabase.storage.from("qr-codes").upload(`${id}.png`, qrBlob, { contentType: "image/png" });
     console.debug("[API CALL RESULT]", { action: "QR uploaded" });
   }
@@ -432,7 +427,7 @@ if (isNew) {
   alert("✅ Καταχώρηση επιτυχής!");
   memorialForm.reset();
   hiddenIdInput.value = "";
-  document.querySelector("#relationshipsTable tbody").innerHTML = `
+  document.querySelector("#relations-table tbody").innerHTML = `
     <tr id="noRelationshipsRow"><td colspan="2" style="text-align:center">Δεν υπάρχουν.</td></tr>
   `;
   attachDeleteListeners();
