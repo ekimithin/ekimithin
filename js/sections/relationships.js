@@ -1,6 +1,6 @@
 // js/sections/relationships.js
 
-import { supabase } from "../supabase.js";
+import { supabase } from "./supabase.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // DOM elements
@@ -10,9 +10,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const cityInput      = document.getElementById("relativeCityInput");
   const resultsUl      = document.getElementById("relativeResults");
   const addBtn         = document.getElementById("addRelationshipBtn");
-  const relationsTable  = document.getElementById("relationshipsTable");
+
+  // 1) Ελέγχουμε αν υπάρχει ο πίνακας relations
+  const relationsTable = document.getElementById("relationshipsTable");
+  if (!relationsTable) {
+    console.warn("[DOM MISSING]", "relationshipsTable");
+    return; // δεν μπορούμε να προχωρήσουμε χωρίς αυτό
+  }
+  console.debug("[DOM FOUND]", "relationshipsTable", relationsTable);
+
+  // 2) Μόνο τώρα παίρνουμε το <tbody>
   const relationsTbody = relationsTable.querySelector("tbody");
+  if (!relationsTbody) {
+    console.warn("[DOM MISSING]", "relationshipsTable tbody");
+    return;
+  }
+  console.debug("[DOM FOUND]", "relationshipsTable tbody", relationsTbody);
+
   let searchTimer;
+
 
   // 1) Debounced search
   function searchRelatives() {
