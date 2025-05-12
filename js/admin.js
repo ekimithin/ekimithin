@@ -302,13 +302,29 @@ memorialForm?.addEventListener("submit", async e => {
   }
 
   // Determine ID
-  let id = hiddenIdInput.value || null;
-  const isNew = !id;
-  if (isNew) {
-    // generate slug ID...
-    id = /* ... slug logic ... */;
-    console.debug("[ID GEN]", { id });
-  }
+     // Determine ID
+-  let id = hiddenIdInput.value || null;
++  let id = hiddenIdInput.value.trim() || null;
+   const isNew = !id;
+   if (isNew) {
+-    // generate slug ID...
+-    id = /* ... slug logic ... */;
+-    console.debug("[ID GEN]", { id });
++    // Μετατρέπουμε rawLast και rawCity σε Latin-safe slug
++    const latinLast = toLatin(rawLast).toLowerCase().replace(/\s+/g, '');
++    const citySlug = toLatin(rawCity).toLowerCase().replace(/\s+/g, '');
++    console.debug("[SLUGIZE]", { latinLast, citySlug });
++    // Υπολογίζουμε πόσες υπάρχουσες εγγραφές ταιριάζουν
++    const { count } = await supabase
++      .from("memorials")
++      .select('*', { head: true, count: 'exact' })
++      .ilike('last_name', `%${latinLast}%`)
++      .ilike('city', `%${citySlug}%`);
++    // Δημιουργία μοναδικού ID με αύξοντα αριθμό
++    id = `${latinLast}${citySlug}A${(count||0) + 1}`;
++    console.debug("[ID GEN]", { id });
+   }
+
 
   // Upsert memorial
   console.debug("[API CALL START]", { query: "upsert memorial", params: { id } });
