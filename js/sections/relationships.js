@@ -1,24 +1,24 @@
 // js/sections/relationships.js
+
 import { supabase } from "../supabase.js";
 
-export function initRelationships() {
+export function initRelationships(){
   const addBtn      = document.getElementById("addRelationshipBtn");
   const resultsList = document.getElementById("relativeResults");
-  const tableBody   = document.querySelector("#relations-table tbody");
+  const table       = document.getElementById("relations-table");
   const inputId     = document.getElementById("relativeIdInput");
   const inputLast   = document.getElementById("relativeLastnameInput");
   const inputFirst  = document.getElementById("relativeFirstnameInput");
   const inputCity   = document.getElementById("relativeCityInput");
   const selectType  = document.getElementById("relationType");
   const noRow       = document.getElementById("noRelationshipsRow");
-
-  if (!resultsList || !addBtn || !tableBody) {
-    console.warn("[RELATIONS INIT] missing elements");
+  if(!addBtn || !resultsList || !table) {
+    console.warn("[RELATIONS INIT] Κάποιο στοιχείο λείπει");
     return;
   }
 
-  // 1) Live search memorials for relatives
   let timer;
+  // 1) Live search για συγγενείς
   [inputId, inputLast, inputFirst, inputCity].forEach(inp => {
     inp.addEventListener("input", () => {
       clearTimeout(timer);
@@ -26,22 +26,26 @@ export function initRelationships() {
         const { data, error } = await supabase
           .from("memorials")
           .select("id, first_name, last_name, city")
-          .ilike("id", `%${inputId.value}%`)
-          .ilike("last_name", `%${inputLast.value}%`)
+          .ilike("id",         `%${inputId.value}%`)
+          .ilike("last_name",  `%${inputLast.value}%`)
           .ilike("first_name", `%${inputFirst.value}%`)
-          .ilike("city", `%${inputCity.value}%`)
+          .ilike("city",       `%${inputCity.value}%`)
           .limit(5);
 
+        // Καθάρισμα λίστας
         resultsList.innerHTML = "";
-        if (error || !data) return;
 
+        if (error) {
+          console.error("[RELATIONS] Σφάλμα search:", error);
+          return;
+        }
+        // Εμφάνιση αποτελεσμάτων
         data.forEach(m => {
           const li = document.createElement("li");
           li.textContent = `${m.first_name} ${m.last_name} — ${m.city}`;
-          // αποθηκεύουμε συστατικά για να τα γεμίσουμε
-          li.dataset.id   = m.id;
-          li.dataset.fn   = m.first_name;
-          li.dataset.ln   = m.last_name;
+          li.dataset.id = m.id;
+          li.dataset.fn = m.first_name;
+          li.dataset.ln = m.last_name;
           li.dataset.city = m.city;
           resultsList.append(li);
         });
@@ -49,61 +53,65 @@ export function initRelationships() {
     });
   });
 
-  // 2) Όταν επιλέγεις κάποιο li, γεμίζεις τα πεδία
+  // 2) Όταν επιλέγω από τη λίστα, γεμίζουν τα πεδία
   resultsList.addEventListener("click", e => {
     if (e.target.tagName !== "LI") return;
 
-    const { id, fn, ln, city } = e.target.dataset;
+    const id   = e.target.dataset.id;
+    const fn   = e.target.dataset.fn;
+    const ln   = e.target.dataset.ln;
+    const ct   = e.target.dataset.city;
 
-    // συμπληρώνουμε τα πεδία
+    // Γέμισμα των πεδίων
     inputId.value    = id;
     inputFirst.value = fn;
     inputLast.value  = ln;
-    inputCity.value  = city;
+    inputCity.value  = ct;
 
-    // reset relation type
+    // Reset τύπου σχέσης
     selectType.value = "";
-
-    // αποθηκεύουμε και στο selectType τα δεδομένα για το add
     selectType.dataset.relativeId   = id;
     selectType.dataset.relativeName = `${fn} ${ln}`;
 
-    // καθαρίζουμε τη λίστα
+    // Καθάρισμα λίστας
     resultsList.innerHTML = "";
   });
 
-  // 3) Όταν πατάς το ➕, προσθέτεις γραμμή στον πίνακα
+  // 3) Προσθήκη σχέσης στον πίνακα
   addBtn.addEventListener("click", () => {
     const relId   = selectType.dataset.relativeId;
     const relName = selectType.dataset.relativeName;
     const relType = selectType.value;
+
     if (!relId || !relType) {
-      alert("Επίλεξε συγγενή και τύπο σχέσης.");
-      return;
+      return alert("Επίλεξε πρώτα συγγενή και τύπο σχέσης.");
     }
 
-    // Αφαιρούμε το placeholder row
+    // Απόκρυψη placeholder
     noRow.style.display = "none";
 
-    // Δημιουργούμε νέο tr
+    // Δημιουργία σειράς
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td data-id="${relId}">${relName}</td>
       <td>${relType}</td>
       <td><button class="deleteBtn">🗑️</button></td>
     `;
-    tableBody.append(tr);
+    table.querySelector("tbody").append(tr);
 
-    // listener για διαγραφή γραμμής
+    // Listener για διαγραφή
     tr.querySelector(".deleteBtn").addEventListener("click", () => {
       tr.remove();
-      if (!tableBody.querySelector("tr")) {
+      const anyRow = table.querySelector("tbody tr");
+      if (!anyRow) {
         noRow.style.display = "";
       }
     });
 
-    // καθαρίζουμε inputs
-    inputId.value = inputFirst.value = inputLast.value = inputCity.value = "";
+    // Καθαρισμός πεδίων εισαγωγής
+    inputId.value = inputLast.value = inputFirst.value = inputCity.value = "";
     selectType.value = "";
+    delete selectType.dataset.relativeId;
+    delete selectType.dataset.relativeName;
   });
 }
