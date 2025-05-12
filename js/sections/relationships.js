@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cityInput      = document.getElementById("relativeCityInput");
   const resultsUl      = document.getElementById("relativeResults");
   const addBtn         = document.getElementById("addRelationshipBtn");
-  const relationsTable = document.getElementById("relations-table");
+  const relationsTable  = document.getElementById("relationshipsTable");
   const relationsTbody = relationsTable.querySelector("tbody");
   let searchTimer;
 
