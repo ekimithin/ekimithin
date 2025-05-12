@@ -38,7 +38,7 @@ import { initBioSection }      from "./sections/biography.js";
 import { initAwardsSection }   from "./sections/awards.js";
 import { initInterestsSection }from "./sections/interests.js";
 import { initBurialSection }   from "./sections/burial.js";
-import "./sections/relationships.js"; // UI & listeners for relationships
+import { initRelationships }   from "./sections/relationships.js";
 
 // --------------------------------------------------
 // 1. Έλεγχος authentication
@@ -99,10 +99,7 @@ let addrTimer;
 addrIn?.addEventListener("input", () => {
   clearTimeout(addrTimer);
   const q = addrIn.value.trim();
-  if (q.length < 3) {
-    suggList.innerHTML = "";
-    return;
-  }
+  if (q.length < 3) { suggList.innerHTML=""; return; }
   addrTimer = setTimeout(async () => {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
     const places = await res.json();
@@ -112,15 +109,14 @@ addrIn?.addEventListener("input", () => {
   }, 300);
 });
 suggList?.addEventListener("click", e => {
-  if (e.target.tagName !== "LI") return;
+  if (e.target.tagName!=="LI") return;
   const { lat, lon } = e.target.dataset;
   const [city, region] = e.target.textContent.split(",").map(s=>s.trim());
   cityInput.value   = city;
   regionInput.value = region;
-  map.setView([lat, lon], 14);
+  map.setView([lat, lon],14);
   marker.setLatLng([lat, lon]);
-  addrIn.value = "";
-  suggList.innerHTML = "";
+  addrIn.value=""; suggList.innerHTML="";
 });
 
 // --------------------------------------------------
@@ -135,18 +131,12 @@ async function searchMemorials() {
     if (searchCity.value)     q = q.ilike("city",      `%${searchCity.value}%`);
     const { data, error } = await q;
     resultsContainer.innerHTML = "";
-    if (error) {
-      resultsContainer.innerHTML = "<p>Σφάλμα.</p>";
-      return;
-    }
-    if (!data.length) {
-      resultsContainer.innerHTML = "<p>Δεν βρέθηκαν.</p>";
-      return;
-    }
-    data.forEach(entry => {
+    if (error) { resultsContainer.innerHTML="<p>Σφάλμα.</p>"; return; }
+    if (!data.length) { resultsContainer.innerHTML="<p>Δεν βρέθηκαν.</p>"; return; }
+    data.forEach(entry=>{
       const div = document.createElement("div");
-      div.style = "border:1px solid #ccc;padding:1rem;margin-bottom:1rem;border-radius:5px";
-      div.innerHTML = `
+      div.style="border:1px solid #ccc;padding:1rem;margin-bottom:1rem;border-radius:5px";
+      div.innerHTML=`
         <strong>${entry.first_name} ${entry.last_name}</strong><br/>
         <small>${entry.city}, ${entry.region}</small><br/>
         <button class="editBtn" data-id="${entry.id}">✏️</button>
@@ -155,26 +145,25 @@ async function searchMemorials() {
       resultsContainer.appendChild(div);
     });
     attachDeleteListeners();
-    document.querySelectorAll(".editBtn").forEach(btn => btn.addEventListener("click", loadForEdit));
-  }, 300);
+    document.querySelectorAll(".editBtn").forEach(btn=>btn.addEventListener("click", loadForEdit));
+  },300);
 }
-[searchLastname, searchCity].forEach(el => el?.addEventListener("input", searchMemorials));
+[searchLastname,searchCity].forEach(el=>el?.addEventListener("input",searchMemorials));
 
 // --------------------------------------------------
 // 6. Delete helper
 // --------------------------------------------------
-function attachDeleteListeners() {
-  document.querySelectorAll(".deleteBtn").forEach(btn => {
+function attachDeleteListeners(){
+  document.querySelectorAll(".deleteBtn").forEach(btn=>{
     btn.replaceWith(btn.cloneNode(true));
   });
-  document.querySelectorAll(".deleteBtn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      if (!confirm("Διαγραφή;")) return;
+  document.querySelectorAll(".deleteBtn").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      if(!confirm("Θέλετε σίγουρα;")) return;
       await supabase.storage.from("qr-codes").remove([`${btn.dataset.id}.png`]);
-      await supabase.from("relationships").delete().eq("memorial_id", btn.dataset.id);
-      await supabase.from("memorials").delete().eq("id", btn.dataset.id);
+      await supabase.from("relationships").delete().eq("memorial_id",btn.dataset.id);
+      await supabase.from("memorials").delete().eq("id",btn.dataset.id);
       btn.closest("div").remove();
-      alert("Διαγράφηκε.");
     });
   });
 }
@@ -182,36 +171,37 @@ function attachDeleteListeners() {
 // --------------------------------------------------
 // 7. Load for edit
 // --------------------------------------------------
-async function loadForEdit() {
+async function loadForEdit(){
   const id = this.dataset.id;
-  const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
-  if (error || !data) return alert("Δεν βρέθηκε.");
-  hiddenIdInput.value        = data.id;
-  firstInput.value           = data.first_name;
-  lastInput.value            = data.last_name;
-  birthDateInput.value       = data.birth_date  || "";
-  deathDateInput.value       = data.death_date  || "";
-  genderSelect.value         = data.gender      || "";
-  regionInput.value          = data.region      || "";
-  cityInput.value            = data.city        || "";
-  messageInput.value         = data.message     || "";
-  photoUrlInput.value        = data.photo_url   || "";
-  videoInput.value           = data.youtube_url || "";
-  birthPlaceInput.value      = data.birth_place || "";
-  professionInput.value      = data.profession  || "";
-  educationInput.value       = data.education   || "";
-  awardsInput.value          = data.awards      || "";
-  interestsInput.value       = data.interests   || "";
-  cemeteryInput.value        = data.cemetery    || "";
-  genealogyInput.value       = data.genealogy   || "";
+  const { data, error } = await supabase.from("memorials").select("*").eq("id",id).single();
+  if(error||!data) return alert("Δεν βρέθηκε.");
+  Object.assign(hiddenIdInput, { value:data.id });
+  Object.assign(firstInput,      { value:data.first_name });
+  Object.assign(lastInput,       { value:data.last_name });
+  birthDateInput.value = data.birth_date || "";
+  deathDateInput.value = data.death_date || "";
+  genderSelect.value   = data.gender     || "";
+  regionInput.value    = data.region     || "";
+  cityInput.value      = data.city       || "";
+  messageInput.value   = data.message    || "";
+  photoUrlInput.value  = data.photo_url  || "";
+  videoInput.value     = data.youtube_url|| "";
+  birthPlaceInput.value= data.birth_place|| "";
+  professionInput.value= data.profession  || "";
+  educationInput.value = data.education   || "";
+  awardsInput.value    = data.awards      || "";
+  interestsInput.value = data.interests   || "";
+  cemeteryInput.value  = data.cemetery    || "";
+  genealogyInput.value = data.genealogy   || "";
 
-  const { data: rels } = await supabase.from("relationships").select("*").eq("memorial_id", id);
+  // Φόρτωση σχέσεων στον πίνακα
+  const { data: rels } = await supabase.from("relationships").select("*").eq("memorial_id",id);
   const tbody = document.querySelector("#relations-table tbody");
   tbody.innerHTML = "";
-  if (!rels.length) {
-    tbody.innerHTML = `<tr id="noRelationshipsRow"><td colspan="2" style="text-align:center">Δεν υπάρχουν.</td></tr>`;
+  if(!rels.length){
+    tbody.innerHTML=`<tr id="noRelationshipsRow"><td colspan="2" style="text-align:center">Δεν υπάρχουν.</td></tr>`;
   } else {
-    rels.forEach(r => {
+    rels.forEach(r=>{
       const tr = document.createElement("tr");
       tr.innerHTML = `<td>${r.relative_id}</td><td>${r.relation_type}</td>`;
       tbody.appendChild(tr);
@@ -223,33 +213,31 @@ async function loadForEdit() {
 // --------------------------------------------------
 // 8. Form submit handler (create/update) + QR
 // --------------------------------------------------
-memorialForm?.addEventListener("submit", async e => {
+memorialForm?.addEventListener("submit",async e=>{
   e.preventDefault();
-
-  if (!firstInput.value || !lastInput.value || !birthDateInput.value || !deathDateInput.value) {
+  // Έλεγχοι υποχρεωτικών
+  if(!firstInput.value||!lastInput.value||!birthDateInput.value||!deathDateInput.value){
     return alert("Συμπλήρωσε όλα τα υποχρεωτικά πεδία.");
   }
   const today = new Date().toISOString().slice(0,10);
-  if (deathDateInput.value > today) {
+  if(deathDateInput.value>today){
     return alert("Η ημερομηνία θανάτου δεν μπορεί να είναι μελλοντική.");
   }
 
-  let id = hiddenIdInput.value.trim() || null;
+  let id = hiddenIdInput.value.trim()||null;
   const isNew = !id;
-  const rawLast = lastInput.value.trim();
-  const rawCity = cityInput.value.trim();
-
-  if (isNew) {
-    const latinLast = toLatin(rawLast).toLowerCase().replace(/\s+/g,'');
-    const citySlug  = toLatin(rawCity).toLowerCase().replace(/\s+/g,'');
+  if(isNew){
+    const latinLast = toLatin(lastInput.value).toLowerCase().replace(/\s+/g,'');
+    const citySlug  = toLatin(cityInput.value).toLowerCase().replace(/\s+/g,'');
     const { count } = await supabase
       .from("memorials")
-      .select('*',{ head:true,count:'exact' })
+      .select('*',{head:true,count:'exact'})
       .ilike('last_name', `%${latinLast}%`)
       .ilike('city',      `%${citySlug}%`);
     id = `${latinLast}${citySlug}A${(count||0)+1}`;
   }
 
+  // Upsert
   await supabase.from("memorials").upsert({
     id,
     first_name:  firstInput.value,
@@ -273,54 +261,51 @@ memorialForm?.addEventListener("submit", async e => {
     genealogy:   genealogyInput.value
   }, { onConflict:['id'] });
 
-  // δημιουργούμε URL
+  // Δημιουργία/αποθήκευση QR
   const url = `${location.origin}/memorial.html?id=${id}`;
-
-  // ανεβάζουμε QR μόνο αν νέο
-  if (isNew) {
+  if(isNew){
     const qrBlob = await (await fetch(
       `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(url)}`
     )).blob();
     try {
-      await supabase.storage.from("qr-codes").upload(`${id}.png`, qrBlob, { contentType:'image/png' });
-    } catch (err) {
-      if (err.status !== 409) console.error(err);
+      await supabase.storage.from("qr-codes").upload(`${id}.png`,qrBlob,{contentType:'image/png'});
+    } catch(err){
+      if(err.status!==409) console.error(err);
     }
   }
-
-  // πάντα παίρνουμε public URL
   const { data: pu } = supabase.storage.from("qr-codes").getPublicUrl(`${id}.png`);
   qrPreview.innerHTML = `
     <h3>QR Code</h3>
     <img src="${pu.publicUrl}" style="max-width:300px; border-radius:4px; margin-bottom:1rem;">
     <div><a href="${url}" target="_blank">${url}</a></div>
-    <div style="margin-top:0.5rem;">
-      <a href="${pu.publicUrl}" download="${id}.png">⬇️ Κατέβασε το QR</a>
-    </div>
+    <div style="margin-top:0.5rem;"><a href="${pu.publicUrl}" download="${id}.png">⬇️ Κατέβασε το QR</a></div>
   `;
 
   alert("✅ Καταχώρηση επιτυχής!");
   memorialForm.reset();
-  hiddenIdInput.value = "";
-  document.querySelector("#relations-table tbody").innerHTML = `<tr id="noRelationshipsRow"><td colspan="2" style="text-align:center">Δεν υπάρχουν.</td></tr>`;
+  hiddenIdInput.value="";
+  document.querySelector("#relations-table tbody").innerHTML=`
+    <tr id="noRelationshipsRow"><td colspan="2" style="text-align:center">Δεν υπάρχουν.</td></tr>
+  `;
   attachDeleteListeners();
 });
 
 // --------------------------------------------------
 // 9. Logout
 // --------------------------------------------------
-logoutBtn?.addEventListener("click", async () => {
+logoutBtn?.addEventListener("click",async()=>{
   await supabase.auth.signOut();
-  window.location.href = "/login.html";
+  window.location.href="/login.html";
 });
 
 // --------------------------------------------------
 // 10. Init sections on load
 // --------------------------------------------------
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded",()=>{
   initBioSection();
   initAwardsSection();
   initInterestsSection();
   initBurialSection();
+  initRelationships();    // <-- Εδώ καλούμε τις γενεαλογικές σχέσεις
   attachDeleteListeners();
 });
