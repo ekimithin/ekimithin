@@ -169,6 +169,7 @@
         <div class="fullwidth" style="height:200px;">
           <div id="map" style="height:100%; border-radius:var(--radius);"></div>
         </div>
+
         <div>
           <label for="city">Πόλη</label>
           <input type="text" id="city" required/>
@@ -181,13 +182,7 @@
         <!-- Γενεαλογικό Πλαίσιο -->
         <details>
           <summary>➤ Γενεαλογικό Πλαίσιο</summary>
-          <textarea
-            id="genealogy"
-            name="genealogy"
-            rows="3"
-            readonly
-            placeholder="Όλες οι σχέσεις…"
-          ></textarea>
+          <textarea id="genealogy" name="genealogy" rows="3" readonly placeholder="Όλες οι σχέσεις…"></textarea>
         </details>
 
         <!-- Γενεαλογικές Σχέσεις -->
@@ -254,7 +249,7 @@
       <h2>🔍 Αναζήτηση Memorials</h2>
       <div style="display:flex;gap:var(--gap);flex-wrap:wrap;margin:var(--gap) 0;">
         <input id="searchLastname" placeholder="Επώνυμο" style="flex:1"/>
-        <input id="searchCity" placeholder="Πόλη" style="flex:1"/>
+        <input id="searchCity"     placeholder="Πόλη"   style="flex:1"/>
       </div>
       <div id="resultsContainer"></div>
     </section>
@@ -263,7 +258,12 @@
 
   <!-- JS Modules -->
   <script type="module" src="js/supabase.js"></script>
-  <script type="module" src="js/admin.js"></script>
+  <script type="module" src="js/sections/biography.js"></script>
+  <script type="module" src="js/sections/awards.js"></script>
+  <script type="module" src="js/sections/interests.js"></script>
+  <script type="module" src="js/sections/burial.js"></script>
+  <script type="module" src="js/sections/relationships.js"></script>
   <script type="module" src="js/logout.js"></script>
+  <script type="module" src="js/admin.js"></script>
 </body>
 </html>
