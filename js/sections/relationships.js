@@ -2,144 +2,93 @@
 
 import { supabase } from "../supabase.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  // DOM elements
-  const idInput        = document.getElementById("relativeIdInput");
-  const lastInput      = document.getElementById("relativeLastnameInput");
-  const firstInput     = document.getElementById("relativeFirstnameInput");
-  const cityInput      = document.getElementById("relativeCityInput");
-  const resultsUl      = document.getElementById("relativeResults");
-  const addBtn         = document.getElementById("addRelationshipBtn");
+export function initRelationships() {
+  const addBtn      = document.getElementById("addRelationshipBtn");
+  const resultsList = document.getElementById("relativeResults");
+  const table       = document.getElementById("relations-table");
+  const inputId     = document.getElementById("relativeIdInput");
+  const inputLast   = document.getElementById("relativeLastnameInput");
+  const inputFirst  = document.getElementById("relativeFirstnameInput");
+  const inputCity   = document.getElementById("relativeCityInput");
+  const selectType  = document.getElementById("relationType");
+  const noRow       = document.getElementById("noRelationshipsRow");
 
-  // 1) Ελέγχουμε αν υπάρχει ο πίνακας relations
-  const relationsTable = document.getElementById("relations-table");
-  if (!relationsTable) {
-    console.warn("[DOM MISSING]", "relationshipsTable");
-    return; // δεν μπορούμε να προχωρήσουμε χωρίς αυτό
-  }
-  console.debug("[DOM FOUND]", "relationshipsTable", relationsTable);
-
-  // 2) Μόνο τώρα παίρνουμε το <tbody>
-  const relationsTbody = relationsTable.querySelector("tbody");
-  if (!relationsTbody) {
-    console.warn("[DOM MISSING]", "relationshipsTable tbody");
+  if (!table || !addBtn || !resultsList) {
+    console.warn("[RELATIONS INIT] missing elements");
     return;
   }
-  console.debug("[DOM FOUND]", "relationshipsTable tbody", relationsTbody);
 
   let searchTimer;
-
-
-  // 1) Debounced search
-  function searchRelatives() {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(async () => {
-      try {
-        const idVal = idInput.value.trim();
-        const lnVal = lastInput.value.trim().toLowerCase();
-        const fnVal = firstInput.value.trim().toLowerCase();
-        const ctVal = cityInput.value.trim().toLowerCase();
-
-        console.debug("🔍 Searching relatives with:", { idVal, lnVal, fnVal, ctVal });
-
-        let query = supabase
+  // 1) Live search memorials for relatives
+  [inputId, inputLast, inputFirst, inputCity].forEach(inp => {
+    inp.addEventListener("input", () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(async () => {
+        const q = supabase
           .from("memorials")
           .select("id, first_name, last_name, city")
+          .ilike("id", `%${inputId.value}%`)
+          .ilike("last_name", `%${inputLast.value}%`)
+          .ilike("first_name", `%${inputFirst.value}%`)
+          .ilike("city", `%${inputCity.value}%`)
           .limit(5);
-
-        if (idVal) {
-          query = query.eq("id", idVal);
-        } else {
-          if (lnVal) query = query.ilike("last_name", `%${lnVal}%`);
-          if (fnVal) query = query.ilike("first_name", `%${fnVal}%`);
-          if (ctVal) query = query.ilike("city", `%${ctVal}%`);
-        }
-
-        const { data, error } = await query;
-        if (error) throw error;
-
-        resultsUl.innerHTML = "";
-        if (!data.length) {
-          resultsUl.innerHTML = `<li>Δεν βρέθηκαν συγγενείς.</li>`;
-          return;
-        }
-
-        data.forEach(r => {
+        const { data, error } = await q;
+        resultsList.innerHTML = "";
+        if (!data || error) return;
+        data.forEach(m => {
           const li = document.createElement("li");
-          li.textContent        = `${r.id} – ${r.first_name} ${r.last_name} (${r.city})`;
-          li.dataset.id         = r.id;
-          li.dataset.firstname  = r.first_name;
-          li.dataset.lastname   = r.last_name;
-          li.dataset.city       = r.city;
-          resultsUl.appendChild(li);
+          li.textContent = `${m.first_name} ${m.last_name} — ${m.city}`;
+          li.dataset.id  = m.id;
+          li.dataset.fn  = m.first_name;
+          li.dataset.ln  = m.last_name;
+          resultsList.append(li);
         });
-      } catch (err) {
-        console.error("❌ Relatives search error:", err);
-        resultsUl.innerHTML = `<li>Σφάλμα αναζήτησης.</li>`;
-      }
-    }, 500); // αύξηση debounce για λιγότερα calls
-  }
+      }, 300);
+    });
+  });
 
-  // hook up search
-  [idInput, lastInput, firstInput, cityInput].forEach(el =>
-    el.addEventListener("input", searchRelatives)
-  );
-
-  // 2) Select a result
-  resultsUl.addEventListener("click", e => {
+  // 2) Όταν επιλέγεις κάποιο li, το προεπισκοπείς
+  resultsList.addEventListener("click", e => {
     if (e.target.tagName !== "LI") return;
-    const li = e.target;
-    console.debug("✅ Selected relative:", li.dataset);
-    idInput.value      = li.dataset.id      || "";
-    firstInput.value   = li.dataset.firstname || "";
-    lastInput.value    = li.dataset.lastname  || "";
-    cityInput.value    = li.dataset.city      || "";
-    resultsUl.innerHTML = "";
+    // Σβήνουμε τη λίστα
+    const id   = e.target.dataset.id;
+    const fn   = e.target.dataset.fn;
+    const ln   = e.target.dataset.ln;
+    selectType.value = ""; // reset
+    // Αποθηκεύουμε σε custom fields για το add:
+    selectType.dataset.relativeId = id;
+    selectType.dataset.relativeName = `${fn} ${ln}`;
+    resultsList.innerHTML = "";
   });
 
-  // 3) Add relationship row (no duplicates + delete button)
+  // 3) Όταν πατάς το ➕, προσθέτεις γραμμή στον πίνακα
   addBtn.addEventListener("click", () => {
-    const idVal   = idInput.value.trim();
-    const fnVal   = firstInput.value.trim();
-    const lnVal   = lastInput.value.trim();
-    const relType = document.getElementById("relationType").value;
-
-    if (!idVal || !fnVal || !lnVal || !relType) {
-      alert("Συμπλήρωσε όλα τα πεδία για να προσθέσεις μια σχέση.");
+    const relId   = selectType.dataset.relativeId;
+    const relName = selectType.dataset.relativeName;
+    const relType = selectType.value;
+    if (!relId || !relType) {
+      alert("Επίλεξε συγγενή και τύπο σχέσης.");
       return;
     }
-
-    // Prevent duplicate
-    const exists = Array.from(relationsTbody.querySelectorAll("td[data-id]"))
-      .some(td => td.dataset.id === idVal);
-    if (exists) {
-      alert("Αυτή η σχέση υπάρχει ήδη.");
-      return;
-    }
-
-    console.debug("➕ Adding relationship:", { idVal, fnVal, lnVal, relType });
-
-    // Remove placeholder row, if any
-    const placeholder = relationsTbody.querySelector("td[colspan]");
-    if (placeholder) relationsTbody.innerHTML = "";
-
-    // Build row
-    const tr     = document.createElement("tr");
-    const tdName = document.createElement("td");
-    const tdRel  = document.createElement("td");
-    const tdDel  = document.createElement("td");
-    const btnDel = document.createElement("button");
-
-    tdName.dataset.id = idVal;
-    tdName.textContent = `${fnVal} ${lnVal}`;
-    tdRel.textContent  = relType;
-
-    btnDel.type        = "button";
-    btnDel.textContent = "✖️";
-    btnDel.addEventListener("click", () => tr.remove());
-    tdDel.appendChild(btnDel);
-
-    tr.append(tdName, tdRel, tdDel);
-    relationsTbody.appendChild(tr);
+    // Αφαιρούμε το placeholder
+    noRow.style.display = "none";
+    // Δημιουργούμε tr
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td data-id="${relId}">${relName}</td>
+      <td>${relType}</td>
+      <td><button class="deleteBtn">🗑️</button></td>
+    `;
+    table.querySelector("tbody").append(tr);
+    // Cleanup inputs
+    inputId.value = inputFirst.value = inputLast.value = inputCity.value = "";
+    selectType.value = "";
+    // Attach delete listener
+    tr.querySelector(".deleteBtn").addEventListener("click", () => {
+      tr.remove();
+      if (!table.querySelector("tbody tr")) {
+        noRow.style.display = "";
+      }
+    });
   });
-});
+}
