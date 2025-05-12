@@ -2,7 +2,7 @@
 
 import { supabase } from "../supabase.js";
 
-// === DOM elements ===
+// DOM elements
 const idInput       = document.getElementById("relativeIdInput");
 const lastInput     = document.getElementById("relativeLastnameInput");
 const firstInput    = document.getElementById("relativeFirstnameInput");
@@ -14,7 +14,7 @@ const relationsTbody  = relationsTable.querySelector("tbody");
 
 let searchTimer;
 
-// === Debounced search ===
+// Debounced search of memorials for relatives
 function searchRelatives() {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(async () => {
@@ -54,41 +54,35 @@ function searchRelatives() {
 
     data.forEach(r => {
       const li = document.createElement("li");
-      li.textContent        = `${r.first_name} ${r.last_name} (${r.city})`;
-
-      // **Βάζουμε εδώ τα σωστά data- attributes**
-      li.dataset.id         = r.id;
-      li.dataset.firstname  = r.first_name;
-      li.dataset.lastname   = r.last_name;
-      li.dataset.city       = r.city;
-
+      // Εδώ βάζουμε το ID μπροστά:
+      li.textContent       = `${r.id} – ${r.first_name} ${r.last_name} (${r.city})`;
+      li.dataset.id        = r.id;
+      li.dataset.firstname = r.first_name;
+      li.dataset.lastname  = r.last_name;
+      li.dataset.city      = r.city;
       resultsUl.appendChild(li);
     });
   }, 300);
 }
 
-// attach search to inputs
+// Attach search to inputs
 [idInput, lastInput, firstInput, cityInput].forEach(el =>
   el.addEventListener("input", searchRelatives)
 );
 
-// === When user clicks a result ===
+// Click to select a relative from results
 resultsUl.addEventListener("click", e => {
   if (e.target.tagName !== "LI") return;
   const li = e.target;
-
-  // debug print για να δούμε τι dataset έχει
-  console.debug("✅ Clicked LI dataset:", li.dataset);
-
+  console.debug("✅ Selected relative:", li.dataset);
   idInput.value      = li.dataset.id      || "";
   firstInput.value   = li.dataset.firstname || "";
   lastInput.value    = li.dataset.lastname  || "";
   cityInput.value    = li.dataset.city      || "";
-
   resultsUl.innerHTML = "";
 });
 
-// === Add relationship row ===
+// Add relationship row
 addBtn.addEventListener("click", () => {
   const idVal   = idInput.value.trim();
   const fnVal   = firstInput.value.trim();
@@ -101,15 +95,16 @@ addBtn.addEventListener("click", () => {
   }
   console.debug("➕ Adding relationship:", { idVal, fnVal, lnVal, relType });
 
-  // remove placeholder row
+  // Remove placeholder row if exists
   const placeholder = relationsTbody.querySelector("td[colspan]");
   if (placeholder) relationsTbody.innerHTML = "";
 
+  // Build new row
   const tr     = document.createElement("tr");
   const tdName = document.createElement("td");
   const tdRel  = document.createElement("td");
 
-  // αποθηκεύουμε το ID στο πρώτο κελί
+  // Store relative ID for later saving
   tdName.dataset.id = idVal;
   tdName.textContent = `${fnVal} ${lnVal}`;
   tdRel.textContent  = relType;
