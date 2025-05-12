@@ -28,10 +28,6 @@
       background: var(--c-bg);
       color: #333;
     }
-    a { color: var(--c-primary); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* Top bar */
     header {
       background: var(--c-card);
       padding: var(--gap);
@@ -54,7 +50,6 @@
     .btn.danger {
       background: var(--c-danger);
     }
-
     main {
       max-width: 1200px;
       margin: var(--gap) auto;
@@ -66,7 +61,6 @@
     @media(min-width:800px) {
       main { grid-template-columns: 2fr 1fr; }
     }
-
     .card {
       background: var(--c-card);
       border-radius: var(--radius);
@@ -78,7 +72,6 @@
       font-size: 1.2rem;
       color: var(--c-primary);
     }
-
     form {
       display: grid;
       grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
@@ -111,7 +104,6 @@
       font-size: 1rem;
       cursor: pointer;
     }
-
     details {
       grid-column: 1 / -1;
       background: var(--c-bg);
@@ -123,7 +115,6 @@
       cursor: pointer;
       font-weight: bold;
     }
-
     .relationship-search-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
@@ -145,7 +136,6 @@
     #relativeResults li:hover {
       background: #eee;
     }
-
     #relations-table {
       width: 100%;
       border-collapse: collapse;
@@ -159,7 +149,6 @@
       background: var(--c-bg);
       font-weight: bold;
     }
-
     .fullwidth { grid-column: 1 / -1; }
   </style>
 </head>
@@ -243,13 +232,24 @@
         </details>
 
         <details>
-          <summary>➤ Ενδιαφέροντα & Χόμπι</summary>
+          <summary>➤ Ενδιαφέροντα &amp; Χόμπι</summary>
           <textarea id="interests" rows="3"></textarea>
         </details>
 
         <details>
           <summary>➤ Τοποθεσία Ταφής</summary>
           <input id="cemetery" placeholder="π.χ. Κοιμητήριο …"/>
+        </details>
+
+        <details>
+          <summary>➤ Γενεαλογικό Πλαίσιο</summary>
+          <textarea
+            id="genealogy"
+            name="genealogy"
+            rows="3"
+            readonly
+            placeholder="Όλες οι σχέσεις…"
+          ></textarea>
         </details>
 
         <details>
@@ -276,7 +276,9 @@
           </div>
           <table id="relations-table">
             <thead>
-              <tr><th colspan="2">Σχέσεις</th></tr>
+              <tr>
+                <th colspan="2" id="relationsHeader">Σχέσεις</th>
+              </tr>
               <tr><th>Συγγενής</th><th>Σχέση</th></tr>
             </thead>
             <tbody>
