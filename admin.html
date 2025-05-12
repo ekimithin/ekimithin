@@ -3,76 +3,91 @@
 <html lang="el">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Διαχειριστικό Panel – ekimithin.gr</title>
-  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" href="/favicon.ico"/>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css"/>
 
   <style>
     :root {
-      --primary: #3498db;
-      --secondary: #2ecc71;
-      --danger: #e74c3c;
-      --bg: #f9f9f9;
-      --card-bg: #fff;
-      --text: #333;
-      --radius: 6px;
+      --c-bg: #f5f7fa;
+      --c-card: #ffffff;
+      --c-primary: #3498db;
+      --c-danger: #e74c3c;
+      --radius: 8px;
       --gap: 1rem;
     }
-    * { box-sizing: border-box; margin:0; padding:0; }
+    * { box-sizing: border-box; margin:0; padding:0 }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
+      font-family: Arial, sans-serif;
+      background: var(--c-bg);
+      color: #333;
     }
-    a { color: var(--primary); text-decoration: none; }
+    a { color: var(--c-primary); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
+    /* Top bar */
     header {
-      background: var(--card-bg);
+      background: var(--c-card);
       padding: var(--gap);
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      display: flex; align-items:center; justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    header h1 { font-size: 1.5rem; }
-    .btn { 
-      display: inline-block; padding: 0.5rem 1rem;
-      border: none; border-radius: var(--radius);
-      cursor: pointer; font-weight: bold;
-      background: var(--primary); color: #fff;
+    header h1 {
+      font-size: 1.4rem;
+      color: var(--c-primary);
     }
-    .btn.danger { background: var(--danger); }
-    .btn.secondary { background: var(--secondary); }
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: var(--c-primary);
+      color: #fff;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn.danger {
+      background: var(--c-danger);
+    }
 
     main {
-      max-width: 1200px; margin: var(--gap) auto;
+      max-width: 1200px;
+      margin: var(--gap) auto;
       padding: 0 var(--gap);
-      display: grid; grid-template-columns: 1fr;
+      display: grid;
+      grid-template-columns: 1fr;
       gap: var(--gap);
+    }
+    @media(min-width:800px) {
+      main { grid-template-columns: 2fr 1fr; }
     }
 
     .card {
-      background: var(--card-bg);
+      background: var(--c-card);
       border-radius: var(--radius);
       padding: var(--gap);
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
+    .card h2 {
+      margin-bottom: var(--gap);
+      font-size: 1.2rem;
+      color: var(--c-primary);
+    }
 
     form {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+      grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
       gap: var(--gap);
     }
     form label {
       display: block;
-      margin-bottom: 0.25rem;
-      font-weight: 600;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
     }
     form input, form select, form textarea {
       width: 100%;
@@ -81,65 +96,86 @@
       border-radius: var(--radius);
       font: inherit;
     }
+    form input:focus, form select:focus, form textarea:focus {
+      outline: none;
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+    }
     form button[type="submit"] {
       grid-column: 1 / -1;
-      justify-self: start;
-      background: var(--primary);
+      background: var(--c-primary);
       color: #fff;
-      padding: 0.75rem 1.5rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      cursor: pointer;
     }
 
     details {
       grid-column: 1 / -1;
-      background: var(--bg);
+      background: var(--c-bg);
       border-radius: var(--radius);
       padding: var(--gap);
+      margin-top: var(--gap);
     }
     details summary {
       cursor: pointer;
-      font-weight: 600;
-      outline: none;
+      font-weight: bold;
     }
 
-    /* Γενεαλογικές Σχέσεις */
-    #relations-section {
+    .relationship-search-grid {
       display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
       gap: var(--gap);
+      margin-bottom: var(--gap);
     }
+    #relativeResults {
+      list-style: none;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      max-height: 150px;
+      overflow-y: auto;
+      margin-bottom: var(--gap);
+    }
+    #relativeResults li {
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+    #relativeResults li:hover {
+      background: #eee;
+    }
+
     #relations-table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: var(--gap);
     }
     #relations-table th, #relations-table td {
       border: 1px solid #ddd;
       padding: 0.5rem;
-      text-align: left;
     }
     #relations-table th {
-      background: var(--bg);
-      font-weight: 600;
+      background: var(--c-bg);
+      font-weight: bold;
     }
 
-    /* Responsive */
-    @media (min-width: 768px) {
-      main { grid-template-columns: 2fr 1fr; }
-      .full-width { grid-column: 1 / -1; }
-    }
+    .fullwidth { grid-column: 1 / -1; }
   </style>
 </head>
-
 <body>
+
   <header>
-    <h1>ekimithin.gr – Admin Panel</h1>
+    <h1>ekimithin.gr Admin</h1>
     <button id="logoutBtn" class="btn danger">🚪 Αποσύνδεση</button>
   </header>
 
   <main>
-    <!-- Αριστερή στήλη: Φόρμα -->
-    <section class="card">
-      <h2>📋 Δημιουργία / Επεξεργασία Memorial</h2>
-      <form id="memorialForm">
 
+    <!-- Create/Edit Form -->
+    <section class="card">
+      <h2>➕ Δημιουργία / Επεξεργασία Memorial</h2>
+      <form id="memorialForm">
         <input type="hidden" id="memorialId"/>
 
         <div>
@@ -167,14 +203,13 @@
           </select>
         </div>
 
-        <!-- Διεύθυνση & Χάρτης -->
-        <div class="full-width">
+        <div class="fullwidth">
           <label for="addressInput">Διεύθυνση / Τοποθεσία</label>
-          <input type="text" id="addressInput" placeholder="Αναζήτηση διεύθυνσης…"/>
-          <ul id="suggestions" style="list-style:none;margin-top:0.5rem;"></ul>
+          <input type="text" id="addressInput" placeholder="π.χ. Οδός …"/>
+          <ul id="suggestions"></ul>
         </div>
-        <div class="full-width" style="height:200px;">
-          <div id="map" style="width:100%;height:100%;border-radius:var(--radius);"></div>
+        <div class="fullwidth" style="height:200px;">
+          <div id="map" style="height:100%;border-radius:var(--radius);"></div>
         </div>
 
         <div>
@@ -186,7 +221,6 @@
           <input type="text" id="region"/>
         </div>
 
-        <!-- Επιπλέον Details -->
         <details>
           <summary>➤ Βασικά Βιογραφικά</summary>
           <div>
@@ -207,26 +241,27 @@
           <summary>➤ Διακρίσεις</summary>
           <textarea id="awards" rows="3" placeholder="π.χ. Βραβείο …"></textarea>
         </details>
+
         <details>
           <summary>➤ Ενδιαφέροντα & Χόμπι</summary>
           <textarea id="interests" rows="3"></textarea>
         </details>
+
         <details>
           <summary>➤ Τοποθεσία Ταφής</summary>
           <input id="cemetery" placeholder="π.χ. Κοιμητήριο …"/>
         </details>
 
-        <!-- Γενεαλογικές Σχέσεις -->
-        <details id="relations-section">
+        <details>
           <summary>➤ Γενεαλογικές Σχέσεις</summary>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:var(--gap)">
+          <div class="relationship-search-grid">
             <input id="relativeIdInput" placeholder="Memorial ID"/>
             <input id="relativeLastnameInput" placeholder="Επώνυμο"/>
             <input id="relativeFirstnameInput" placeholder="Όνομα"/>
             <input id="relativeCityInput" placeholder="Πόλη"/>
           </div>
-          <ul id="relativeResults" style="list-style:none;margin:0.5rem 0;"></ul>
-          <div style="display:flex;gap:var(--gap);align-items:center;margin-bottom:var(--gap)">
+          <ul id="relativeResults"></ul>
+          <div style="display:flex;gap:var(--gap);align-items:center;margin:var(--gap) 0;">
             <select id="relationType">
               <option value="" disabled selected>Επίλεξε σχέση</option>
               <option>Πατέρας</option><option>Μητέρα</option>
@@ -237,7 +272,7 @@
               <option>Ανιψιός</option><option>Ανιψιά</option>
               <option>Ξάδερφος</option><option>Ξαδέρφη</option>
             </select>
-            <button type="button" id="addRelationshipBtn" class="btn secondary">➕ Πρόσθεσε Σχέση</button>
+            <button type="button" id="addRelationshipBtn" class="btn secondary">➕ Πρόσθεσε</button>
           </div>
           <table id="relations-table">
             <thead>
@@ -250,34 +285,32 @@
           </table>
         </details>
 
-        <!-- Μήνυμα & Μέσα -->
-        <div class="full-width">
+        <div class="fullwidth">
           <label for="message">Μήνυμα Μνήμης</label>
           <textarea id="message" rows="4"></textarea>
         </div>
-        <div class="full-width">
+        <div class="fullwidth">
           <label for="photoUrl">Φωτογραφία (URL)</label>
           <input id="photoUrl"/>
         </div>
-        <div class="full-width">
+        <div class="fullwidth">
           <label for="video">YouTube Video (URL)</label>
           <input id="video"/>
         </div>
 
-        <!-- Submit -->
         <button type="submit" class="btn">📌 Καταχώρηση Memorial</button>
       </form>
     </section>
 
-    <!-- Δεξιά στήλη: Αναζήτηση -->
     <section class="card">
       <h2>🔍 Αναζήτηση Memorials</h2>
       <div style="display:flex;gap:var(--gap);flex-wrap:wrap;margin-bottom:var(--gap)">
-        <input id="searchLastname" placeholder="Επώνυμο" style="flex:1;min-width:120px"/>
-        <input id="searchCity"     placeholder="Πόλη"     style="flex:1;min-width:120px"/>
+        <input id="searchLastname" placeholder="Επώνυμο" style="flex:1;"/>
+        <input id="searchCity"     placeholder="Πόλη"     style="flex:1;"/>
       </div>
       <div id="resultsContainer"></div>
     </section>
+
   </main>
 
   <script type="module" src="js/supabase.js"></script>
