@@ -1,6 +1,6 @@
 // js/sections/relationships.js
 
-import { supabase } from "./supabase.js";
+import { supabase } from "../supabase.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // DOM elements
