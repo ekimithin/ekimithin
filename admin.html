@@ -16,14 +16,11 @@
   <link rel="stylesheet" href="css/style.css" />
 
   <!-- Leaflet CSS & JS για το χάρτη -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
-    /* Βασικές ρυθμίσεις */
+    /* Βασικές Ρυθμίσεις */
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -36,7 +33,7 @@
       padding: 1rem;
     }
     h1, h2 {
-      margin: 0 0 1rem 0;
+      margin: 0 0 1rem;
     }
     .header {
       display: flex;
@@ -60,7 +57,7 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    /* Responsive Grid για το form */
+    /* Responsive Grid για το Form */
     #memorialForm {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
@@ -71,8 +68,7 @@
       margin-bottom: 0.25rem;
       font-weight: bold;
     }
-    #memorialForm input[type="text"],
-    #memorialForm input[type="date"],
+    #memorialForm input,
     #memorialForm select,
     #memorialForm textarea {
       width: 100%;
@@ -92,7 +88,7 @@
       cursor: pointer;
     }
 
-    /* Στυλ για τα collapsible details */
+    /* Στυλ για <details> */
     details {
       grid-column: 1 / -1;
       background: #fafafa;
@@ -114,7 +110,7 @@
       margin-top: 1rem;
     }
 
-    /* Grid για αναζήτηση συγγενούς */
+    /* Grid για Αναζήτηση Συγγενούς */
     .relationship-search-grid {
       display: grid;
       gap: 1rem;
@@ -124,7 +120,7 @@
     #relativeResults {
       list-style: none;
       padding: 0;
-      margin: 0 0 1rem 0;
+      margin: 0 0 1rem;
       max-height: 200px;
       overflow-y: auto;
       border: 1px solid #ccc;
@@ -268,7 +264,7 @@
 
         <!-- Προσωπικά Ενδιαφέροντα & Χόμπι -->
         <details>
-          <summary>➤ Προσωπικά Ενδιαφέροντα & Χόμπι</summary>
+          <summary>➤ Προσωπικά Ενδιαφέροντα &amp; Χόμπι</summary>
           <textarea
             id="interests"
             name="interests"
@@ -420,16 +416,13 @@
             📌 Καταχώρηση Memorial
           </button>
         </div>
+
       </form>
 
       <!-- QR Preview -->
       <div id="qr-preview" style="margin-top:2rem;">
         <h3>QR Code:</h3>
-        <img
-          id="qr-image"
-          alt="QR Code"
-          style="display:none; max-width:300px;"
-        />
+        <img id="qr-image" alt="QR Code" style="display:none; max-width:300px;"/>
       </div>
     </section>
 
@@ -439,19 +432,9 @@
     <section class="section">
       <h2>🔍 Αναζήτηση Memorials</h2>
       <form id="searchForm" style="display:grid; grid-template-columns:1fr 1fr auto; gap:1rem;">
-        <input
-          type="text"
-          id="searchLastname"
-          placeholder="Αναζήτηση με Επώνυμο"
-        />
-        <input
-          type="text"
-          id="searchCity"
-          placeholder="Αναζήτηση με Πόλη"
-        />
-        <button type="submit" style="padding:0.5rem 1rem; background:#3498db; color:#fff; border:none; border-radius:4px; cursor:pointer;">
-          Αναζήτηση
-        </button>
+        <input type="text" id="searchLastname" placeholder="Αναζήτηση με Επώνυμο"/>
+        <input type="text" id="searchCity" placeholder="Αναζήτηση με Πόλη"/>
+        <button type="submit" style="padding:0.5rem 1rem; background:#3498db; color:#fff; border:none; border-radius:4px; cursor:pointer;">Αναζήτηση</button>
       </form>
       <div id="resultsContainer" style="margin-top:2rem;"></div>
     </section>
