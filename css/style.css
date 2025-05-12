@@ -1,11 +1,9 @@
 /* 
   ΑΡΧΕΙΟ: css/style.css
-  ΠΕΡΙΓΡΑΦΗ: Κύριο αρχείο CSS για το frontend του ekimithin.gr
+  ΠΕΡΙΓΡΑΦΗ: Κύριο αρχείο CSS για το frontend και το admin panel του ekimithin.gr
   Περιέχει καθαρό, μοντέρνο και responsive design.
-  Φόρτωση από όλα τα δημόσια HTML (π.χ. index.html, admin.html, memorial.html κλπ.)
+  Φόρτωση από όλα τα HTML (index.html, admin.html, memorial.html κλπ.)
 */
-
-/* Βασικά Στυλ */
 
 /* ---------------------------------------------
    Flex layout για sticky footer χωρίς masking 
@@ -62,6 +60,7 @@ main, .memorial-container {
   text-decoration: none;
   border-radius: 5px;
 }
+
 /* Προσθέτουμε padding στο container γενικά */
 main.container,
 section.container {
@@ -94,7 +93,6 @@ nav a:hover {
 
 /* Footer: κολλητό στο κάτω μέρος */
 footer {
-  /* Καθαρίζουμε το fixed */
   position: static;
   margin-top: auto;      /* σπρώχνει το footer στο τέλος του flex container */
   background: #222;
@@ -102,7 +100,6 @@ footer {
   text-align: center;
   padding: 1rem;
 }
-
 footer nav {
   margin-top: 1rem;
 }
@@ -117,27 +114,24 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/* Φόρμες */
+/* Φόρμες (frontend) */
 form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   margin: 2rem 0;
 }
-
 input, textarea, select, button {
   padding: 0.8rem;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-
 button {
   background: #333;
   color: white;
   cursor: pointer;
 }
-
 button:hover {
   background: #555;
 }
@@ -156,7 +150,6 @@ button:hover {
   position: relative;
   width: 100%;
 }
-
 .suggestions-list {
   position: absolute;
   top: 100%;
@@ -172,12 +165,141 @@ button:hover {
   padding: 0;
   z-index: 1000;
 }
-
 .suggestions-list li {
   padding: 4px 8px;
   cursor: pointer;
 }
-
 .suggestions-list li:hover {
   background: #f0f0f0;
+}
+
+/* ---------------------------------------------
+   Admin Panel Styles
+--------------------------------------------- */
+
+main.container {
+  max-width: 1200px;
+  padding: 1rem;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.logout-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.section {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Responsive Grid για το Admin Form */
+#memorialForm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  gap: 1rem;
+}
+#memorialForm label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+}
+#memorialForm input,
+#memorialForm select,
+#memorialForm textarea {
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+#memorialForm button[type="submit"] {
+  grid-column: 1 / -1;
+  background: #3498db;
+  color: #fff;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* <details> styling */
+details {
+  grid-column: 1 / -1;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+}
+details summary {
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+details[open] {
+  padding-bottom: 1rem;
+}
+details + details {
+  margin-top: 1rem;
+}
+
+/* Grid για αναζήτηση συγγενούς */
+.relationship-search-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+  margin-bottom: 1rem;
+}
+#relativeResults {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+#relativeResults li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+#relativeResults li:hover {
+  background: #f0f0f0;
+}
+
+/* Πίνακας Γενεαλογικών Σχέσεων */
+#relations-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+#relations-table th,
+#relations-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+#relations-table .centered-header {
+  text-align: center;
+  background: #f5f5f5;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+@media (max-width: 600px) {
+  #relations-table th,
+  #relations-table td {
+    font-size: 0.9rem;
+    padding: 6px;
+  }
 }
