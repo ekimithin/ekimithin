@@ -17,62 +17,93 @@ export function initRelationships() {
     return;
   }
 
-  // Live search
+  // 1) Live search memorials for relatives
   let timer;
-  [inputId, inputLast, inputFirst, inputCity].forEach(inp=>{
-    inp.addEventListener("input",()=>{
+  [inputId, inputLast, inputFirst, inputCity].forEach(inp => {
+    inp.addEventListener("input", () => {
       clearTimeout(timer);
-      timer = setTimeout(async()=>{
+      timer = setTimeout(async () => {
         const { data, error } = await supabase
           .from("memorials")
           .select("id, first_name, last_name, city")
-          .ilike("id",`%${inputId.value}%`)
-          .ilike("last_name",`%${inputLast.value}%`)
-          .ilike("first_name",`%${inputFirst.value}%`)
-          .ilike("city",`%${inputCity.value}%`)
+          .ilike("id", `%${inputId.value}%`)
+          .ilike("last_name", `%${inputLast.value}%`)
+          .ilike("first_name", `%${inputFirst.value}%`)
+          .ilike("city", `%${inputCity.value}%`)
           .limit(5);
-        resultsList.innerHTML="";
-        if(error||!data) return;
-        data.forEach(m=>{
-          const li=document.createElement("li");
+
+        resultsList.innerHTML = "";
+        if (error || !data) return;
+
+        data.forEach(m => {
+          const li = document.createElement("li");
           li.textContent = `${m.first_name} ${m.last_name} — ${m.city}`;
-          li.dataset.id  = m.id;
-          li.dataset.fn  = m.first_name;
-          li.dataset.ln  = m.last_name;
+          // αποθηκεύουμε συστατικά για να τα γεμίσουμε
+          li.dataset.id   = m.id;
+          li.dataset.fn   = m.first_name;
+          li.dataset.ln   = m.last_name;
+          li.dataset.city = m.city;
           resultsList.append(li);
         });
-      },300);
+      }, 300);
     });
   });
 
-  // select from list
-  resultsList.addEventListener("click",e=>{
-    if(e.target.tagName!=="LI") return;
-    selectType.value="";
-    selectType.dataset.relativeId   = e.target.dataset.id;
-    selectType.dataset.relativeName = `${e.target.dataset.fn} ${e.target.dataset.ln}`;
-    resultsList.innerHTML="";
+  // 2) Όταν επιλέγεις κάποιο li, γεμίζεις τα πεδία
+  resultsList.addEventListener("click", e => {
+    if (e.target.tagName !== "LI") return;
+
+    const { id, fn, ln, city } = e.target.dataset;
+
+    // συμπληρώνουμε τα πεδία
+    inputId.value    = id;
+    inputFirst.value = fn;
+    inputLast.value  = ln;
+    inputCity.value  = city;
+
+    // reset relation type
+    selectType.value = "";
+
+    // αποθηκεύουμε και στο selectType τα δεδομένα για το add
+    selectType.dataset.relativeId   = id;
+    selectType.dataset.relativeName = `${fn} ${ln}`;
+
+    // καθαρίζουμε τη λίστα
+    resultsList.innerHTML = "";
   });
 
-  // add relationship
-  addBtn.addEventListener("click",()=>{
-    const rid  = selectType.dataset.relativeId;
-    const name = selectType.dataset.relativeName;
-    const rel  = selectType.value;
-    if(!rid||!rel){ alert("Επίλεξε συγγενή & τύπο σχέσης"); return; }
-    noRow.style.display="none";
-    const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td data-id="${rid}">${name}</td>
-      <td>${rel}</td>
+  // 3) Όταν πατάς το ➕, προσθέτεις γραμμή στον πίνακα
+  addBtn.addEventListener("click", () => {
+    const relId   = selectType.dataset.relativeId;
+    const relName = selectType.dataset.relativeName;
+    const relType = selectType.value;
+    if (!relId || !relType) {
+      alert("Επίλεξε συγγενή και τύπο σχέσης.");
+      return;
+    }
+
+    // Αφαιρούμε το placeholder row
+    noRow.style.display = "none";
+
+    // Δημιουργούμε νέο tr
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td data-id="${relId}">${relName}</td>
+      <td>${relType}</td>
       <td><button class="deleteBtn">🗑️</button></td>
     `;
     tableBody.append(tr);
-    tr.querySelector(".deleteBtn").addEventListener("click",()=>{
+
+    // listener για διαγραφή γραμμής
+    tr.querySelector(".deleteBtn").addEventListener("click", () => {
       tr.remove();
-      if(!tableBody.querySelector("tr")) noRow.style.display="";
+      if (!tableBody.querySelector("tr")) {
+        noRow.style.display = "";
+      }
     });
-    inputId.value = inputLast.value = inputFirst.value = inputCity.value = "";
+
+    // καθαρίζουμε inputs
+    inputId.value = inputFirst.value = inputLast.value = inputCity.value = "";
     selectType.value = "";
   });
 }
