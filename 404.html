@@ -2,34 +2,107 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <!-- favicon -->
-<link rel="icon" href="/favicon.ico" type="image/x-icon" />
-
+  <!-- ==================================================
+       Βασικές ρυθμίσεις εγγράφου
+  ================================================== -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Σελίδα Δεν Βρέθηκε | ekimithin.gr</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ==================================================
+       Τίτλος σελίδας και favicon
+  ================================================== -->
+  <title>404 – Σελίδα Δεν Βρέθηκε | ekimithin.gr</title>
+  <!-- favicon για browser tabs -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+
+  <!-- ==================================================
+       Σύνδεση με το κύριο stylesheet
+  ================================================== -->
   <link rel="stylesheet" href="css/style.css" />
-<!-- ✅ Open Graph Tags για Social Sharing -->
-<meta property="og:title" content="ekimithin.gr – Ψηφιακή Μνήμη" />
-<meta property="og:description" content="Δημιουργήστε μια αξιοπρεπή ψηφιακή σελίδα μνήμης για αγαπημένα πρόσωπα." />
-<meta property="og:image" content="https://ekimithin.vercel.app/ekimithin.png" />
-<meta property="og:url" content="https://ekimithin.vercel.app/" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary_large_image" />
+
+  <!-- ==================================================
+       Open Graph & Twitter Cards για social sharing
+  ================================================== -->
+  <meta property="og:title" content="ekimithin.gr – Ψηφιακή Μνήμη" />
+  <meta property="og:description" content="Δημιουργήστε μια αξιοπρεπή ψηφιακή σελίδα μνήμης για αγαπημένα πρόσωπα." />
+  <meta property="og:image" content="https://ekimithin.vercel.app/ekimithin.png" />
+  <meta property="og:url" content="https://ekimithin.vercel.app/" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
 </head>
 <body>
+  <!-- ==================================================
+       Header με λογότυπο
+  ================================================== -->
   <header>
-    <img src="/images/logo.png" alt="Λογότυπο ekimithin" style="max-width: 160px; display: block; margin: 2rem auto 1rem;">
+    <!--
+      Λογότυπο πλατφόρμας.
+      style inline για γρήγορο centering και sizing,
+      μπορεί να μεταφερθεί στο CSS αν προτιμάς.
+    -->
+    <img
+      src="/images/logo.png"
+      alt="Λογότυπο ekimithin"
+      style="max-width: 160px; display: block; margin: 2rem auto 1rem;"
+    />
   </header>
 
-  <section style="text-align:center;">
+  <!-- ==================================================
+       Main Section: Μήνυμα 404
+  ================================================== -->
+  <section style="text-align:center; padding: 2rem;">
+    <!-- Επικεφαλίδα μεγάλης γραμματοσειράς -->
     <h1>404 – Η σελίδα δεν βρέθηκε</h1>
+    <!-- Παράγραφος με περιγραφικό μήνυμα -->
     <p>Λυπούμαστε, αλλά η σελίδα που ζητήσατε δεν υπάρχει.</p>
+    <!-- Κουμπί επιστροφής στην αρχική -->
     <a href="/index.html" class="btn">Επιστροφή στην Αρχική</a>
   </section>
 
-  <footer>
+  <!-- ==================================================
+       Footer με πνευματικά δικαιώματα
+  ================================================== -->
+  <footer style="text-align:center; margin: 2rem 0;">
     <p>&copy; 2025 ekimithin.gr</p>
   </footer>
+
+  <!-- ==================================================
+       Inline Script για Debug-Logging
+       Κάθε φορά που φορτώνει η σελίδα:
+       - log στο console ότι η σελίδα 404 έχει φορτώσει
+       - log του URL για έλεγχο routing
+  ================================================== -->
+  <script>
+    // Εκτέλεση μόλις είναι έτοιμο το DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      console.debug('[PAGE LOAD]', { page: '404.html', url: window.location.href });
+      // Επιβεβαίωση παρουσίας στοιχείων DOM
+      const header = document.querySelector('header');
+      if (!header) {
+        console.warn('[DOM MISSING]', 'header');
+      } else {
+        console.debug('[DOM FOUND]', header);
+      }
+      const mainSection = document.querySelector('section');
+      if (!mainSection) {
+        console.warn('[DOM MISSING]', 'section (404 message)');
+      } else {
+        console.debug('[DOM FOUND]', mainSection);
+      }
+      const footer = document.querySelector('footer');
+      if (!footer) {
+        console.warn('[DOM MISSING]', 'footer');
+      } else {
+        console.debug('[DOM FOUND]', footer);
+      }
+      // Έλεγχος link προς index.html
+      const homeLink = document.querySelector('a.btn');
+      if (!homeLink) {
+        console.warn('[DOM MISSING]', 'a.btn (home link)');
+      } else {
+        console.debug('[DOM FOUND]', homeLink, { href: homeLink.href });
+      }
+    });
+  </script>
 </body>
 </html>
