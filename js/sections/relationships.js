@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const addBtn         = document.getElementById("addRelationshipBtn");
 
   // 1) Ελέγχουμε αν υπάρχει ο πίνακας relations
-  const relationsTable = document.getElementById("relationshipsTable");
+  const relationsTable = document.getElementById("relations-table");
   if (!relationsTable) {
     console.warn("[DOM MISSING]", "relationshipsTable");
     return; // δεν μπορούμε να προχωρήσουμε χωρίς αυτό
