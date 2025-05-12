@@ -5,7 +5,7 @@ import { initBioSection } from "./sections/biography.js";
 import { initAwardsSection } from "./sections/awards.js";
 import { initInterestsSection } from "./sections/interests.js";
 import { initBurialSection } from "./sections/burial.js";
-// το relationships.js φροντίζει μόνο του το UI & listeners
+// Το relationships.js τώρα χειρίζεται όλο το UI & listeners για το relations‐table
 import "./sections/relationships.js";
 
 // ================= Utility: Greek → Latin =================
@@ -29,7 +29,12 @@ function toLatin(text) {
 // ================= Auth redirect =================
 (async () => {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) window.location.href = "/login.html";
+  if (!session) {
+    console.debug("No session – redirecting to login");
+    window.location.href = "/login.html";
+  } else {
+    console.debug("Session active:", session);
+  }
 })();
 
 // ================= DOM elements =================
@@ -41,20 +46,23 @@ const qrPreview = document.getElementById("qr-preview");
 const addrIn   = document.getElementById("addressInput");
 const suggList = document.getElementById("suggestions");
 let addrTimer;
-
 addrIn.addEventListener("input", () => {
   clearTimeout(addrTimer);
   const q = addrIn.value.trim();
   if (q.length < 3) { suggList.innerHTML = ""; return; }
   addrTimer = setTimeout(async () => {
-    const res    = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
-    const places = await res.json();
-    suggList.innerHTML = places.slice(0,5).map(p =>
-      `<li data-lat="${p.lat}" data-lon="${p.lon}">${p.display_name}</li>`
-    ).join("");
+    try {
+      const res    = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
+      const places = await res.json();
+      console.debug("Autocomplete results:", places);
+      suggList.innerHTML = places.slice(0,5).map(p =>
+        `<li data-lat="${p.lat}" data-lon="${p.lon}">${p.display_name}</li>`
+      ).join("");
+    } catch (err) {
+      console.error("Autocomplete error:", err);
+    }
   }, 300);
 });
-
 suggList.addEventListener("click", e => {
   if (e.target.tagName !== "LI") return;
   const { lat, lon } = e.target.dataset;
@@ -80,11 +88,15 @@ function attachDeleteListeners() {
   document.querySelectorAll(".deleteBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
+      console.debug("Deleting memorial:", id);
       if (!confirm("Θες σίγουρα να διαγράψεις αυτό το memorial;")) return;
       await supabase.storage.from("qr-codes").remove([`${id}.png`]);
       await supabase.from("relationships").delete().eq("memorial_id", id);
       const { error } = await supabase.from("memorials").delete().eq("id", id);
-      if (error) return alert("❌ Σφάλμα διαγραφής.");
+      if (error) {
+        console.error("Delete error:", error);
+        return alert("❌ Σφάλμα διαγραφής.");
+      }
       btn.closest("div").remove();
       alert("✅ Διαγράφηκε memorial, σχέσεις & QR.");
     });
@@ -99,16 +111,18 @@ searchForm.addEventListener("submit", async e => {
   e.preventDefault();
   const ln = document.getElementById("searchLastname").value.trim().toLowerCase();
   const ct = document.getElementById("searchCity").value.trim().toLowerCase();
+  console.debug("Search by", { ln, ct });
   let q = supabase.from("memorials").select("*");
-  if (ln && ct) q = q.ilike("last_name", ln).ilike("city", ct);
-  else if (ln)   q = q.ilike("last_name", ln);
-  else if (ct)   q = q.ilike("city", ct);
-
+  if (ln) q = q.ilike("last_name", ln);
+  if (ct) q = q.ilike("city", ct);
   const { data, error } = await q;
   resultsContainer.innerHTML = "";
-  if (error || !data.length) {
-    resultsContainer.innerHTML = "<p>❌ Δεν βρέθηκαν αποτελέσματα.</p>";
-    return;
+  if (error) {
+    console.error("Search error:", error);
+    return resultsContainer.innerHTML = "<p>❌ Σφάλμα αναζήτησης.</p>";
+  }
+  if (!data.length) {
+    return resultsContainer.innerHTML = "<p>❌ Δεν βρέθηκαν αποτελέσματα.</p>";
   }
   data.forEach(entry => {
     const div = document.createElement("div");
@@ -126,14 +140,15 @@ searchForm.addEventListener("submit", async e => {
 
   document.querySelectorAll(".editBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
-      const { data, error } = await supabase
-        .from("memorials")
-        .select("*")
-        .eq("id", btn.dataset.id)
-        .single();
-      if (error || !data) return alert("Δεν βρέθηκε.");
+      const id = btn.dataset.id;
+      console.debug("Editing memorial:", id);
+      const { data, error } = await supabase.from("memorials").select("*").eq("id", id).single();
+      if (error || !data) {
+        console.error("Load for edit error:", error);
+        return alert("Δεν βρέθηκε.");
+      }
 
-      // fill βασικά πεδία
+      // fill basic fields
       form.firstname.value   = data.first_name;
       form.lastname.value    = data.last_name;
       form.birth_date.value  = data.birth_date;
@@ -145,31 +160,26 @@ searchForm.addEventListener("submit", async e => {
       form.photoUrl.value    = data.photo_url;
       form.video.value       = data.youtube_url;
 
-      // fill extra fields
-      form.birth_place.value = data.birth_place || "";
-      form.profession.value  = data.profession  || "";
-      form.education.value   = data.education   || "";
-      form.awards.value      = data.awards      || "";
-      form.interests.value   = data.interests   || "";
-      form.cemetery.value    = data.cemetery    || "";
-      form.genealogy.value   = data.genealogy   || "";
+      // extra fields
+      form.birth_place.value = data.birth_place  || "";
+      form.profession.value  = data.profession   || "";
+      form.education.value   = data.education    || "";
+      form.awards.value      = data.awards       || "";
+      form.interests.value   = data.interests    || "";
+      form.cemetery.value    = data.cemetery     || "";
+      form.genealogy.value   = data.genealogy    || "";
 
-      // load relationships
-      const { data: rels } = await supabase
-        .from("relationships")
-        .select("*")
-        .eq("memorial_id", data.id);
-      const tbody = document.querySelector("#relationshipsTable tbody");
+      // load relationships into #relations-table
+      const { data: rels } = await supabase.from("relationships").select("*").eq("memorial_id", id);
+      const tbody = document.querySelector("#relations-table tbody");
       tbody.innerHTML = "";
       rels.forEach(r => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
+          <td>${r.relative_first_name} ${r.relative_last_name}</td>
           <td>${r.relation_type}</td>
-          <td>${r.relative_id}</td>
-          <td><button class="remove-relationship">✖️</button></td>
         `;
         tbody.appendChild(tr);
-        tr.querySelector('.remove-relationship').addEventListener('click', () => tr.remove());
       });
 
       alert("Φορτώθηκαν τα στοιχεία. Πάτησε ‘Καταχώρηση’ για αποθήκευση.");
@@ -184,6 +194,7 @@ attachDeleteListeners();
 // ================= Submit handler με debug & extra fields =================
 form.addEventListener("submit", async e => {
   e.preventDefault();
+  console.debug("Form submit triggered");
 
   // gather + validation
   const rawFirst  = form.firstname.value.trim();
@@ -191,7 +202,9 @@ form.addEventListener("submit", async e => {
   const rawCity   = form.city.value.trim();
   const birthDate = form.birth_date.value || null;
   const deathDate = form.death_date.value || null;
+
   if (!rawFirst || !rawLast || !rawCity) {
+    console.warn("Validation failed: missing required fields");
     return alert("Συμπλήρωσε Όνομα, Επώνυμο, Πόλη.");
   }
   if (birthDate && deathDate && new Date(birthDate) > new Date(deathDate)) {
@@ -214,14 +227,15 @@ form.addEventListener("submit", async e => {
 
   // latinise + ID
   const latinFirst = toLatin(rawFirst).toLowerCase();
-  const last_name  = toLatin(rawLast).toLowerCase();
+  const latinLast  = toLatin(rawLast).toLowerCase();
   const citySlug   = toLatin(rawCity).toLowerCase();
   const { count }  = await supabase
     .from("memorials")
     .select("*", { head: true, count: "exact" })
-    .ilike("last_name", last_name)
+    .ilike("last_name", latinLast)
     .ilike("city", citySlug);
-  const id = `${last_name}${citySlug}A${(count||0)+1}`.replace(/\s+/g,'');
+  const id = `${latinLast}${citySlug}A${(count||0)+1}`.replace(/\s+/g,'');
+  console.debug("Computed ID:", id);
 
   // extra fields
   const birth_place = form.birth_place.value.trim();
@@ -232,55 +246,57 @@ form.addEventListener("submit", async e => {
   const cemetery    = form.cemetery.value.trim();
   const genealogy   = form.genealogy.value.trim();
 
-  console.log("Extra fields before upsert:", {
+  console.debug("Extra fields before upsert:", {
     birth_place, profession, education,
     awards, interests, cemetery, genealogy
   });
 
   try {
-    // upsert με όλα τα πεδία
-    // νέα εκδοχή με onConflict
-const { error: upErr } = await supabase
-  .from("memorials")
-  .upsert(
-    {
-      id,
-      first_name:  rawFirst,
-      last_name,
-      birth_date:  birthDate,
-      death_date:  deathDate,
-      gender:      form.gender.value,
-      region:      form.region.value.trim(),
-      city,
-      message:     form.message.value.trim(),
-      photo_url:   form.photoUrl.value.trim(),
-      youtube_url: form.video.value.trim(),
-      candles:     0,
-      created_at:  new Date().toISOString(),
-      // — νέα πεδία —
-      birth_place,
-      profession,
-      education,
-      awards,
-      interests,
-      cemetery,
-      genealogy
-    },
-    {
-      onConflict: ['id']   // <–– εδώ λέμε “αν υπάρχει ήδη εγγραφή με αυτό το id, κάνε UPDATE”
-    }
-  );
-if (upErr) throw upErr;
+    // upsert με onConflict
+    const { error: upErr } = await supabase
+      .from("memorials")
+      .upsert(
+        {
+          id,
+          first_name:  rawFirst,
+          last_name:   latinLast,
+          birth_date:  birthDate,
+          death_date:  deathDate,
+          gender:      form.gender.value,
+          region:      form.region.value.trim(),
+          city:        rawCity,
+          message:     form.message.value.trim(),
+          photo_url:   form.photoUrl.value.trim(),
+          youtube_url: form.video.value.trim(),
+          candles:     0,
+          created_at:  new Date().toISOString(),
+          birth_place,
+          profession,
+          education,
+          awards,
+          interests,
+          cemetery,
+          genealogy
+        },
+        { onConflict: ['id'] }
+      );
+    if (upErr) throw upErr;
+    console.debug("Upsert succeeded");
 
     // relationships
+    console.debug("Deleting old relationships for:", id);
     await supabase.from("relationships").delete().eq("memorial_id", id);
-    const relRows = Array.from(document.querySelectorAll("#relationshipsTable tbody tr"));
+    const relRows = Array.from(document.querySelectorAll("#relations-table tbody tr"));
+    console.debug("Found relationship rows to insert:", relRows.length);
     if (relRows.length) {
-      const toInsert = relRows.map(tr => ({
-        memorial_id:   id,
-        relative_id:   tr.children[1].textContent,
-        relation_type: tr.children[0].textContent
-      }));
+      const toInsert = relRows
+        .filter(tr => tr.children.length === 2)
+        .map(tr => ({
+          memorial_id:   id,
+          relative_id:   tr.children[0].dataset.id,        // assumes data-id on <tr> cells
+          relation_type: tr.children[1].textContent.trim()
+        }));
+      console.debug("Inserting relationships:", toInsert);
       await supabase.from("relationships").insert(toInsert);
     }
 
@@ -290,6 +306,7 @@ if (upErr) throw upErr;
       `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(url)}`
     )).blob();
     const fn     = `${id}.png`;
+    console.debug("Uploading QR code:", fn);
     await supabase.storage.from("qr-codes").upload(fn, qrBlob, { contentType: "image/png" });
     const { data: pu } = supabase.storage.from("qr-codes").getPublicUrl(fn);
 
@@ -298,10 +315,13 @@ if (upErr) throw upErr;
       <div><a href="${url}" target="_blank">${url}</a></div>
       <a href="${pu.publicUrl}" download="${fn}">⬇️ Κατέβασε το QR Code</a>
     `;
-
     alert("✅ Το memorial καταχωρήθηκε!");
+
+    // reset form + relationships UI
     form.reset();
-    document.querySelector("#relationshipsTable tbody").innerHTML = "";
+    document.querySelector("#relations-table tbody").innerHTML = `
+      <tr><td colspan="2" style="text-align:center;">Δεν υπάρχουν καταχωρημένες σχέσεις.</td></tr>
+    `;
     attachDeleteListeners();
 
   } catch (err) {
@@ -312,6 +332,7 @@ if (upErr) throw upErr;
 
 // ================= Logout handler =================
 logoutBtn.addEventListener("click", async () => {
+  console.debug("Signing out");
   await supabase.auth.signOut();
   window.location.href = "/login.html";
 });
