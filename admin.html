@@ -2,103 +2,164 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <!-- ==================================================
-       Favicon
-  ================================================== -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-
-  <!-- ==================================================
-       Open Graph Tags για Social Sharing
-  ================================================== -->
-  <meta property="og:title"       content="ekimithin.gr – Ψηφιακή Μνήμη" />
-  <meta property="og:description" content="Δημιουργήστε μια αξιοπρεπή ψηφιακή σελίδα μνήμης για αγαπημένα πρόσωπα." />
-  <meta property="og:image"       content="https://ekimithin.vercel.app/ekimithin.png" />
-  <meta property="og:url"         content="https://ekimithin.vercel.app/admin.html" />
-  <meta property="og:type"        content="website" />
-  <meta name="twitter:card"       content="summary_large_image" />
-
-  <!-- ==================================================
-       Βασικά Meta Tags
-  ================================================== -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- ==================================================
-       Τίτλος Σελίδας & CSS
-  ================================================== -->
   <title>Διαχειριστικό Panel – ekimithin.gr</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="/favicon.ico" />
 
-  <!-- ==================================================
-       Leaflet (Χάρτης)
-  ================================================== -->
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- ==================================================
-       Inline Styles Ειδικά για Admin
-  ================================================== -->
+  <link rel="stylesheet" href="css/style.css" />
+
   <style>
-    body { margin:0; font-family:Arial,sans-serif; background:#f2f2f2; color:#333; }
-    main.container { max-width:1200px; margin:0 auto; padding:1rem; }
-    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; }
-    .logout-btn { background:#e74c3c; color:#fff; border:none; padding:0.5rem 1rem; border-radius:4px; cursor:pointer; }
-    .section { background:#fff; padding:1.5rem; border-radius:8px; margin-bottom:2rem; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-
-    #memorialForm { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:1rem; }
-    #memorialForm label { display:block; margin-bottom:0.25rem; font-weight:bold; }
-    #memorialForm input, #memorialForm select, #memorialForm textarea {
-      width:100%; padding:0.5rem; box-sizing:border-box; border:1px solid #ccc; border-radius:4px;
+    :root {
+      --primary: #3498db;
+      --secondary: #2ecc71;
+      --danger: #e74c3c;
+      --bg: #f9f9f9;
+      --card-bg: #fff;
+      --text: #333;
+      --radius: 6px;
+      --gap: 1rem;
     }
-    #memorialForm button[type="submit"] {
-      grid-column:1 / -1; background:#3498db; color:#fff; border:none; padding:0.75rem; border-radius:4px; font-size:1rem; cursor:pointer;
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header {
+      background: var(--card-bg);
+      padding: var(--gap);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex; align-items:center; justify-content: space-between;
+    }
+    header h1 { font-size: 1.5rem; }
+    .btn { 
+      display: inline-block; padding: 0.5rem 1rem;
+      border: none; border-radius: var(--radius);
+      cursor: pointer; font-weight: bold;
+      background: var(--primary); color: #fff;
+    }
+    .btn.danger { background: var(--danger); }
+    .btn.secondary { background: var(--secondary); }
+
+    main {
+      max-width: 1200px; margin: var(--gap) auto;
+      padding: 0 var(--gap);
+      display: grid; grid-template-columns: 1fr;
+      gap: var(--gap);
     }
 
-    details { grid-column:1 / -1; background:#fafafa; border:1px solid #ddd; border-radius:4px; padding:0.5rem 1rem; }
-    details summary { font-size:1rem; font-weight:bold; cursor:pointer; outline:none; margin-bottom:0.5rem; }
-    details + details { margin-top:1rem; }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: var(--gap);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
 
-    .relationship-search-grid { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); margin-bottom:1rem; }
-    #relativeResults { list-style:none; padding:0; margin:0 0 1rem; max-height:200px; overflow-y:auto; border:1px solid #ccc; border-radius:4px; }
-    #relativeResults li { padding:0.5rem; cursor:pointer; }
-    #relativeResults li:hover { background:#f0f0f0; }
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+      gap: var(--gap);
+    }
+    form label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      font: inherit;
+    }
+    form button[type="submit"] {
+      grid-column: 1 / -1;
+      justify-self: start;
+      background: var(--primary);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+    }
 
-    #relations-table { width:100%; border-collapse:collapse; margin-top:1rem; }
-    #relations-table th, #relations-table td { border:1px solid #ddd; padding:8px; }
-    .centered-header { text-align:center; background:#f5f5f5; font-weight:bold; font-size:1.1rem; }
+    details {
+      grid-column: 1 / -1;
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: var(--gap);
+    }
+    details summary {
+      cursor: pointer;
+      font-weight: 600;
+      outline: none;
+    }
 
-    @media (max-width:600px) {
-      #relations-table th, #relations-table td { font-size:0.9rem; padding:6px; }
+    /* Γενεαλογικές Σχέσεις */
+    #relations-section {
+      display: grid;
+      gap: var(--gap);
+    }
+    #relations-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #relations-table th, #relations-table td {
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    #relations-table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (min-width: 768px) {
+      main { grid-template-columns: 2fr 1fr; }
+      .full-width { grid-column: 1 / -1; }
     }
   </style>
 </head>
 
 <body>
-  <main class="container">
+  <header>
+    <h1>ekimithin.gr – Admin Panel</h1>
+    <button id="logoutBtn" class="btn danger">🚪 Αποσύνδεση</button>
+  </header>
 
-    <!-- Header με Τίτλο & Logout -->
-    <section class="header">
-      <h1>Διαχείριση Memorials</h1>
-      <button id="logoutBtn" class="logout-btn">🚪 Αποσύνδεση</button>
-    </section>
-
-    <!-- Φόρμα Δημιουργίας / Επεξεργασίας Memorial -->
-    <section class="section">
-      <h2>➕ Δημιουργία / Επεξεργασία Memorial</h2>
+  <main>
+    <!-- Αριστερή στήλη: Φόρμα -->
+    <section class="card">
+      <h2>📋 Δημιουργία / Επεξεργασία Memorial</h2>
       <form id="memorialForm">
-        <input type="hidden" id="memorialId" />
 
-        <!-- Όνομα & Επώνυμο -->
-        <div><label for="firstname">Όνομα:</label><input id="firstname" required /></div>
-        <div><label for="lastname">Επώνυμο:</label><input id="lastname" required /></div>
+        <input type="hidden" id="memorialId"/>
 
-        <!-- Ημερομηνίες -->
-        <div><label for="birth_date">Ημ. Γέννησης:</label><input type="date" id="birth_date" /></div>
-        <div><label for="death_date">Ημ. Θανάτου:</label><input type="date" id="death_date" /></div>
-
-        <!-- Φύλο -->
         <div>
-          <label for="gender">Φύλο:</label>
+          <label for="firstname">Όνομα</label>
+          <input type="text" id="firstname" required/>
+        </div>
+        <div>
+          <label for="lastname">Επώνυμο</label>
+          <input type="text" id="lastname" required/>
+        </div>
+        <div>
+          <label for="birth_date">Ημ. Γέννησης</label>
+          <input type="date" id="birth_date"/>
+        </div>
+        <div>
+          <label for="death_date">Ημ. Θανάτου</label>
+          <input type="date" id="death_date"/>
+        </div>
+        <div>
+          <label for="gender">Φύλο</label>
           <select id="gender">
             <option value="" disabled selected>Επιλογή</option>
             <option value="male">Άνδρας</option>
@@ -106,62 +167,66 @@
           </select>
         </div>
 
-        <!-- Διεύθυνση με Autocomplete -->
-        <div style="grid-column:1/-1;">
-          <label for="addressInput">Διεύθυνση:</label>
-          <div class="autocomplete-wrapper">
-            <input id="addressInput" placeholder="π.χ. Οδός …" autocomplete="off"/>
-            <ul id="suggestions"></ul>
-          </div>
+        <!-- Διεύθυνση & Χάρτης -->
+        <div class="full-width">
+          <label for="addressInput">Διεύθυνση / Τοποθεσία</label>
+          <input type="text" id="addressInput" placeholder="Αναζήτηση διεύθυνσης…"/>
+          <ul id="suggestions" style="list-style:none;margin-top:0.5rem;"></ul>
+        </div>
+        <div class="full-width" style="height:200px;">
+          <div id="map" style="width:100%;height:100%;border-radius:var(--radius);"></div>
         </div>
 
-        <!-- Χάρτης -->
-        <div style="grid-column:1/-1;">
-          <div id="map" style="width:100%;height:200px;margin-top:0.5rem;"></div>
+        <div>
+          <label for="city">Πόλη</label>
+          <input type="text" id="city"/>
+        </div>
+        <div>
+          <label for="region">Περιοχή</label>
+          <input type="text" id="region"/>
         </div>
 
-        <!-- Πόλη & Περιοχή -->
-        <div><label for="city">Πόλη:</label><input id="city" /></div>
-        <div><label for="region">Περιοχή:</label><input id="region" /></div>
-
-        <!-- Βασικά Βιογραφικά -->
+        <!-- Επιπλέον Details -->
         <details>
           <summary>➤ Βασικά Βιογραφικά</summary>
-          <div><label for="birth_place">Τόπος Γέννησης:</label><input id="birth_place" /></div>
-          <div><label for="profession">Επάγγελμα:</label><input id="profession" /></div>
-          <div><label for="education">Εκπαίδευση:</label><input id="education" /></div>
+          <div>
+            <label for="birth_place">Τόπος Γέννησης</label>
+            <input id="birth_place"/>
+          </div>
+          <div>
+            <label for="profession">Επάγγελμα</label>
+            <input id="profession"/>
+          </div>
+          <div>
+            <label for="education">Εκπαίδευση</label>
+            <input id="education"/>
+          </div>
         </details>
 
-        <!-- Διακρίσεις -->
         <details>
-          <summary>➤ Δημόσιες Διακρίσεις</summary>
+          <summary>➤ Διακρίσεις</summary>
           <textarea id="awards" rows="3" placeholder="π.χ. Βραβείο …"></textarea>
         </details>
-
-        <!-- Ενδιαφέροντα -->
         <details>
-          <summary>➤ Ενδιαφέροντα &amp; Χόμπι</summary>
-          <textarea id="interests" rows="3" placeholder="π.χ. …"></textarea>
+          <summary>➤ Ενδιαφέροντα & Χόμπι</summary>
+          <textarea id="interests" rows="3"></textarea>
         </details>
-
-        <!-- Ταφή -->
         <details>
           <summary>➤ Τοποθεσία Ταφής</summary>
-          <input id="cemetery" placeholder="π.χ. Κοιμητήριο …" />
+          <input id="cemetery" placeholder="π.χ. Κοιμητήριο …"/>
         </details>
 
         <!-- Γενεαλογικές Σχέσεις -->
-        <details id="relationshipDetails">
+        <details id="relations-section">
           <summary>➤ Γενεαλογικές Σχέσεις</summary>
-          <div class="relationship-search-grid">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:var(--gap)">
             <input id="relativeIdInput" placeholder="Memorial ID"/>
             <input id="relativeLastnameInput" placeholder="Επώνυμο"/>
             <input id="relativeFirstnameInput" placeholder="Όνομα"/>
             <input id="relativeCityInput" placeholder="Πόλη"/>
           </div>
-          <ul id="relativeResults"></ul>
-          <div id="relLoading" style="display:none;color:#555;">⏳ Αναζήτηση…</div>
-          <div style="display:flex;gap:1rem;margin:1rem 0;">
+          <ul id="relativeResults" style="list-style:none;margin:0.5rem 0;"></ul>
+          <div style="display:flex;gap:var(--gap);align-items:center;margin-bottom:var(--gap)">
             <select id="relationType">
               <option value="" disabled selected>Επίλεξε σχέση</option>
               <option>Πατέρας</option><option>Μητέρα</option>
@@ -172,62 +237,49 @@
               <option>Ανιψιός</option><option>Ανιψιά</option>
               <option>Ξάδερφος</option><option>Ξαδέρφη</option>
             </select>
-            <button type="button" id="addRelationshipBtn" style="background:#2ecc71;color:#fff;padding:0.6rem 1rem;border:none;border-radius:4px;cursor:pointer;">
-              ➕ Πρόσθεσε Σχέση
-            </button>
+            <button type="button" id="addRelationshipBtn" class="btn secondary">➕ Πρόσθεσε Σχέση</button>
           </div>
           <table id="relations-table">
             <thead>
-              <tr><th colspan="2" class="centered-header">Σχέσεις</th></tr>
+              <tr><th colspan="2">Σχέσεις</th></tr>
               <tr><th>Συγγενής</th><th>Σχέση</th></tr>
             </thead>
             <tbody>
-              <tr id="noRelationshipsRow"><td colspan="2" style="text-align:center;">Δεν υπάρχουν σχέσεις.</td></tr>
+              <tr id="noRelationshipsRow"><td colspan="2" style="text-align:center">Δεν υπάρχουν.</td></tr>
             </tbody>
           </table>
         </details>
 
-        <!-- Μήνυμα -->
-        <div style="grid-column:1/-1;">
-          <label for="message">Μήνυμα Μνήμης:</label>
+        <!-- Μήνυμα & Μέσα -->
+        <div class="full-width">
+          <label for="message">Μήνυμα Μνήμης</label>
           <textarea id="message" rows="4"></textarea>
         </div>
-
-        <!-- Φωτογραφία -->
-        <div style="grid-column:1/-1;">
-          <label for="photoUrl">Φωτογραφία (URL):</label>
-          <input id="photoUrl" placeholder="π.χ. https://..." />
+        <div class="full-width">
+          <label for="photoUrl">Φωτογραφία (URL)</label>
+          <input id="photoUrl"/>
         </div>
-
-        <!-- YouTube -->
-        <div style="grid-column:1/-1;">
-          <label for="video">YouTube Video:</label>
-          <input id="video" placeholder="https://..." />
+        <div class="full-width">
+          <label for="video">YouTube Video (URL)</label>
+          <input id="video"/>
         </div>
 
         <!-- Submit -->
-        <div style="grid-column:1/-1;">
-          <button type="submit" class="btn-primary">📌 Καταχώρηση Memorial</button>
-        </div>
+        <button type="submit" class="btn">📌 Καταχώρηση Memorial</button>
       </form>
-
-      <!-- QR Preview -->
-      <div id="qr-preview" style="margin-top:2rem;"></div>
     </section>
 
-    <!-- Ζωντανή Αναζήτηση -->
-    <section class="section">
+    <!-- Δεξιά στήλη: Αναζήτηση -->
+    <section class="card">
       <h2>🔍 Αναζήτηση Memorials</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
-        <input id="searchLastname" placeholder="Επώνυμο"/>
-        <input id="searchCity"     placeholder="Πόλη"/>
+      <div style="display:flex;gap:var(--gap);flex-wrap:wrap;margin-bottom:var(--gap)">
+        <input id="searchLastname" placeholder="Επώνυμο" style="flex:1;min-width:120px"/>
+        <input id="searchCity"     placeholder="Πόλη"     style="flex:1;min-width:120px"/>
       </div>
       <div id="resultsContainer"></div>
     </section>
-
   </main>
 
-  <!-- JS Modules -->
   <script type="module" src="js/supabase.js"></script>
   <script type="module" src="js/admin.js"></script>
   <script type="module" src="js/logout.js"></script>
