@@ -116,10 +116,41 @@ function updateCandleText(count) {
     document.getElementById("cemetery").textContent = data.cemetery;
   }
 
-  // 5) Genealogy (αν το έχετε στο σχήμα)
-  if (data.genealogy) {
-    document.getElementById("genealogySection").style.display = "block";
-    document.getElementById("genealogy").textContent = data.genealogy;
+  // ─── Render Γενεαλογικές Σχέσεις ───────────────────
+  // Εξασφαλίζουμε ότι ο πίνακας υπάρχει
+  const relTbody = document.querySelector("#relationshipsTable tbody");
+  if (relTbody) {
+    // Φόρτωση σχέσεων
+    const { data: relRows, error: relErr } = await supabase
+      .from("relationships")
+      .select("*")
+      .eq("memorial_id", id);
+    if (relErr) {
+      console.error("Error loading relationships:", relErr);
+    } else {
+      // Αφαιρούμε placeholder row
+      const placeholder = document.getElementById("noRelationshipsRow");
+      if (relRows.length > 0 && placeholder) placeholder.remove();
+
+      // Για κάθε σχέση, βγάζουμε το όνομα από memorials
+      for (const r of relRows) {
+        const { data: person, error: pErr } = await supabase
+          .from("memorials")
+          .select("first_name, last_name")
+          .eq("id", r.relative_id)
+          .single();
+        if (pErr || !person) {
+          console.warn("Failed to load relative info for", r.relative_id, pErr);
+          continue;
+        }
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="padding:8px;">${person.first_name} ${person.last_name}</td>
+          <td style="padding:8px;">${r.relation_type}</td>
+        `;
+        relTbody.appendChild(tr);
+      }
+    }
   }
 
   // ─── Slide-down χάρτης ────────────────────────
@@ -182,13 +213,13 @@ document.getElementById("lightCandleBtn")
     if (last && now - parseInt(last) < 24 * 60 * 60 * 1000) {
       return alert("Μπορείς να ανάψεις μόνο 1 κερί το 24ωρο");
     }
-    const { data, error } = await supabase
+    const { data: newCount, error: candleErr } = await supabase
       .rpc("increment_candle", { memorial_id: id });
-    if (error || data === null) {
+    if (candleErr || newCount === null) {
       alert("❌ Το κερί δεν καταγράφηκε. Δοκίμασε ξανά.");
-      console.error(error);
+      console.error(candleErr);
       return;
     }
     localStorage.setItem(key, now.toString());
-    updateCandleText(data);
+    updateCandleText(newCount);
   });
