@@ -102,6 +102,7 @@
       gap:var(--gap);
       margin-bottom:var(--gap);
     }
+    #addressSuggestions,
     #relativeResults {
       list-style:none;
       border:1px solid #ccc;
@@ -109,8 +110,13 @@
       max-height:150px;
       overflow-y:auto;
       margin-bottom:var(--gap);
+      background:#fff;
     }
-    #relativeResults li { padding:0.5rem; cursor:pointer; }
+    #addressSuggestions li,
+    #relativeResults li {
+      padding:0.5rem; cursor:pointer;
+    }
+    #addressSuggestions li:hover,
     #relativeResults li:hover { background:#eee; }
 
     table { width:100%; border-collapse:collapse; margin-top:var(--gap); }
@@ -161,14 +167,18 @@
           </select>
         </div>
 
+        <!-- Address Autocomplete -->
         <div class="fullwidth">
           <label for="addressInput">Διεύθυνση / Τοποθεσία</label>
           <input type="text" id="addressInput" placeholder="π.χ. Οδός …"/>
-          <ul id="relativeResults"></ul>
+          <ul id="addressSuggestions"></ul>
         </div>
+
+        <!-- Map -->
         <div class="fullwidth" style="height:200px;">
           <div id="map" style="height:100%; border-radius:var(--radius);"></div>
         </div>
+
         <div>
           <label for="city">Πόλη</label>
           <input type="text" id="city" required/>
@@ -278,6 +288,15 @@
     </section>
 
   </main>
+
+  <!-- Set max date for death_date -->
+  <script>
+    const deathInput = document.getElementById('death_date');
+    if (deathInput) {
+      const today = new Date().toISOString().split('T')[0];
+      deathInput.setAttribute('max', today);
+    }
+  </script>
 
   <!-- JS Modules -->
   <script type="module" src="js/supabase.js"></script>
