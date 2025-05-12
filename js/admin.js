@@ -302,28 +302,28 @@ memorialForm?.addEventListener("submit", async e => {
   }
 
   // Determine ID
-     // Determine ID
--  let id = hiddenIdInput.value || null;
-+  let id = hiddenIdInput.value.trim() || null;
-   const isNew = !id;
-   if (isNew) {
--    // generate slug ID...
--    id = /* ... slug logic ... */;
--    console.debug("[ID GEN]", { id });
-+    // Μετατρέπουμε rawLast και rawCity σε Latin-safe slug
-+    const latinLast = toLatin(rawLast).toLowerCase().replace(/\s+/g, '');
-+    const citySlug = toLatin(rawCity).toLowerCase().replace(/\s+/g, '');
-+    console.debug("[SLUGIZE]", { latinLast, citySlug });
-+    // Υπολογίζουμε πόσες υπάρχουσες εγγραφές ταιριάζουν
-+    const { count } = await supabase
-+      .from("memorials")
-+      .select('*', { head: true, count: 'exact' })
-+      .ilike('last_name', `%${latinLast}%`)
-+      .ilike('city', `%${citySlug}%`);
-+    // Δημιουργία μοναδικού ID με αύξοντα αριθμό
-+    id = `${latinLast}${citySlug}A${(count||0) + 1}`;
-+    console.debug("[ID GEN]", { id });
-   }
+  // js/admin.js  (μέσα στο submit handler)
+let id = hiddenIdInput.value.trim() || null;
+const isNew = !id;
+if (isNew) {
+  // Μετατρέπουμε το επώνυμο και την πόλη σε “Latin” slug χωρίς κενά
+  const latinLast = toLatin(rawLast).toLowerCase().replace(/\s+/g, '');
+  const citySlug  = toLatin(rawCity).toLowerCase().replace(/\s+/g, '');
+  console.debug("[SLUGIZE]", { latinLast, citySlug });
+
+  // Υπολογίζουμε πόσες ήδη υπάρχουν εγγραφές με το ίδιο pattern
+  const { count } = await supabase
+    .from("memorials")
+    .select('*', { head: true, count: 'exact' })
+    .ilike('last_name', `%${latinLast}%`)
+    .ilike('city',     `%${citySlug}%`);
+  console.debug("[COUNT]", { count });
+
+  // Δημιουργούμε ένα μοναδικό ID με αύξοντα αριθμό
+  id = `${latinLast}${citySlug}A${(count || 0) + 1}`;
+  console.debug("[ID GEN]", { id });
+}
+
 
 
   // Upsert memorial
