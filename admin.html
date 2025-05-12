@@ -47,11 +47,11 @@
     #relativeResults li { padding:0.5rem; cursor:pointer; }
     #relativeResults li:hover { background:#f0f0f0; }
 
-    #relations-table { width:100%; border-collapse:collapse; margin-top:1rem; }
-    #relations-table th, #relations-table td { border:1px solid #ddd; padding:8px; }
-    #relations-table .centered-header { text-align:center; background:#f5f5f5; font-weight:bold; font-size:1.1rem; }
+    #relationshipsTable { width:100%; border-collapse:collapse; margin-top:1rem; }
+    #relationshipsTable th, #relationshipsTable td { border:1px solid #ddd; padding:8px; }
+    #relationshipsTable .centered-header { text-align:center; background:#f5f5f5; font-weight:bold; font-size:1.1rem; }
     @media (max-width:600px) {
-      #relations-table th, #relations-table td { font-size:0.9rem; padding:6px; }
+      #relationshipsTable th, #relationshipsTable td { font-size:0.9rem; padding:6px; }
     }
   </style>
 </head>
@@ -69,7 +69,8 @@
   <section class="section">
     <h2>➕ Δημιουργία / Επεξεργασία Memorial</h2>
     <form id="memorialForm">
-<input type="hidden" id="memorialId" value="" />
+      <!-- Κρυφό πεδίο για edit mode -->
+      <input type="hidden" id="memorialId" value="" />
 
       <!-- Όνομα & Επώνυμο -->
       <div>
@@ -193,17 +194,10 @@
         </div>
 
         <ul id="relativeResults"></ul>
-        
-<!-- Spinner loading indicator -->
-<div id="relLoading" style="
-     display: none;
-     margin: 0.5rem 0;
-     font-size: 0.9rem;
-     color: #555;
-   ">
-  ⏳ Αναζήτηση…
-</div>
-        
+        <div id="relLoading" style="display:none; margin:0.5rem 0; font-size:0.9rem; color:#555;">
+          ⏳ Αναζήτηση…
+        </div>
+
         <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
           <div style="flex:1;">
             <label for="relationType">Σχέση:</label>
@@ -223,7 +217,7 @@
           </button>
         </div>
 
-        <table id="relations-table">
+        <table id="relationshipsTable">
           <thead>
             <tr>
               <th colspan="2" class="centered-header" id="relationsHeader">…</th>
@@ -231,7 +225,7 @@
             <tr><th>Συγγενής</th><th>Σχέση</th></tr>
           </thead>
           <tbody>
-            <tr>
+            <tr id="noRelationshipsRow">
               <td colspan="2" style="text-align:center;">Δεν υπάρχουν καταχωρημένες σχέσεις.</td>
             </tr>
           </tbody>
@@ -270,16 +264,13 @@
     </div>
   </section>
 
-  <hr/>
-
-  <!-- Αναζήτηση Memorials -->
+  <!-- Ζωντανή Αναζήτηση Memorials -->
   <section class="section">
     <h2>🔍 Αναζήτηση Memorials</h2>
-    <form id="searchForm" style="display:grid; grid-template-columns:1fr 1fr auto; gap:1rem;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
       <input type="text" id="searchLastname" placeholder="Αναζήτηση με Επώνυμο"/>
-      <input type="text" id="searchCity" placeholder="Αναζήτηση με Πόλη"/>
-      <button type="submit" style="padding:0.5rem 1rem; background:#3498db; color:#fff; border:none; border-radius:4px; cursor:pointer;">Αναζήτηση</button>
-    </form>
+      <input type="text" id="searchCity"     placeholder="Αναζήτηση με Πόλη"/>
+    </div>
     <div id="resultsContainer" style="margin-top:2rem;"></div>
   </section>
 
@@ -288,33 +279,6 @@
 <!-- Scripts -->
 <script type="module" src="js/supabase.js"></script>
 <script type="module" src="js/admin.js"></script>
-<script>
-  // Live-update header “…” → “Όνομα Επώνυμο”
-  const fnInput = document.getElementById('firstname');
-  const lnInput = document.getElementById('lastname');
-  const headerTh = document.getElementById('relationsHeader');
-  function updateHeader() {
-    const fn = fnInput.value.trim();
-    const ln = lnInput.value.trim();
-    headerTh.textContent = (fn || ln) ? `${fn} ${ln}`.trim() : '…';
-  }
-  fnInput.addEventListener('input', updateHeader);
-  lnInput.addEventListener('input', updateHeader);
-  updateHeader();
-
-  // Επιλογή συγγενούς από τη λίστα
-  const resultsUl = document.getElementById('relativeResults');
-  resultsUl.addEventListener('click', e => {
-    if (e.target.tagName !== 'LI') return;
-    const li = e.target;
-    document.getElementById('relativeIdInput').value        = li.dataset.id;
-    document.getElementById('relativeFirstnameInput').value = li.dataset.firstname;
-    document.getElementById('relativeLastnameInput').value  = li.dataset.lastname;
-    document.getElementById('relativeCityInput').value      = li.dataset.city;
-    resultsUl.innerHTML = '';
-  });
-</script>
 <script type="module" src="js/logout.js"></script>
-
 </body>
 </html>
