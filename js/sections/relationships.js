@@ -2,7 +2,7 @@
 
 import { supabase } from "../supabase.js";
 
-// DOM elements
+// === DOM elements ===
 const idInput       = document.getElementById("relativeIdInput");
 const lastInput     = document.getElementById("relativeLastnameInput");
 const firstInput    = document.getElementById("relativeFirstnameInput");
@@ -14,7 +14,7 @@ const relationsTbody  = relationsTable.querySelector("tbody");
 
 let searchTimer;
 
-// Debounced search of memorials for relatives
+// === Debounced search ===
 function searchRelatives() {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(async () => {
@@ -55,33 +55,40 @@ function searchRelatives() {
     data.forEach(r => {
       const li = document.createElement("li");
       li.textContent        = `${r.first_name} ${r.last_name} (${r.city})`;
+
+      // **Βάζουμε εδώ τα σωστά data- attributes**
       li.dataset.id         = r.id;
       li.dataset.firstname  = r.first_name;
       li.dataset.lastname   = r.last_name;
       li.dataset.city       = r.city;
+
       resultsUl.appendChild(li);
     });
   }, 300);
 }
 
-// Attach search to inputs
+// attach search to inputs
 [idInput, lastInput, firstInput, cityInput].forEach(el =>
   el.addEventListener("input", searchRelatives)
 );
 
-// Click to select a relative from results
+// === When user clicks a result ===
 resultsUl.addEventListener("click", e => {
   if (e.target.tagName !== "LI") return;
   const li = e.target;
-  console.debug("✅ Selected relative:", li.dataset);
-  idInput.value      = li.dataset.id;
-  firstInput.value   = li.dataset.firstname;
-  lastInput.value    = li.dataset.lastname;
-  cityInput.value    = li.dataset.city;
+
+  // debug print για να δούμε τι dataset έχει
+  console.debug("✅ Clicked LI dataset:", li.dataset);
+
+  idInput.value      = li.dataset.id      || "";
+  firstInput.value   = li.dataset.firstname || "";
+  lastInput.value    = li.dataset.lastname  || "";
+  cityInput.value    = li.dataset.city      || "";
+
   resultsUl.innerHTML = "";
 });
 
-// Add relationship row
+// === Add relationship row ===
 addBtn.addEventListener("click", () => {
   const idVal   = idInput.value.trim();
   const fnVal   = firstInput.value.trim();
@@ -94,16 +101,15 @@ addBtn.addEventListener("click", () => {
   }
   console.debug("➕ Adding relationship:", { idVal, fnVal, lnVal, relType });
 
-  // Remove placeholder row if exists
+  // remove placeholder row
   const placeholder = relationsTbody.querySelector("td[colspan]");
   if (placeholder) relationsTbody.innerHTML = "";
 
-  // Build new row
   const tr     = document.createElement("tr");
   const tdName = document.createElement("td");
   const tdRel  = document.createElement("td");
 
-  // Store relative ID for later saving
+  // αποθηκεύουμε το ID στο πρώτο κελί
   tdName.dataset.id = idVal;
   tdName.textContent = `${fnVal} ${lnVal}`;
   tdRel.textContent  = relType;
