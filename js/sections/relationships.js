@@ -1,108 +1,114 @@
 // js/sections/relationships.js
-import { supabase } from '../supabase.js';
 
-const idInput       = document.getElementById('relativeIdInput');
-const lnameInput    = document.getElementById('relativeLastnameInput');
-const fnameInput    = document.getElementById('relativeFirstnameInput');
-const cityInput     = document.getElementById('relativeCityInput');
-const resultsList   = document.getElementById('relativeResults');
-const addBtn        = document.getElementById('addRelationshipBtn');
-const relationSelect= document.getElementById('relationType');
-const tableBody     = document.querySelector('#relationshipsTable tbody');
+import { supabase } from "../supabase.js";
 
-let selectedRelative = null;
+// DOM elements
+const idInput       = document.getElementById("relativeIdInput");
+const lastInput     = document.getElementById("relativeLastnameInput");
+const firstInput    = document.getElementById("relativeFirstnameInput");
+const cityInput     = document.getElementById("relativeCityInput");
+const resultsUl     = document.getElementById("relativeResults");
+const addBtn        = document.getElementById("addRelationshipBtn");
+const relationsTable  = document.getElementById("relations-table");
+const relationsTbody  = relationsTable.querySelector("tbody");
 
-// 1) Όταν ο admin γράφει σε κάποιο πεδίο, κάνουμε αναζήτηση
-[idInput, lnameInput, fnameInput, cityInput].forEach(el => {
-  el.addEventListener('input', debounce(performSearch, 300));
+let searchTimer;
+
+// Debounced search of memorials for relatives
+function searchRelatives() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(async () => {
+    const idVal = idInput.value.trim();
+    const lnVal = lastInput.value.trim().toLowerCase();
+    const fnVal = firstInput.value.trim().toLowerCase();
+    const ctVal = cityInput.value.trim().toLowerCase();
+
+    console.debug("🔍 Searching relatives with:", { idVal, lnVal, fnVal, ctVal });
+
+    let query = supabase
+      .from("memorials")
+      .select("id, first_name, last_name, city")
+      .limit(5);
+
+    if (idVal) {
+      query = query.eq("id", idVal);
+    } else {
+      if (lnVal) query = query.ilike("last_name", `%${lnVal}%`);
+      if (fnVal) query = query.ilike("first_name", `%${fnVal}%`);
+      if (ctVal) query = query.ilike("city", `%${ctVal}%`);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      console.error("❌ Relatives search error:", error);
+      resultsUl.innerHTML = `<li>Σφάλμα αναζήτησης.</li>`;
+      return;
+    }
+
+    resultsUl.innerHTML = "";
+    if (!data.length) {
+      console.debug("No relatives found");
+      resultsUl.innerHTML = `<li>Δεν βρέθηκαν συγγενείς.</li>`;
+      return;
+    }
+
+    data.forEach(r => {
+      const li = document.createElement("li");
+      li.textContent        = `${r.first_name} ${r.last_name} (${r.city})`;
+      li.dataset.id         = r.id;
+      li.dataset.firstname  = r.first_name;
+      li.dataset.lastname   = r.last_name;
+      li.dataset.city       = r.city;
+      resultsUl.appendChild(li);
+    });
+  }, 300);
+}
+
+// Attach search to inputs
+[idInput, lastInput, firstInput, cityInput].forEach(el =>
+  el.addEventListener("input", searchRelatives)
+);
+
+// Click to select a relative from results
+resultsUl.addEventListener("click", e => {
+  if (e.target.tagName !== "LI") return;
+  const li = e.target;
+  console.debug("✅ Selected relative:", li.dataset);
+  idInput.value      = li.dataset.id;
+  firstInput.value   = li.dataset.firstname;
+  lastInput.value    = li.dataset.lastname;
+  cityInput.value    = li.dataset.city;
+  resultsUl.innerHTML = "";
 });
 
-async function performSearch() {
-  const filters = {
-    id:    idInput.value.trim(),
-    last:  lnameInput.value.trim(),
-    first: fnameInput.value.trim(),
-    city:  cityInput.value.trim(),
-  };
+// Add relationship row
+addBtn.addEventListener("click", () => {
+  const idVal   = idInput.value.trim();
+  const fnVal   = firstInput.value.trim();
+  const lnVal   = lastInput.value.trim();
+  const relType = document.getElementById("relationType").value;
 
-  let query = supabase
-    .from('memorials')
-    .select('id, first_name, last_name, city')
-    .limit(10);
-
-  if (filters.id)    query = query.ilike('id',         `%${filters.id}%`);
-  if (filters.last)  query = query.ilike('last_name',  `%${filters.last}%`);
-  if (filters.first) query = query.ilike('first_name', `%${filters.first}%`);
-  if (filters.city)  query = query.ilike('city',       `%${filters.city}%`);
-
-  const { data, error } = await query;
-  if (error) {
-    console.error(error);
+  if (!idVal || !fnVal || !lnVal || !relType) {
+    alert("Συμπλήρωσε όλα τα πεδία για να προσθέσεις μια σχέση.");
     return;
   }
-  renderResults(data);
-}
+  console.debug("➕ Adding relationship:", { idVal, fnVal, lnVal, relType });
 
-function renderResults(items) {
-  resultsList.innerHTML = items
-    .map(item => `
-      <li data-id="${item.id}"
-          data-name="${item.first_name} ${item.last_name}">
-        ${item.id} – ${item.first_name} ${item.last_name} (${item.city})
-      </li>
-    `).join('');
-}
+  // Remove placeholder row if exists
+  const placeholder = relationsTbody.querySelector("td[colspan]");
+  if (placeholder) relationsTbody.innerHTML = "";
 
-// 2) Επιλογή εγγραφής
-resultsList.addEventListener('click', e => {
-  if (e.target.tagName !== 'LI') return;
-  selectedRelative = {
-    id:   e.target.dataset.id,
-    name: e.target.dataset.name
-  };
-  // highlight
-  Array.from(resultsList.children).forEach(li => li.classList.remove('selected'));
-  e.target.classList.add('selected');
+  // Build new row
+  const tr     = document.createElement("tr");
+  const tdName = document.createElement("td");
+  const tdRel  = document.createElement("td");
+
+  // Store relative ID for later saving
+  tdName.dataset.id = idVal;
+  tdName.textContent = `${fnVal} ${lnVal}`;
+  tdRel.textContent  = relType;
+
+  tr.appendChild(tdName);
+  tr.appendChild(tdRel);
+  relationsTbody.appendChild(tr);
 });
-
-// 3) Προσθήκη σχέσης στον πίνακα
-addBtn.addEventListener('click', () => {
-  if (!selectedRelative) {
-    return alert('Διάλεξε πρώτα έναν συγγενή από τα αποτελέσματα.');
-  }
-  const relation = relationSelect.value;
-  if (!relation) {
-    return alert('Επίλεξε τύπο σχέσης.');
-  }
-
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td>
-      ${relation}
-      <input type="hidden" name="relationships[][relation]" value="${relation}">
-    </td>
-    <td>
-      ${selectedRelative.name}
-      <small>${selectedRelative.id}</small>
-      <input type="hidden" name="relationships[][relative_id]" value="${selectedRelative.id}">
-    </td>
-    <td><button type="button" class="remove-relationship">✖️</button></td>
-  `;
-  tableBody.appendChild(tr);
-
-  tr.querySelector('.remove-relationship').addEventListener('click', () => tr.remove());
-
-  // Καθάρισμα
-  selectedRelative = null;
-  resultsList.innerHTML = '';
-  [idInput, lnameInput, fnameInput, cityInput].forEach(i => i.value = '');
-});
-
-// βοηθητική debounce για να μην στέλνουμε πάρα πολλά requests
-function debounce(fn, ms) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), ms);
-  };
-}
