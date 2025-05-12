@@ -102,17 +102,6 @@
       gap:var(--gap);
       margin-bottom:var(--gap);
     }
-    #suggestions {
-      list-style:none;
-      border:1px solid #ccc;
-      border-radius:var(--radius);
-      max-height:150px;
-      overflow-y:auto;
-      margin-top:0.5rem;
-    }
-    #suggestions li { padding:0.5rem; cursor:pointer; }
-    #suggestions li:hover { background:#eee; }
-
     #relativeResults {
       list-style:none;
       border:1px solid #ccc;
@@ -189,37 +178,19 @@
           <input type="text" id="region"/>
         </div>
 
+        <!-- Γενεαλογικό Πλαίσιο -->
         <details>
-          <summary>➤ Βασικά Βιογραφικά</summary>
-          <div>
-            <label for="birth_place">Τόπος Γέννησης</label>
-            <input id="birth_place"/>
-          </div>
-          <div>
-            <label for="profession">Επάγγελμα</label>
-            <input id="profession"/>
-          </div>
-          <div>
-            <label for="education">Εκπαίδευση</label>
-            <input id="education"/>
-          </div>
+          <summary>➤ Γενεαλογικό Πλαίσιο</summary>
+          <textarea
+            id="genealogy"
+            name="genealogy"
+            rows="3"
+            readonly
+            placeholder="Όλες οι σχέσεις…"
+          ></textarea>
         </details>
 
-        <details>
-          <summary>➤ Διακρίσεις</summary>
-          <textarea id="awards" rows="3" placeholder="π.χ. Βραβείο …"></textarea>
-        </details>
-
-        <details>
-          <summary>➤ Ενδιαφέροντα &amp; Χόμπι</summary>
-          <textarea id="interests" rows="3"></textarea>
-        </details>
-
-        <details>
-          <summary>➤ Τοποθεσία Ταφής</summary>
-          <input id="cemetery" placeholder="π.χ. Κοιμητήριο …"/>
-        </details>
-
+        <!-- Γενεαλογικές Σχέσεις -->
         <details>
           <summary>➤ Γενεαλογικές Σχέσεις</summary>
           <div class="relationship-search-grid">
@@ -244,7 +215,7 @@
           </div>
           <table id="relations-table">
             <thead>
-              <tr><th colspan="2" id="relationsHeader">Σχέσεις</th></tr>
+              <tr><th colspan="2">Σχέσεις</th></tr>
               <tr><th>Συγγενής</th><th>Σχέση</th></tr>
             </thead>
             <tbody>
