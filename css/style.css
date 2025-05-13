@@ -1,0 +1,183 @@
+/* 
+  ΑΡΧΕΙΟ: css/style.css
+  ΠΕΡΙΓΡΑΦΗ: Κύριο αρχείο CSS για το frontend του ekimithin.gr
+  Περιέχει καθαρό, μοντέρνο και responsive design.
+  Φόρτωση από όλα τα δημόσια HTML (π.χ. index.html, admin.html, memorial.html κλπ.)
+*/
+
+/* Βασικά Στυλ */
+
+/* ---------------------------------------------
+   Flex layout για sticky footer χωρίς masking 
+--------------------------------------------- */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Το main (ή το κύριο wrapper) καταλαμβάνει όλο το διαθέσιμο ύψος */
+main, .memorial-container, section {
+  flex: 1;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* Header με σκούρο φόντο και κεντραρισμένο λογότυπο */
+header {
+  background: #222;
+  color: white;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+header img {
+  display: block;
+  margin: 0 auto;
+  height: 60px;
+}
+
+/* Περιεχόμενο */
+section {
+  padding: 2rem;
+  max-width: 800px;
+  margin: auto;
+}
+main, .memorial-container {
+  padding-bottom: 100px; /* για να μην κρύβεται το περιεχόμενο πίσω από το footer */
+}
+
+/* Κουμπί CTA */
+.cta {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #333;
+  color: white;
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 5px;
+}
+/* Προσθέτουμε padding στο container γενικά */
+main.container,
+section.container {
+  padding: 1rem;        /* 16px εσωτερικό κενό γύρω-γύρω */
+}
+
+/* Για πολύ μικρές οθόνες, λίγο μεγαλύτερη απόσταση */
+@media (max-width: 480px) {
+  main.container,
+  section.container {
+    padding: 1.25rem;   /* 20px */
+  }
+}
+
+/* Πλοήγηση (π.χ. footer ή πάνω links) */
+nav {
+  text-align: center;
+  background: #eee;
+  padding: 1rem;
+}
+nav a {
+  color: #333;
+  text-decoration: none;
+  margin: 0 1rem;
+  font-weight: bold;
+}
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* Footer: κολλητό στο κάτω μέρος */
+footer {
+  /* Καθαρίζουμε το fixed */
+  position: static;
+  margin-top: auto;      /* σπρώχνει το footer στο τέλος του flex container */
+  background: #222;
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+}
+
+footer nav {
+  margin-top: 1rem;
+}
+footer a {
+  color: #000;           /* πιο μαύρο χρώμα για καλύτερη ανάγνωση */
+  text-decoration: none;
+  margin: 0 1rem;
+  font-weight: normal;
+}
+footer a:hover {
+  color: #333;           /* ελαφρώς ανοιχτότερο στο hover */
+  text-decoration: underline;
+}
+
+/* Φόρμες */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+input, textarea, select, button {
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  background: #333;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #555;
+}
+
+/* Αποτελέσματα αναζήτησης memorials */
+#resultsContainer > div {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+}
+
+/* Autocomplete (χάρτης, περιοχές κλπ) */
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: 1000;
+}
+
+.suggestions-list li {
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.suggestions-list li:hover {
+  background: #f0f0f0;
+}
