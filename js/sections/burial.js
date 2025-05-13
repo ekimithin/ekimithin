@@ -1,5 +1,11 @@
 // js/sections/burial.js
+
 export function initBurialSection() {
-  const cemetery = document.getElementById('cemetery');
-  // π.χ. autocomplete για γνωστά νεκροταφεία
+  const cemeteryInput = document.getElementById("cemetery");
+  if (!cemeteryInput) return;
+
+  const details = cemeteryInput.closest("details");
+  cemeteryInput.addEventListener("input", () => {
+    if (details && !details.open) details.open = true;
+  });
 }
