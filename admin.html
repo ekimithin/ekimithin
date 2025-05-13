@@ -24,7 +24,7 @@
       --radius: 8px;
       --gap: 1rem;
     }
-    * { box-sizing:border-box; margin:0; padding:0; }
+    * { box-sizing:border-box; margin:0; padding:0 }
     body {
       font-family:Arial,sans-serif;
       background:var(--c-bg);
@@ -50,9 +50,7 @@
       max-width:1200px;
       margin:var(--gap) auto;
       padding:0 var(--gap);
-      display:grid;
-      grid-template-columns:1fr;
-      gap:var(--gap);
+      display:grid; grid-template-columns:1fr; gap:var(--gap);
     }
     @media(min-width:800px) {
       main { grid-template-columns:2fr 1fr; }
@@ -102,16 +100,19 @@
       gap:var(--gap);
       margin-bottom:var(--gap);
     }
-    #relativeResults {
+    #suggestions, #relativeResults {
       list-style:none;
       border:1px solid #ccc;
       border-radius:var(--radius);
       max-height:150px;
       overflow-y:auto;
       margin-bottom:var(--gap);
+      background:#fff;
     }
-    #relativeResults li { padding:0.5rem; cursor:pointer; }
-    #relativeResults li:hover { background:#eee; }
+    #suggestions li, #relativeResults li {
+      padding:0.5rem; cursor:pointer;
+    }
+    #suggestions li:hover, #relativeResults li:hover { background:#eee; }
 
     table { width:100%; border-collapse:collapse; margin-top:var(--gap); }
     th, td { border:1px solid #ddd; padding:0.5rem; }
@@ -204,13 +205,13 @@
 
         <!-- Δημόσιες Διακρίσεις -->
         <details>
-          <summary>➤ Δημόσιες Διακρίσεις</summary>
+          <summary>➤ Δημόσιες Διακρίσεις</summary>
           <textarea id="awards" rows="3" placeholder="π.χ. Βραβείο …"></textarea>
         </details>
 
         <!-- Ενδιαφέροντα & Χόμπι -->
         <details>
-          <summary>➤ Ενδιαφέροντα & Χόμπι</summary>
+          <summary>➤ Ενδιαφέροντα &amp; Χόμπι</summary>
           <textarea id="interests" rows="3"></textarea>
         </details>
 
@@ -235,7 +236,7 @@
               <option value="" disabled selected>Επίλεξε σχέση</option>
               <option>Πατέρας</option><option>Μητέρα</option>
               <option>Υιός</option><option>Κόρη</option>
-              <option>Πανπούς</option><option>Γιαγιά</option>
+              <option>Παππούς</option><option>Γιαγιά</option>
               <option>Αδελφός</option><option>Αδελφή</option>
               <option>Θείος</option><option>Θεία</option>
               <option>Ανιψιός</option><option>Ανιψιά</option>
@@ -291,7 +292,7 @@
 
   </main>
 
-  <!-- JS Modules (all deferred by default) -->
+  <!-- JS Modules -->
   <script type="module" src="js/supabase.js"></script>
   <script type="module" src="js/sections/biography.js"></script>
   <script type="module" src="js/sections/awards.js"></script>
