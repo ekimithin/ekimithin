@@ -159,34 +159,42 @@ searchForm.addEventListener("submit", async e => {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  // 📌 Βασικά πεδία
   const first = form.firstname.value.trim();
-  const last  = form.lastname.value.trim();
-  const city  = form.city.value.trim();
-
+  const last = form.lastname.value.trim();
+  const city = form.city.value.trim();
   if (!first || !last || !city) return alert("Συμπλήρωσε Όνομα, Επώνυμο, Πόλη.");
 
   const birth = form.birth_date.value || null;
   const death = form.death_date.value || null;
 
-  // Έλεγχος ημερομηνιών
+  // 🧠 Έλεγχος ημερομηνιών
   if (birth && death && new Date(birth) > new Date(death)) return alert("Η γέννηση είναι μετά τον θάνατο.");
   if (!birth && death) return alert("❗ Έχεις θάνατο χωρίς γέννηση.");
   if (!death && birth) return alert("❗ Έχεις γέννηση χωρίς θάνατο.");
 
-  // ✨ Δημιουργία ID τύπου: ek548321-eleni-karagiorgi-piraeus
-  const initials  = toLatin(first[0] + last[0]).toLowerCase();
-  const timestamp = Date.now().toString().slice(-6);
-  const slug      = `${toLatin(first)}-${toLatin(last)}-${toLatin(city)}`.toLowerCase().replace(/\s+/g, '-');
-  const id        = `${initials}${timestamp}-${slug}`;
+  // 🧠 Κανονικοποίηση
+  const firstL = toLatin(first).toLowerCase();
+  const lastL = toLatin(last).toLowerCase();
+  const cityL = toLatin(city).toLowerCase();
 
-  // ➕ Απόδοση ID για χρήση από relationships.js
+  // 🔠 Δημιουργία ID: ek548321-eleni-karagiorgi-athens
+  const initials = toLatin(first[0] + last[0]).toLowerCase();
+  const timestamp = Date.now().toString().slice(-6);
+  const slug = `${firstL}-${lastL}-${cityL}`.replace(/\s+/g, "-");
+  const id = `ek${timestamp}-${slug}`;
+
+  console.log("🆔 ID:", id);
+
+  // 📌 Απόδοση προσωρινά στο form για use από relationships.js
   form.dataset.id = id;
 
+  // 🗂 Extra πεδία
   const dataToSave = {
     id,
     first_name: first,
-    last_name: toLatin(last).toLowerCase(),
-    city: toLatin(city).toLowerCase(),
+    last_name: lastL,
+    city: cityL,
     region: form.region.value.trim(),
     gender: form.gender.value,
     birth_date: birth,
@@ -205,37 +213,55 @@ form.addEventListener("submit", async (e) => {
     candles: 0
   };
 
+  // 🧪 Αποθήκευση memorial
   const { error: upErr } = await supabase.from("memorials").upsert(dataToSave);
   if (upErr) {
-    console.error(upErr);
-    return alert("❌ Σφάλμα αποθήκευσης memorial.");
+    console.error("❌ Σφάλμα upsert memorial:", upErr.message);
+    return alert("❌ Δεν αποθηκεύτηκε το memorial.");
   }
 
-  // 🔁 Σχέσεις
-  await supabase.from("relationships").delete().eq("memorial_id", id);
-  const rels = Array.from(document.querySelectorAll("#relationshipsTable tbody tr")).map(tr => ({
-    memorial_id: id,
-    relative_id: tr.children[1].textContent,
-    relation_type: tr.children[0].textContent
-  }));
-  if (rels.length) {
-    await supabase.from("relationships").insert(rels);
+  // 🔁 Αποθήκευση relationships (μόνο όσα ΔΕΝ έχουν αποθηκευτεί ήδη)
+  const rels = Array.from(document.querySelectorAll("#relationshipsTable tbody tr"))
+    .filter(tr => !tr.dataset.saved)
+    .map(tr => ({
+      memorial_id: id,
+      relative_id: tr.querySelector("input[name*='relative_id']").value,
+      relation_type: tr.querySelector("input[name*='relation']").value
+    }));
+
+  if (rels.length > 0) {
+    const { error: relErr } = await supabase.from("relationships").insert(rels);
+    if (relErr) {
+      console.error("❌ Σφάλμα αποθήκευσης σχέσεων:", relErr.message);
+      alert("❌ Οι σχέσεις δεν αποθηκεύτηκαν.");
+    }
   }
 
-  // 📦 Δημιουργία QR Code
+  // 📦 Δημιουργία QR
   const url = `${location.origin}/memorial.html?id=${id}`;
   const blob = await (await fetch(`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(url)}`)).blob();
   const fileName = `${id}.png`;
 
-  await supabase.storage.from("qr-codes").upload(fileName, blob, { contentType: "image/png", upsert: true });
+  // 🗃️ Αποθήκευση QR στο Supabase Storage
+  const { error: qrErr } = await supabase.storage
+    .from("qr-codes")
+    .upload(fileName, blob, { contentType: "image/png", upsert: true });
+
+  if (qrErr) {
+    console.error("❌ Σφάλμα upload QR:", qrErr.message);
+    return alert("❌ Το QR δεν αποθηκεύτηκε.");
+  }
+
   const { data: qr } = supabase.storage.from("qr-codes").getPublicUrl(fileName);
 
+  // ✅ Preview
   qrPreview.innerHTML = `
     <img src="${qr.publicUrl}" style="max-width:300px;margin-bottom:1rem;" />
     <div><a href="${url}" target="_blank">${url}</a></div>
     <a href="${qr.publicUrl}" download="${fileName}">⬇️ Κατέβασε το QR</a>
   `;
 
+  // 🔄 Reset
   alert("✅ Το memorial καταχωρήθηκε!");
   form.reset();
   form.removeAttribute("data-id");
