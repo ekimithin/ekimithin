@@ -339,7 +339,7 @@ document.getElementById("generatePdfBtn")?.addEventListener("click", async () =>
       warning: { fontSize: 10, italics: true, color: 'red' }
     },
     defaultStyle: {
-      font: 'Helvetica'
+      font: 'Roboto'
     }
   };
 
