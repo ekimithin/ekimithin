@@ -252,14 +252,12 @@ logoutBtn?.addEventListener("click", async () => {
 });
 
 document.getElementById("generatePdfBtn")?.addEventListener("click", async () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
+  const form = document.getElementById("memorialForm");
   const first = form.firstname.value.trim();
-  const last  = form.lastname.value.trim();
-  const city  = form.city.value.trim();
-  const region= form.region.value.trim();
-  const id    = form.dataset.id || "χωρίς-id";
+  const last = form.lastname.value.trim();
+  const city = form.city.value.trim();
+  const region = form.region.value.trim();
+  const id = form.dataset.id || "χωρίς-id";
 
   const data = {
     first_name: first,
@@ -276,39 +274,38 @@ document.getElementById("generatePdfBtn")?.addEventListener("click", async () =>
     genealogy: form.genealogy.value.trim()
   };
 
-  // 🔗 URL QR
   const qrUrl = `https://glsayujqzkevokaznnrd.supabase.co/storage/v1/object/public/qr-codes/${id}.png`;
 
-  // 🧠 Βασικά
-  let y = 20;
-  doc.setFont("Helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text("Μνημείο Καταχώρησης", 105, y, { align: "center" });
+  const qrBase64 = await fetch(qrUrl)
+    .then(res => res.blob())
+    .then(blob => new Promise(res => {
+      const reader = new FileReader();
+      reader.onloadend = () => res(reader.result);
+      reader.readAsDataURL(blob);
+    }))
+    .catch(() => null); // fallback in case no QR exists
 
-  y += 15;
-  doc.setFontSize(12);
-  doc.setFont("Helvetica", "normal");
-  doc.text(`Ονοματεπώνυμο: ${data.last_name} ${data.first_name}`, 20, y);
-  y += 8;
-  doc.text(`Τοποθεσία: ${data.city}, ${data.region}`, 20, y);
-
-  // 🔴 ID σε κόκκινο πλαίσιο
-  y += 10;
-  doc.setDrawColor(255, 0, 0);
-  doc.setTextColor(255, 0, 0);
-  doc.setFont("Helvetica", "bold");
-  doc.rect(20, y, 170, 10);
-  doc.text(`ID Εγγραφής: ${data.id}`, 25, y + 7);
-
-  y += 15;
-  doc.setFontSize(10);
-  doc.setFont("Helvetica", "normal");
-  const warning = `⚠️ ΠΡΟΣΟΧΗ\nΟ κωδικός καταχώρησης είναι μοναδικός.\nΣας παρακαλούμε να τον φυλάξετε για τυχόν μελλοντικές αλλαγές\nστη Βάση Ψηφιακής Μνήμης.`;
-  doc.text(warning, 25, y);
-  y += 30;
-
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(12);
+  const content = [
+    { text: "Μνημείο Καταχώρησης", style: "header", alignment: "center", margin: [0, 0, 0, 20] },
+    { text: `Ονοματεπώνυμο: ${data.last_name} ${data.first_name}`, style: "normal" },
+    { text: `Τοποθεσία: ${data.city}, ${data.region}`, style: "normal", margin: [0, 0, 0, 10] },
+    {
+      style: "idBox",
+      table: {
+        widths: ['*'],
+        body: [
+          [{ text: `ID Εγγραφής: ${data.id}`, style: "idText" }],
+          [{ text: "⚠️ ΠΡΟΣΟΧΗ\nΟ κωδικός καταχώρησης είναι μοναδικός.\nΣας παρακαλούμε να τον φυλάξετε για τυχόν μελλοντικές αλλαγές\nστη Βάση Ψηφιακής Μνήμης.", style: "warning" }]
+        ]
+      },
+      layout: {
+        hLineWidth: () => 1,
+        vLineWidth: () => 0,
+        hLineColor: () => 'red'
+      },
+      margin: [0, 0, 0, 15]
+    }
+  ];
 
   const labels = {
     birth_place: "Τόπος Γέννησης",
@@ -322,29 +319,33 @@ document.getElementById("generatePdfBtn")?.addEventListener("click", async () =>
 
   for (const key in labels) {
     if (data[key]) {
-      doc.text(`${labels[key]}: ${data[key]}`, 20, y);
-      y += 8;
+      content.push({ text: `${labels[key]}: ${data[key]}`, style: "normal" });
     }
   }
 
-  // 📷 QR Code
-  try {
-    const qrBlob = await fetch(qrUrl).then(r => r.blob());
-    const qrDataUrl = await new Promise(res => {
-      const reader = new FileReader();
-      reader.onload = () => res(reader.result);
-      reader.readAsDataURL(qrBlob);
-    });
-    y += 10;
-    doc.addImage(qrDataUrl, "PNG", 80, y, 50, 50);
-  } catch (e) {
-    doc.setTextColor(255, 0, 0);
-    doc.text("❌ Το QR δεν βρέθηκε", 20, y);
+  if (qrBase64) {
+    content.push({ image: qrBase64, width: 150, alignment: "center", margin: [0, 20, 0, 0] });
+  } else {
+    content.push({ text: "❌ Δεν βρέθηκε QR", color: "red", margin: [0, 20, 0, 0] });
   }
 
-  // 💾 Αποθήκευση
-  doc.save(`mnimeio-${data.id}.pdf`);
+  const docDefinition = {
+    content,
+    styles: {
+      header: { fontSize: 18, bold: true },
+      normal: { fontSize: 12 },
+      idBox: { margin: [0, 10, 0, 10] },
+      idText: { fontSize: 13, bold: true, color: 'red' },
+      warning: { fontSize: 10, italics: true, color: 'red' }
+    },
+    defaultStyle: {
+      font: 'Helvetica'
+    }
+  };
+
+  pdfMake.createPdf(docDefinition).download(`mnimeio-${data.id}.pdf`);
 });
+
 
 
 
