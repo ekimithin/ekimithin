@@ -156,6 +156,61 @@ searchForm.addEventListener("submit", async e => {
   });
 });
 
+async function executeSearch() {
+  const idInput    = document.getElementById("searchId").value.trim();
+  const lastInput  = document.getElementById("searchLastname").value.trim();
+  const firstInput = document.getElementById("searchFirstname").value.trim();
+  const cityInput  = document.getElementById("searchCity").value.trim();
+
+  // 🔠 Καθαρισμός από τόνους
+  const id    = removeGreekDiacritics(idInput).toLowerCase();
+  const last  = removeGreekDiacritics(lastInput).toLowerCase();
+  const first = removeGreekDiacritics(firstInput).toLowerCase();
+  const city  = removeGreekDiacritics(cityInput).toLowerCase();
+
+  // 🔎 Χτίσιμο query
+  let query = supabase
+    .from("memorials")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (id)    query = query.ilike("id", `${id}%`);
+  if (last)  query = query.ilike("last_name", `%${last}%`);
+  if (first) query = query.ilike("first_name", `%${first}%`);
+  if (city)  query = query.ilike("city", `%${city}%`);
+
+  const { data, error } = await query;
+  const resultsContainer = document.getElementById("resultsContainer");
+  resultsContainer.innerHTML = "";
+
+  if (error || !data || data.length === 0) {
+    resultsContainer.innerHTML = "<p>❌ Δεν βρέθηκαν αποτελέσματα.</p>";
+    return;
+  }
+
+  data.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = "result-entry";
+    div.style = "border:1px solid #ccc;padding:1rem;margin-bottom:1rem;border-radius:5px";
+
+    div.innerHTML = `
+      <strong>${entry.first_name} ${entry.last_name}</strong><br/>
+      <small>${entry.city}, ${entry.region}</small><br/>
+      <a href="/memorial.html?id=${entry.id}" target="_blank">➡️ Προβολή</a><br/>
+      <button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
+      <button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
+    `;
+    resultsContainer.appendChild(div);
+  });
+
+  // 👉 Σύνδεση listeners
+  attachDeleteListeners();
+  document.querySelectorAll(".editBtn").forEach(btn => {
+    btn.addEventListener("click", () => loadForEdit(btn.dataset.id));
+  });
+}
+
+
 // ================= Submit: καταχώρηση memorial =================
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -331,4 +386,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initAwardsSection();
   initInterestsSection();
   initBurialSection();
+});
+
+// 🔁 Σύνδεση live search
+["searchId", "searchLastname", "searchFirstname", "searchCity"].forEach(id => {
+  const input = document.getElementById(id);
+  if (input) input.addEventListener("input", debounce(executeSearch, 300));
 });
