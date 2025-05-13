@@ -250,10 +250,36 @@ logoutBtn?.addEventListener("click", async () => {
   await supabase.auth.signOut();
   window.location.href = "/login.html";
 });
-async function generatePdf(data, qrUrl) {
+
+document.getElementById("generatePdfBtn")?.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
+  const first = form.firstname.value.trim();
+  const last  = form.lastname.value.trim();
+  const city  = form.city.value.trim();
+  const region= form.region.value.trim();
+  const id    = form.dataset.id || "χωρίς-id";
+
+  const data = {
+    first_name: first,
+    last_name: last,
+    city,
+    region,
+    id,
+    birth_place: form.birth_place.value.trim(),
+    profession: form.profession.value.trim(),
+    education: form.education.value.trim(),
+    awards: form.awards.value.trim(),
+    interests: form.interests.value.trim(),
+    cemetery: form.cemetery.value.trim(),
+    genealogy: form.genealogy.value.trim()
+  };
+
+  // 🔗 URL QR
+  const qrUrl = `https://glsayujqzkevokaznnrd.supabase.co/storage/v1/object/public/qr-codes/${id}.png`;
+
+  // 🧠 Βασικά
   let y = 20;
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(16);
@@ -266,7 +292,7 @@ async function generatePdf(data, qrUrl) {
   y += 8;
   doc.text(`Τοποθεσία: ${data.city}, ${data.region}`, 20, y);
 
-  // 🔴 Κόκκινο πλαίσιο με ID
+  // 🔴 ID σε κόκκινο πλαίσιο
   y += 10;
   doc.setDrawColor(255, 0, 0);
   doc.setTextColor(255, 0, 0);
@@ -277,7 +303,6 @@ async function generatePdf(data, qrUrl) {
   y += 15;
   doc.setFontSize(10);
   doc.setFont("Helvetica", "normal");
-  doc.setTextColor(255, 0, 0);
   const warning = `⚠️ ΠΡΟΣΟΧΗ\nΟ κωδικός καταχώρησης είναι μοναδικός.\nΣας παρακαλούμε να τον φυλάξετε για τυχόν μελλοντικές αλλαγές\nστη Βάση Ψηφιακής Μνήμης.`;
   doc.text(warning, 25, y);
   y += 30;
@@ -285,7 +310,6 @@ async function generatePdf(data, qrUrl) {
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(12);
 
-  // 🧠 Επιπλέον πεδία
   const labels = {
     birth_place: "Τόπος Γέννησης",
     profession: "Επάγγελμα",
@@ -296,29 +320,33 @@ async function generatePdf(data, qrUrl) {
     genealogy: "Γενεαλογικά"
   };
 
-  for (const field in labels) {
-    if (data[field]) {
-      doc.text(`${labels[field]}: ${data[field]}`, 20, y);
+  for (const key in labels) {
+    if (data[key]) {
+      doc.text(`${labels[key]}: ${data[key]}`, 20, y);
       y += 8;
     }
   }
 
-  // 📷 QR Εικόνα
-  if (qrUrl) {
-    const qrImage = await fetch(qrUrl).then(res => res.blob()).then(blob => {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(blob);
-      });
+  // 📷 QR Code
+  try {
+    const qrBlob = await fetch(qrUrl).then(r => r.blob());
+    const qrDataUrl = await new Promise(res => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result);
+      reader.readAsDataURL(qrBlob);
     });
     y += 10;
-    doc.addImage(qrImage, "PNG", 80, y, 50, 50);
+    doc.addImage(qrDataUrl, "PNG", 80, y, 50, 50);
+  } catch (e) {
+    doc.setTextColor(255, 0, 0);
+    doc.text("❌ Το QR δεν βρέθηκε", 20, y);
   }
 
   // 💾 Αποθήκευση
-  doc.save(`memorial-${data.id}.pdf`);
-}
+  doc.save(`mnimeio-${data.id}.pdf`);
+});
+
+
 
 // ================= Init Modules =================
 document.addEventListener("DOMContentLoaded", () => {
