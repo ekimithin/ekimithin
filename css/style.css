@@ -395,28 +395,6 @@ details[open] summary {
     max-width: 100%;
   }
 }
-/* ✅ Positioning: Autocomplete πάνω από το map, πάντα εντός container */
-.autocomplete-wrapper {
-  position: relative;
-}
-
-.suggestions-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 200px;
-  overflow-y: auto;
-  background: white;
-  border: 1px solid #ccc;
-  z-index: 1001;
-  margin-top: 2px;
-  padding: 0;
-  list-style: none;
-  border-radius: 5px;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
 
 .suggestions-list li {
   padding: 8px 12px;
@@ -427,9 +405,9 @@ details[open] summary {
   background-color: #f0f0f0;
 }
 
-/* ✅ Μείωση κατακόρυφου κενού μεταξύ πεδίων */
+/* ✅ Βελτίωση spacing ανάμεσα στα πεδία */
 form label {
-  margin-top: 0.6rem;
+  margin-top: 0.4rem;
   margin-bottom: 0.2rem;
 }
 
@@ -437,4 +415,21 @@ form input,
 form textarea,
 form select {
   margin-bottom: 0.6rem;
+}
+
+/* ✅ Καλύτερη εμφάνιση autocomplete κάτω από το πεδίο */
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.suggestions-list {
+  margin-top: 0.25rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  font-size: 0.95rem;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  z-index: 9999;
 }
