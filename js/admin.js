@@ -218,21 +218,26 @@ form.addEventListener("submit", async (e) => {
   }
 
   // 🔁 Αποθήκευση σχέσεων
-  const rels = Array.from(document.querySelectorAll("#relationshipsTable tbody tr"))
-    .filter(tr => !tr.dataset.saved)
-    .map(tr => ({
+const rels = Array.from(document.querySelectorAll("#relationshipsTable tbody tr"))
+  .filter(tr => !tr.dataset.saved)
+  .map(tr => {
+    const relIdInput = tr.querySelector("input[name*='relative_id']");
+    const relTypeInput = tr.querySelector("input[name*='relation']");
+    return {
       memorial_id: id,
-      relative_id: tr.querySelector("input[name*='relative_id']").value,
-      relation_type: tr.querySelector("input[name*='relation']").value
-    }));
+      relative_id: relIdInput ? relIdInput.value : tr.children[1]?.textContent.trim(),
+      relation_type: relTypeInput ? relTypeInput.value : tr.children[0]?.textContent.trim()
+    };
+  });
 
-  if (rels.length > 0) {
-    const { error: relErr } = await supabase.from("relationships").insert(rels);
-    if (relErr) {
-      console.error("❌ Σφάλμα σχέσεων:", relErr.message);
-      alert("❌ Οι σχέσεις δεν αποθηκεύτηκαν.");
-    }
+if (rels.length > 0) {
+  const { error: relErr } = await supabase.from("relationships").insert(rels);
+  if (relErr) {
+    console.error("❌ Σφάλμα σχέσεων:", relErr.message);
+    alert("❌ Οι σχέσεις δεν αποθηκεύτηκαν.");
   }
+}
+
 
   // 📦 Δημιουργία QR
   const url = `${location.origin}/memorial.html?id=${id}`;
