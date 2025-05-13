@@ -251,20 +251,23 @@ logoutBtn?.addEventListener("click", async () => {
   window.location.href = "/login.html";
 });
 
+// ================= ΔΗΜΙΟΥΡΓΙΑ PDF =================
 document.getElementById("generatePdfBtn")?.addEventListener("click", async () => {
   const form = document.getElementById("memorialForm");
-  const first = form.firstname.value.trim();
-  const last = form.lastname.value.trim();
-  const city = form.city.value.trim();
-  const region = form.region.value.trim();
-  const id = form.dataset.id || "χωρίς-id";
+  const idRaw = form.dataset.id;
+  if (!idRaw || idRaw.startsWith("temp-")) {
+    return alert("⚠️ Δεν υπάρχει έγκυρο καταχωρημένο ID.\nΠαρακαλώ πρώτα αποθήκευσε ή επίλεξε ένα memorial.");
+  }
+
+  const safeId = toLatin(idRaw);
+  const qrUrl = `https://glsayujqzkevokaznnrd.supabase.co/storage/v1/object/public/qr-codes/${encodeURIComponent(safeId)}.png`;
 
   const data = {
-    first_name: first,
-    last_name: last,
-    city,
-    region,
-    id,
+    first_name: form.firstname.value.trim(),
+    last_name: form.lastname.value.trim(),
+    city: form.city.value.trim(),
+    region: form.region.value.trim(),
+    id: safeId,
     birth_place: form.birth_place.value.trim(),
     profession: form.profession.value.trim(),
     education: form.education.value.trim(),
@@ -274,11 +277,6 @@ document.getElementById("generatePdfBtn")?.addEventListener("click", async () =>
     genealogy: form.genealogy.value.trim()
   };
 
-  const safeId = toLatin(form.dataset.id || "χωρίς-id");
-const qrUrl = `https://glsayujqzkevokaznnrd.supabase.co/storage/v1/object/public/qr-codes/${encodeURIComponent(safeId)}.png`;
-
-
-
   const qrBase64 = await fetch(qrUrl)
     .then(res => res.blob())
     .then(blob => new Promise(res => {
@@ -286,7 +284,7 @@ const qrUrl = `https://glsayujqzkevokaznnrd.supabase.co/storage/v1/object/public
       reader.onloadend = () => res(reader.result);
       reader.readAsDataURL(blob);
     }))
-    .catch(() => null); // fallback in case no QR exists
+    .catch(() => null);
 
   const content = [
     { text: "Μνημείο Καταχώρησης", style: "header", alignment: "center", margin: [0, 0, 0, 20] },
@@ -340,14 +338,12 @@ const qrUrl = `https://glsayujqzkevokaznnrd.supabase.co/storage/v1/object/public
       idBox: { margin: [0, 10, 0, 10] },
       idText: { fontSize: 13, bold: true, color: 'red' },
       warning: { fontSize: 10, italics: true, color: 'red' }
-    },
-    defaultStyle: {
-      font: 'Roboto'
     }
   };
 
   pdfMake.createPdf(docDefinition).download(`mnimeio-${data.id}.pdf`);
 });
+
 
 
 
