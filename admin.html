@@ -1,4 +1,4 @@
-<!-- ===== admin.html===== -->
+<!-- ===== admin.html ===== -->
 <!DOCTYPE html>
 <html lang="el">
 <head>
@@ -24,10 +24,8 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
   <style>
     .relationship-search-grid {
@@ -64,113 +62,164 @@
     <section class="section">
       <h2>➕ Δημιουργία / Επεξεργασία Memorial</h2>
       <form id="memorialForm" data-id="">
-
-
-       <div class="form-row">
-  <div class="half">
-    <label for="firstname">Όνομα:</label>
-    <input type="text" id="firstname" required />
-  </div>
-  <div class="half">
-    <label for="lastname">Επώνυμο:</label>
-    <input type="text" id="lastname" required />
-  </div>
-</div>
-
-
-        <label for="birth_date">Ημ. Γέννησης:</label>
-        <input type="date" id="birth_date" />
-
-        <label for="death_date">Ημ. Θανάτου:</label>
-        <input type="date" id="death_date" />
-
-        <label for="gender">Φύλο:</label>
-        <select id="gender">
-          <option value="">Επιλογή</option>
-          <option value="male">Άνδρας</option>
-          <option value="female">Γυναίκα</option>
-        </select>
-
-        <label for="addressInput">Διεύθυνση / Τοποθεσία:</label>
-        <div class="autocomplete-wrapper">
-          <input id="addressInput" type="text" placeholder="Πληκτρολόγησε διεύθυνση ή τόπο…" autocomplete="off" />
-          <ul id="suggestions" class="suggestions-list"></ul>
+        <div class="form-row">
+          <div class="half">
+            <label for="firstname">Όνομα:</label>
+            <input type="text" id="firstname" required />
+          </div>
+          <div class="half">
+            <label for="lastname">Επώνυμο:</label>
+            <input type="text" id="lastname" required />
+          </div>
         </div>
 
-        <div id="map" style="height:200px; margin:0.5rem 0;"></div>
-
-        <label for="city">Πόλη:</label>
-        <input type="text" id="city" />
-
-        <label for="region">Περιοχή:</label>
-        <input type="text" id="region" />
-
-        <details><summary>➤ Βασικά Βιογραφικά</summary>
-          <label for="birth_place">Τόπος Γέννησης:</label>
-          <input type="text" id="birth_place" name="birth_place" />
-          <label for="profession">Επάγγελμα:</label>
-          <input type="text" id="profession" name="profession" />
-          <label for="education">Εκπαίδευση:</label>
-          <input type="text" id="education" name="education" />
-        </details>
-        <details><summary>➤ Δημόσιες Διακρίσεις</summary>
-          <textarea id="awards" name="awards" rows="3" placeholder="π.χ. Βραβείο Διονύσιος Σολωμός 2010"></textarea>
-        </details>
-
-        <details><summary>➤ Προσωπικά Ενδιαφέροντα & Χόμπι</summary>
-          <textarea id="interests" name="interests" rows="3" placeholder="π.χ. Λάτρης της ποίησης, Φωτογράφος"></textarea>
-        </details>
-
-        <details><summary>➤ Τοποθεσία Ταφής</summary>
-          <label for="cemetery">Κοιμητήριο / Σορός:</label>
-          <input type="text" id="cemetery" name="cemetery" />
-        </details>
-
-        <details><summary>➤ Γενεαλογικό Πλαίσιο</summary>
-          <textarea id="genealogy" name="genealogy" rows="3" readonly></textarea>
-        </details>
-
-        <details id="relationshipDetails"><summary>➤ Γενεαλογικές Σχέσεις</summary>
-          <div class="relationship-search-grid">
-            <div>
-              <label for="relativeIdInput">Memorial ID:</label>
-              <input type="text" id="relativeIdInput" placeholder="π.χ. menikouA1" />
-            </div>
-            <div>
-              <label for="relativeLastnameInput">Επώνυμο:</label>
-              <input type="text" id="relativeLastnameInput" placeholder="π.χ. Παπαδόπουλος" />
-            </div>
-            <div>
-              <label for="relativeFirstnameInput">Όνομα:</label>
-              <input type="text" id="relativeFirstnameInput" placeholder="π.χ. Γιώργος" />
-            </div>
-            <div>
-              <label for="relativeCityInput">Πόλη:</label>
-              <input type="text" id="relativeCityInput" placeholder="π.χ. Αθήνα" />
-            </div>
+        <div class="form-row">
+          <div class="half">
+            <label for="birth_date">Ημ. Γέννησης:</label>
+            <input type="date" id="birth_date" />
           </div>
+          <div class="half">
+            <label for="death_date">Ημ. Θανάτου:</label>
+            <input type="date" id="death_date" />
+          </div>
+        </div>
 
-          <ul id="relativeResults"></ul>
-
-          <label for="relationType">Σχέση:</label>
-          <select id="relationType">
-            <option disabled selected>Επίλεξε σχέση</option>
-            <option>Πατέρας</option><option>Μητέρα</option><option>Υιός</option><option>Κόρη</option>
-            <option>Παππούς</option><option>Γιαγιά</option><option>Αδελφός</option><option>Αδελφή</option>
-            <option>Θείος</option><option>Θεία</option><option>Ανιψιός</option><option>Ανιψιά</option>
-            <option>Ξάδερφος</option><option>Ξαδέρφη</option> <!-- ✅ Προστέθηκαν -->
+        <div class="form-group">
+          <label for="gender">Φύλο:</label>
+          <select id="gender">
+            <option value="">Επιλογή</option>
+            <option value="male">Άνδρας</option>
+            <option value="female">Γυναίκα</option>
           </select>
+        </div>
 
-          <button type="button" id="addRelationshipBtn">➕ Πρόσθεσε Σχέση</button>
+        <div class="map-wrapper">
+          <label for="addressInput">Διεύθυνση / Τοποθεσία:</label>
+          <input id="addressInput" type="text" placeholder="Πληκτρολόγησε διεύθυνση ή τόπο…" autocomplete="off" />
+          <ul id="suggestions" class="suggestions-list"></ul>
+          <div id="map"></div>
+        </div>
 
-          <table id="relationshipsTable" style="width:100%; margin-top:1rem;">
-            <thead>
-              <tr><th>Σχέση</th><th>Συγγενής</th><th>Διαγραφή</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </details>
-<button id="generatePdfBtn" type="button">📄 Δημιουργία PDF</button>
+        <div class="form-row">
+          <div class="half">
+            <label for="city">Πόλη:</label>
+            <input type="text" id="city" />
+          </div>
+          <div class="half">
+            <label for="region">Περιοχή:</label>
+            <input type="text" id="region" />
+          </div>
+        </div>
+        <div class="section-block">
+          <details>
+            <summary>➤ Βασικά Βιογραφικά</summary>
+            <label for="birth_place">Τόπος Γέννησης:</label>
+            <input type="text" id="birth_place" name="birth_place" />
+            <label for="profession">Επάγγελμα:</label>
+            <input type="text" id="profession" name="profession" />
+            <label for="education">Εκπαίδευση:</label>
+            <input type="text" id="education" name="education" />
+          </details>
+        </div>
+
+        <div class="section-block">
+          <details>
+            <summary>➤ Δημόσιες Διακρίσεις</summary>
+            <textarea id="awards" name="awards" rows="3" placeholder="π.χ. Βραβείο Διονύσιος Σολωμός 2010"></textarea>
+          </details>
+        </div>
+
+        <div class="section-block">
+          <details>
+            <summary>➤ Προσωπικά Ενδιαφέροντα & Χόμπι</summary>
+            <textarea id="interests" name="interests" rows="3" placeholder="π.χ. Λάτρης της ποίησης, Φωτογράφος"></textarea>
+          </details>
+        </div>
+
+        <div class="section-block">
+          <details>
+            <summary>➤ Τοποθεσία Ταφής</summary>
+            <label for="cemetery">Κοιμητήριο / Σορός:</label>
+            <input type="text" id="cemetery" name="cemetery" />
+          </details>
+        </div>
+
+        <div class="section-block">
+          <details>
+            <summary>➤ Γενεαλογικό Πλαίσιο</summary>
+            <textarea id="genealogy" name="genealogy" rows="3" readonly></textarea>
+          </details>
+        </div>
+
+        <div class="section-block">
+          <details id="relationshipDetails">
+            <summary>➤ Γενεαλογικές Σχέσεις</summary>
+
+            <div class="relationship-search-grid">
+              <div>
+                <label for="relativeIdInput">Memorial ID:</label>
+                <input type="text" id="relativeIdInput" placeholder="π.χ. menikouA1" />
+              </div>
+              <div>
+                <label for="relativeLastnameInput">Επώνυμο:</label>
+                <input type="text" id="relativeLastnameInput" placeholder="π.χ. Παπαδόπουλος" />
+              </div>
+              <div>
+                <label for="relativeFirstnameInput">Όνομα:</label>
+                <input type="text" id="relativeFirstnameInput" placeholder="π.χ. Γιώργος" />
+              </div>
+              <div>
+                <label for="relativeCityInput">Πόλη:</label>
+                <input type="text" id="relativeCityInput" placeholder="π.χ. Αθήνα" />
+              </div>
+            </div>
+
+            <ul id="relativeResults" class="suggestions-list"></ul>
+
+            <div class="form-row">
+              <div class="half">
+                <label for="relationType">Σχέση:</label>
+                <select id="relationType">
+                  <option disabled selected>Επίλεξε σχέση</option>
+                  <option>Πατέρας</option>
+                  <option>Μητέρα</option>
+                  <option>Υιός</option>
+                  <option>Κόρη</option>
+                  <option>Παππούς</option>
+                  <option>Γιαγιά</option>
+                  <option>Αδελφός</option>
+                  <option>Αδελφή</option>
+                  <option>Θείος</option>
+                  <option>Θεία</option>
+                  <option>Ανιψιός</option>
+                  <option>Ανιψιά</option>
+                  <option>Ξάδερφος</option>
+                  <option>Ξαδέρφη</option>
+                </select>
+              </div>
+              <div class="half" style="display: flex; align-items: end;">
+                <button type="button" id="addRelationshipBtn" style="width: 100%;">➕ Πρόσθεσε Σχέση</button>
+              </div>
+            </div>
+
+            <div class="relationship-table-wrapper">
+              <table id="relationshipsTable">
+                <thead>
+                  <tr><th>Σχέση</th><th>Συγγενής</th><th>Διαγραφή</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+        <div class="preview-block">
+          <button id="generatePdfBtn" type="button">📄 Δημιουργία PDF</button>
+
+          <div id="qr-preview">
+            <h3>QR Code:</h3>
+            <img id="qr-image" alt="QR Code" style="display:none; max-width:300px;" />
+          </div>
+        </div>
 
         <label for="message">Μήνυμα Μνήμης:</label>
         <textarea id="message" rows="4"></textarea>
@@ -183,11 +232,6 @@
 
         <button type="submit" class="btn-primary">📌 Καταχώρηση Memorial</button>
       </form>
-
-      <div id="qr-preview" style="margin-top:2rem;">
-        <h3>QR Code:</h3>
-        <img id="qr-image" alt="QR Code" style="display:none; max-width:300px;" />
-      </div>
     </section>
 
     <hr />
@@ -199,13 +243,11 @@
         <input type="text" id="searchLastname" placeholder="Επώνυμο">
         <input type="text" id="searchFirstname" placeholder="Όνομα">
         <input type="text" id="searchCity" placeholder="Πόλη">
-       </form>
+      </form>
 
-<div id="resultsContainer" style="margin-top: 1rem;"></div>
-
+      <div id="resultsContainer" style="margin-top: 1rem;"></div>
     </section>
   </main>
-
   <!-- 📦 JavaScript Modules -->
   <script type="module" src="js/supabase.js"></script>
   <script type="module" src="js/sections/biography.js"></script>
