@@ -293,6 +293,56 @@ function debounce(fn, delay = 300) {
     timer = setTimeout(() => fn(...args), delay);
   };
 }
+async function executeSearch() {
+  const idInput    = document.getElementById("searchId").value.trim();
+  const lastInput  = document.getElementById("searchLastname").value.trim();
+  const firstInput = document.getElementById("searchFirstname").value.trim();
+  const cityInput  = document.getElementById("searchCity").value.trim();
+
+  const id    = removeGreekDiacritics(idInput).toLowerCase();
+  const last  = removeGreekDiacritics(lastInput).toLowerCase();
+  const first = removeGreekDiacritics(firstInput).toLowerCase();
+  const city  = removeGreekDiacritics(cityInput).toLowerCase();
+
+  let query = supabase
+    .from("memorials")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (id)    query = query.ilike("id", `${id}%`);
+  if (last)  query = query.ilike("last_name", `%${last}%`);
+  if (first) query = query.ilike("first_name", `%${first}%`);
+  if (city)  query = query.ilike("city", `%${city}%`);
+
+  const { data, error } = await query;
+  const resultsContainer = document.getElementById("resultsContainer");
+  resultsContainer.innerHTML = "";
+
+  if (error || !data || data.length === 0) {
+    resultsContainer.innerHTML = "<p>❌ Δεν βρέθηκαν αποτελέσματα.</p>";
+    return;
+  }
+
+  data.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = "result-entry";
+    div.style = "border:1px solid #ccc;padding:1rem;margin-bottom:1rem;border-radius:5px";
+
+    div.innerHTML = `
+      <strong>${entry.first_name} ${entry.last_name}</strong><br/>
+      <small>${entry.city}, ${entry.region}</small><br/>
+      <a href="/memorial.html?id=${entry.id}" target="_blank">➡️ Προβολή</a><br/>
+      <button class="editBtn" data-id="${entry.id}">✏️ Επεξεργασία</button>
+      <button class="deleteBtn" data-id="${entry.id}">🗑️ Διαγραφή</button>
+    `;
+    resultsContainer.appendChild(div);
+  });
+
+  attachDeleteListeners();
+  document.querySelectorAll(".editBtn").forEach(btn => {
+    btn.addEventListener("click", () => loadForEdit(btn.dataset.id));
+  });
+}
 
 // ================= Live Search =================
 ["searchId", "searchLastname", "searchFirstname", "searchCity"].forEach(id => {
