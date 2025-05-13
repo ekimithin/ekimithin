@@ -257,6 +257,20 @@ document.addEventListener("DOMContentLoaded", () => {
   initBurialSection();
 });
 
+// 🔄 Δημιουργία προσωρινού ID για νέες εγγραφές
+["firstname", "lastname", "city"].forEach((field) => {
+  document.getElementById(field).addEventListener("input", () => {
+    const first = form.firstname.value.trim();
+    const last  = form.lastname.value.trim();
+    const city  = form.city.value.trim();
+
+    if (!first || !last || !city) return;
+
+    const tmp = `${toLatin(first[0] + last[0])}-${toLatin(city)}`.toLowerCase();
+    form.dataset.id = `temp-${tmp}`;
+  });
+});
+
 // ================= Helper: Greek to Latin =================
 function toLatin(text) {
   const map = {
