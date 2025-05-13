@@ -75,6 +75,9 @@ function attachDeleteListeners() {
     });
   });
 }
+
+
+
 // ================= Αναζήτηση memorials =================
 searchForm.addEventListener("submit", async e => {
   e.preventDefault();
@@ -108,54 +111,73 @@ searchForm.addEventListener("submit", async e => {
 
   attachDeleteListeners();
 
+
   document.querySelectorAll(".editBtn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const { data, error } = await supabase.from("memorials").select("*").eq("id", btn.dataset.id).single();
-      if (error || !data) return alert("❌ Δεν βρέθηκε.");
-
-      // ➕ Απόδοση ID στο form (για χρήση από relationships.js)
-      form.dataset.id = data.id;
-
-      // Φόρτωση πεδίων
-      form.firstname.value   = data.first_name;
-      form.lastname.value    = data.last_name;
-      form.birth_date.value  = data.birth_date;
-      form.death_date.value  = data.death_date;
-      form.gender.value      = data.gender;
-      form.region.value      = data.region;
-      form.city.value        = data.city;
-      form.message.value     = data.message;
-      form.photoUrl.value    = data.photo_url;
-      form.video.value       = data.youtube_url;
-
-      form.birth_place.value = data.birth_place || "";
-      form.profession.value  = data.profession  || "";
-      form.education.value   = data.education   || "";
-      form.awards.value      = data.awards      || "";
-      form.interests.value   = data.interests   || "";
-      form.cemetery.value    = data.cemetery    || "";
-      form.genealogy.value   = data.genealogy   || "";
-
-      // Σχέσεις
-      const { data: rels } = await supabase.from("relationships").select("*").eq("memorial_id", data.id);
-      const tbody = document.querySelector("#relationshipsTable tbody");
-      tbody.innerHTML = "";
-      rels.forEach(r => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${r.relation_type}</td>
-          <td>${r.relative_id}</td>
-          <td><button class="remove-relationship">✖️</button></td>
-        `;
-        tr.querySelector('.remove-relationship').addEventListener('click', () => tr.remove());
-        tbody.appendChild(tr);
-      });
-
-      alert("✅ Memorial φορτώθηκε για επεξεργασία.");
-    });
-  });
+  btn.addEventListener("click", () => loadForEdit(btn.dataset.id));
 });
+  async function loadForEdit(id) {
+  const { data, error } = await supabase
+    .from("memorials")
+    .select("*")
+    .eq("id", id)
+    .single();
 
+  if (error || !data) {
+    alert("❌ Δεν βρέθηκε το memorial.");
+    console.error(error);
+    return;
+  }
+
+  // 👉 Απόδοση ID στο dataset του form
+  form.dataset.id = id;
+
+  // 👉 Φόρτωση βασικών πεδίων
+  form.firstname.value   = data.first_name;
+  form.lastname.value    = data.last_name;
+  form.birth_date.value  = data.birth_date || "";
+  form.death_date.value  = data.death_date || "";
+  form.gender.value      = data.gender || "";
+  form.city.value        = data.city || "";
+  form.region.value      = data.region || "";
+  form.message.value     = data.message || "";
+  form.photoUrl.value    = data.photo_url || "";
+  form.video.value       = data.youtube_url || "";
+
+  // 👉 Επιπλέον πεδία
+  form.birth_place.value = data.birth_place || "";
+  form.profession.value  = data.profession  || "";
+  form.education.value   = data.education   || "";
+  form.awards.value      = data.awards      || "";
+  form.interests.value   = data.interests   || "";
+  form.cemetery.value    = data.cemetery    || "";
+  form.genealogy.value   = data.genealogy   || "";
+
+  // 👉 Φόρτωση σχέσεων
+  const { data: rels } = await supabase
+    .from("relationships")
+    .select("*")
+    .eq("memorial_id", id);
+
+  const tbody = document.querySelector("#relationshipsTable tbody");
+  tbody.innerHTML = "";
+
+  rels.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.dataset.saved = "1"; // ώστε να μην ξανα-σταλεί
+    tr.innerHTML = `
+      <td>${r.relation_type}</td>
+      <td>${r.relative_id}</td>
+      <td><button type="button" class="remove-relationship">✖️</button></td>
+    `;
+    tr.querySelector('.remove-relationship')
+      .addEventListener('click', () => tr.remove());
+    tbody.appendChild(tr);
+  });
+
+  alert("✅ Memorial φορτώθηκε για επεξεργασία.");
+}
+
+  
 async function executeSearch() {
   const idInput    = document.getElementById("searchId").value.trim();
   const lastInput  = document.getElementById("searchLastname").value.trim();
