@@ -287,7 +287,7 @@ document.getElementById("generatePdfBtn")?.addEventListener("click", async () =>
     .catch(() => null);
 
   const content = [
-    { text: "Μνημείο Καταχώρησης", style: "header", alignment: "center", margin: [0, 0, 0, 20] },
+    { text: "Στοιχεία Καταχώρησης", style: "header", alignment: "center", margin: [0, 0, 0, 20] },
     { text: `Ονοματεπώνυμο: ${data.last_name} ${data.first_name}`, style: "normal" },
     { text: `Τοποθεσία: ${data.city}, ${data.region}`, style: "normal", margin: [0, 0, 0, 10] },
     {
