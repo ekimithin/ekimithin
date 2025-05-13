@@ -17,6 +17,7 @@ main.container {
   padding: 1.25rem;
   flex: 1;
 }
+
 section {
   margin-bottom: 2rem;
 }
@@ -44,9 +45,7 @@ section {
   cursor: pointer;
 }
 
-/* ======================================
-   Φόρμα Memorial - Compact και Responsive
-====================================== */
+/* Φόρμα Memorial */
 form {
   display: flex;
   flex-direction: column;
@@ -103,22 +102,8 @@ button:hover {
 .form-group {
   margin-bottom: 1rem;
 }
-}
 
-.form-row {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.form-row .half {
-  flex: 1 1 48%;
-  min-width: 180px;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
+/* Details / Περιοχές */
 .section-block {
   margin-top: 2rem;
   padding: 1rem;
@@ -139,6 +124,28 @@ summary {
   cursor: pointer;
   margin-bottom: 0.5rem;
 }
+
+/* Map */
+.map-wrapper {
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.map-wrapper input[type="text"] {
+  margin-bottom: 0.25rem;
+}
+
+#map {
+  width: 100%;
+  height: 200px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+/* QR Preview */
 .preview-block {
   margin-top: 2rem;
   display: flex;
@@ -154,6 +161,8 @@ summary {
   padding: 0.5rem;
   background-color: #fff;
 }
+
+/* Σχέσεις */
 .relationship-search-grid {
   display: grid;
   gap: 1rem;
@@ -170,6 +179,7 @@ summary {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
 #relativeResults li {
   padding: 0.5rem;
   cursor: pointer;
@@ -189,6 +199,7 @@ summary {
   border-collapse: collapse;
   margin-top: 0.5rem;
 }
+
 #relationshipsTable th,
 #relationshipsTable td {
   padding: 0.5rem;
@@ -197,6 +208,7 @@ summary {
   font-size: 0.9rem;
 }
 
+/* Αποτελέσματα */
 #resultsContainer > div {
   background: #fff;
   border: 1px solid #ddd;
@@ -205,6 +217,8 @@ summary {
   margin-bottom: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
+
+/* Responsive */
 @media (max-width: 768px) {
   .form-row {
     flex-direction: column;
@@ -226,4 +240,3 @@ summary {
     padding: 0.5rem;
   }
 }
-
