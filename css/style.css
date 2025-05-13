@@ -1,196 +1,24 @@
-/* 
-  ΑΡΧΕΙΟ: css/style.css
-  ΠΕΡΙΓΡΑΦΗ: Κύριο αρχείο CSS για το frontend του ekimithin.gr
-  Περιέχει καθαρό, μοντέρνο και responsive design.
-  Φόρτωση από όλα τα δημόσια HTML (π.χ. index.html, admin.html, memorial.html κλπ.)
-*/
-
-/* Βασικά Στυλ */
-
 /* ---------------------------------------------
-   Flex layout για sticky footer χωρίς masking 
+   Compact και Responsive Στυλ για ekimithin.gr
 --------------------------------------------- */
 html, body {
   height: 100%;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Το main (ή το κύριο wrapper) καταλαμβάνει όλο το διαθέσιμο ύψος */
-main, .memorial-container, section {
-  flex: 1;
-}
-
-body {
-  margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: #f5f5f5;
+  background: #f9f9f9;
   color: #333;
-}
-
-/* Header με σκούρο φόντο και κεντραρισμένο λογότυπο */
-header {
-  background: #222;
-  color: white;
-  text-align: center;
-  padding: 2rem 1rem;
-}
-header img {
-  display: block;
-  margin: 0 auto;
-  height: 60px;
-}
-
-/* Περιεχόμενο */
-section {
-  padding: 2rem;
-  max-width: 800px;
-  margin: auto;
-}
-main, .memorial-container {
-  padding-bottom: 100px; /* για να μην κρύβεται το περιεχόμενο πίσω από το footer */
-}
-
-/* Κουμπί CTA */
-.cta {
-  margin-top: 2rem;
-  padding: 1rem;
-  background: #333;
-  color: white;
-  display: inline-block;
-  text-decoration: none;
-  border-radius: 5px;
-}
-/* Προσθέτουμε padding στο container γενικά */
-main.container,
-section.container {
-  padding: 1rem;        /* 16px εσωτερικό κενό γύρω-γύρω */
-}
-
-/* Για πολύ μικρές οθόνες, λίγο μεγαλύτερη απόσταση */
-@media (max-width: 480px) {
-  main.container,
-  section.container {
-    padding: 1.25rem;   /* 20px */
-  }
-}
-
-/* Πλοήγηση (π.χ. footer ή πάνω links) */
-nav {
-  text-align: center;
-  background: #eee;
-  padding: 1rem;
-}
-nav a {
-  color: #333;
-  text-decoration: none;
-  margin: 0 1rem;
-  font-weight: bold;
-}
-nav a:hover {
-  text-decoration: underline;
-}
-
-/* Footer: κολλητό στο κάτω μέρος */
-footer {
-  /* Καθαρίζουμε το fixed */
-  position: static;
-  margin-top: auto;      /* σπρώχνει το footer στο τέλος του flex container */
-  background: #222;
-  color: #fff;
-  text-align: center;
-  padding: 1rem;
-}
-
-footer nav {
-  margin-top: 1rem;
-}
-footer a {
-  color: #000;           /* πιο μαύρο χρώμα για καλύτερη ανάγνωση */
-  text-decoration: none;
-  margin: 0 1rem;
-  font-weight: normal;
-}
-footer a:hover {
-  color: #333;           /* ελαφρώς ανοιχτότερο στο hover */
-  text-decoration: underline;
-}
-
-/* Φόρμες */
-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin: 2rem 0;
 }
-
-input, textarea, select, button {
-  padding: 0.8rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-button {
-  background: #333;
-  color: white;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #555;
-}
-
-/* Αποτελέσματα αναζήτησης memorials */
-#resultsContainer > div {
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 5px;
-}
-
-/* Autocomplete (χάρτης, περιοχές κλπ) */
-.autocomplete-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.suggestions-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  max-height: 150px;
-  overflow-y: auto;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-top: none;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  z-index: 1000;
-}
-
-.suggestions-list li {
-  padding: 4px 8px;
-  cursor: pointer;
-}
-
-.suggestions-list li:hover {
-  background: #f0f0f0;
-}
-/* ==================== ADMIN PAGE STYLING ==================== */
 
 main.container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.25rem;
+  flex: 1;
 }
-
-.section {
-  margin-bottom: 3rem;
+section {
+  margin-bottom: 2rem;
 }
 
 .header {
@@ -199,78 +27,138 @@ main.container {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 2rem;
+  padding: 1rem 0;
 }
 
 .header h1 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
 }
 
 .logout-btn {
   padding: 0.5rem 1rem;
-  background: #f44336;
+  background: #d9534f;
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-form label {
+/* ======================================
+   Φόρμα Memorial - Compact και Responsive
+====================================== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
   margin-top: 1rem;
-  display: block;
+}
+
+label {
+  font-size: 0.95rem;
   font-weight: bold;
 }
 
-form input,
-form select,
-form textarea {
+input,
+textarea,
+select {
   width: 100%;
-  padding: 0.6rem;
-  margin-top: 0.3rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
   border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
+  border-radius: 5px;
+  box-sizing: border-box;
 }
 
-form details {
-  margin-top: 1.5rem;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background-color: #fafafa;
+textarea {
+  resize: vertical;
 }
 
-form summary {
-  cursor: pointer;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
+button,
 button.btn-primary {
-  margin-top: 1.5rem;
-  padding: 0.8rem 1.2rem;
-  background-color: #2196f3;
+  padding: 0.65rem 1.2rem;
+  font-size: 1rem;
+  background-color: #007acc;
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 1rem;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-button.btn-primary:hover {
-  background-color: #1976d2;
+button:hover {
+  background-color: #005fa3;
 }
 
-#qr-preview {
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-row .half {
+  flex: 1 1 48%;
+  min-width: 180px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-row .half {
+  flex: 1 1 48%;
+  min-width: 180px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+.section-block {
   margin-top: 2rem;
+  padding: 1rem;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
 }
 
+details {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fefefe;
+}
+
+summary {
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+.preview-block {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: flex-start;
+}
+
+.preview-block img {
+  max-width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.5rem;
+  background-color: #fff;
+}
 .relationship-search-grid {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 #relativeResults {
@@ -282,7 +170,6 @@ button.btn-primary:hover {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-
 #relativeResults li {
   padding: 0.5rem;
   cursor: pointer;
@@ -292,244 +179,51 @@ button.btn-primary:hover {
   background: #f0f0f0;
 }
 
-#resultsContainer > div {
-  border: 1px solid #ccc;
-  padding: 1rem;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-  background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+.relationship-table-wrapper {
+  overflow-x: auto;
+  margin-top: 1rem;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
+#relationshipsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+#relationshipsTable th,
+#relationshipsTable td {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+#resultsContainer > div {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-row .half {
+    flex: 1 1 100%;
+  }
+
   .header {
     flex-direction: column;
     align-items: flex-start;
   }
+}
 
-  form {
-    font-size: 0.95rem;
+@media (orientation: landscape) and (max-height: 500px) {
+  input, textarea, select, button {
+    font-size: 0.9rem;
+    padding: 0.5rem;
   }
 }
-/* 🔧 Compact admin form */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem; /* πιο σφιχτό spacing */
-  margin: 1.5rem 0;
-}
 
-form label {
-  font-size: 0.95rem;
-  margin-bottom: 0.25rem;
-}
-
-form input,
-form textarea,
-form select {
-  padding: 0.6rem 0.75rem; /* πιο συμπαγές */
-  font-size: 0.95rem;
-}
-
-form details {
-  padding: 0.5rem;
-  margin-top: 1rem;
-}
-
-button,
-button.btn-primary {
-  padding: 0.6rem 1rem;
-  font-size: 0.95rem;
-}
-
-/* ✅ Μόνο σε desktop: 2 στήλες */
-@media (min-width: 992px) {
-  #memorialForm {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
-
-  #memorialForm label,
-  #memorialForm input,
-  #memorialForm select,
-  #memorialForm textarea,
-  #memorialForm details,
-  #memorialForm button {
-    grid-column: span 2; /* όλα κρατάνε όλο το πλάτος εκτός ειδικής ανάγκης */
-  }
-}
-.form-row {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-
-.form-row .half {
-  flex: 1 1 100%;
-}
-
-@media (min-width: 768px) {
-  .form-row .half {
-    flex: 1 1 50%;
-  }
-}
-.form-group {
-  margin-bottom: 1rem;
-}
-
-select {
-  padding: 0.6rem 0.75rem;
-  font-size: 1rem;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-.map-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-#map {
-  height: 200px;
-  width: 100%;
-  border-radius: 5px;
-  margin-top: 0.5rem;
-}
-.section-block {
-  margin-bottom: 2rem;
-}
-
-details {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background-color: #fafafa;
-}
-
-summary {
-  cursor: pointer;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-.relationship-search-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  margin-bottom: 1rem;
-}
-
-#relativeResults {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1rem 0;
-  max-height: 200px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-#relationshipsTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-#relationshipsTable th,
-#relationshipsTable td {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  text-align: left;
-}
-
-.relationship-table-wrapper {
-  overflow-x: auto;
-}
-.preview-block {
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  align-items: flex-start;
-}
-
-#qr-preview img {
-  max-width: 300px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 0.5rem;
-  background-color: #fff;
-}
-.form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.form-row .half {
-  flex: 1 1 48%;
-  min-width: 200px;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.section-block {
-  margin-top: 2rem;
-  padding: 1rem;
-  background: #fafafa;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-}
-
-.map-wrapper {
-  margin: 1.5rem 0;
-}
-
-.map-wrapper input[type="text"] {
-  margin-bottom: 0.5rem;
-}
-
-#map {
-  width: 100%;
-  height: 200px;
-  border-radius: 5px;
-  overflow: hidden;
-  margin-top: 0.5rem;
-}
-
-.preview-block {
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  align-items: flex-start;
-}
-
-.preview-block img {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 0.5rem;
-  background-color: #fff;
-}
-
-.relationship-table-wrapper {
-  overflow-x: auto;
-}
-
-#relationshipsTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-#relationshipsTable th,
-#relationshipsTable td {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  text-align: left;
-}
