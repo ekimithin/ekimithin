@@ -181,3 +181,134 @@ button:hover {
 .suggestions-list li:hover {
   background: #f0f0f0;
 }
+/* ==================== ADMIN PAGE STYLING ==================== */
+
+main.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.logout-btn {
+  padding: 0.5rem 1rem;
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+form label {
+  margin-top: 1rem;
+  display: block;
+  font-weight: bold;
+}
+
+form input,
+form select,
+form textarea {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+form details {
+  margin-top: 1.5rem;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+
+form summary {
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+button.btn-primary {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.2rem;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button.btn-primary:hover {
+  background-color: #1976d2;
+}
+
+#qr-preview {
+  margin-top: 2rem;
+}
+
+.relationship-search-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-bottom: 0.5rem;
+}
+
+#relativeResults {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#relativeResults li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+#relativeResults li:hover {
+  background: #f0f0f0;
+}
+
+#resultsContainer > div {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  form {
+    font-size: 0.95rem;
+  }
+}
