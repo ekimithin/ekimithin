@@ -182,12 +182,15 @@
 
     <section class="section">
       <h2>🔍 Αναζήτηση Memorials</h2>
-      <form id="searchForm">
-        <input type="text" id="searchLastname" placeholder="Αναζήτηση με Επώνυμο" />
-        <input type="text" id="searchCity" placeholder="Αναζήτηση με Πόλη" />
-        <button type="submit">Αναζήτηση</button>
-      </form>
-      <div id="resultsContainer" style="margin-top:2rem;"></div>
+      <form id="searchForm" onsubmit="return false;" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.5rem;">
+        <input type="text" id="searchId" placeholder="ID (π.χ. sm85)">
+        <input type="text" id="searchLastname" placeholder="Επώνυμο">
+        <input type="text" id="searchFirstname" placeholder="Όνομα">
+        <input type="text" id="searchCity" placeholder="Πόλη">
+       </form>
+
+<div id="resultsContainer" style="margin-top: 1rem;"></div>
+
     </section>
   </main>
 
