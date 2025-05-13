@@ -5,6 +5,7 @@ import { initBioSection } from "./sections/biography.js";
 import { initAwardsSection } from "./sections/awards.js";
 import { initInterestsSection } from "./sections/interests.js";
 import { initBurialSection } from "./sections/burial.js";
+import { removeGreekDiacritics } from "./utils/greekUtils.js";
 import "./sections/relationships.js";
 
 // 🔐 Redirect αν δεν είσαι συνδεδεμένος
@@ -314,3 +315,20 @@ function toLatin(text) {
     .split('').map(c => map[c] || c).join('')
     .replace(/[^a-zA-Z0-9\-]/g, ""); // remove special chars
 }
+
+// ================= Helper: Debounce =================
+function debounce(fn, delay = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+
+// ================= Init Section Modules =================
+document.addEventListener("DOMContentLoaded", () => {
+  initBioSection();
+  initAwardsSection();
+  initInterestsSection();
+  initBurialSection();
+});
