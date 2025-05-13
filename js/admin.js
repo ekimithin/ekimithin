@@ -156,38 +156,37 @@ searchForm.addEventListener("submit", async e => {
 });
 
 // ================= Submit: καταχώρηση memorial =================
-form.addEventListener("submit", async e => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const first = form.firstname.value.trim();
   const last  = form.lastname.value.trim();
   const city  = form.city.value.trim();
+
   if (!first || !last || !city) return alert("Συμπλήρωσε Όνομα, Επώνυμο, Πόλη.");
 
   const birth = form.birth_date.value || null;
   const death = form.death_date.value || null;
 
-  // Έλεγχος λογικής ημερομηνιών
+  // Έλεγχος ημερομηνιών
   if (birth && death && new Date(birth) > new Date(death)) return alert("Η γέννηση είναι μετά τον θάνατο.");
   if (!birth && death) return alert("❗ Έχεις θάνατο χωρίς γέννηση.");
   if (!death && birth) return alert("❗ Έχεις γέννηση χωρίς θάνατο.");
 
-  // Δημιουργία μοναδικού ID
-  const lastL  = toLatin(last).toLowerCase();
-  const cityL  = toLatin(city).toLowerCase();
-  const { count } = await supabase
-    .from("memorials")
-    .select("*", { head: true, count: "exact" })
-    .ilike("last_name", lastL)
-    .ilike("city", cityL);
-  const id = `${lastL}${cityL}A${(count || 0) + 1}`.replace(/\s+/g, '');
+  // ✨ Δημιουργία ID τύπου: ek548321-eleni-karagiorgi-piraeus
+  const initials  = toLatin(first[0] + last[0]).toLowerCase();
+  const timestamp = Date.now().toString().slice(-6);
+  const slug      = `${toLatin(first)}-${toLatin(last)}-${toLatin(city)}`.toLowerCase().replace(/\s+/g, '-');
+  const id        = `${initials}${timestamp}-${slug}`;
 
-  // Upsert memorial
+  // ➕ Απόδοση ID για χρήση από relationships.js
+  form.dataset.id = id;
+
   const dataToSave = {
     id,
     first_name: first,
-    last_name: lastL,
-    city: cityL,
+    last_name: toLatin(last).toLowerCase(),
+    city: toLatin(city).toLowerCase(),
     region: form.region.value.trim(),
     gender: form.gender.value,
     birth_date: birth,
@@ -209,10 +208,10 @@ form.addEventListener("submit", async e => {
   const { error: upErr } = await supabase.from("memorials").upsert(dataToSave);
   if (upErr) {
     console.error(upErr);
-    return alert("❌ Σφάλμα αποθήκευσης.");
+    return alert("❌ Σφάλμα αποθήκευσης memorial.");
   }
 
-  // Διαγραφή προηγούμενων σχέσεων
+  // 🔁 Σχέσεις
   await supabase.from("relationships").delete().eq("memorial_id", id);
   const rels = Array.from(document.querySelectorAll("#relationshipsTable tbody tr")).map(tr => ({
     memorial_id: id,
@@ -223,7 +222,7 @@ form.addEventListener("submit", async e => {
     await supabase.from("relationships").insert(rels);
   }
 
-  // Δημιουργία QR
+  // 📦 Δημιουργία QR Code
   const url = `${location.origin}/memorial.html?id=${id}`;
   const blob = await (await fetch(`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(url)}`)).blob();
   const fileName = `${id}.png`;
@@ -242,6 +241,7 @@ form.addEventListener("submit", async e => {
   form.removeAttribute("data-id");
   document.querySelector("#relationshipsTable tbody").innerHTML = "";
 });
+
 
 // ================= Logout =================
 logoutBtn.addEventListener("click", async () => {
