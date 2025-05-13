@@ -237,6 +237,9 @@ form?.addEventListener("submit", async (e) => {
   `;
 
   alert("✅ Το memorial καταχωρήθηκε!");
+  
+  await generatePdf(dataToSave, qr.publicUrl);
+  
   form.reset();
   form.removeAttribute("data-id");
   document.querySelector("#relationshipsTable tbody").innerHTML = "";
@@ -247,6 +250,75 @@ logoutBtn?.addEventListener("click", async () => {
   await supabase.auth.signOut();
   window.location.href = "/login.html";
 });
+async function generatePdf(data, qrUrl) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  let y = 20;
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text("Μνημείο Καταχώρησης", 105, y, { align: "center" });
+
+  y += 15;
+  doc.setFontSize(12);
+  doc.setFont("Helvetica", "normal");
+  doc.text(`Ονοματεπώνυμο: ${data.last_name} ${data.first_name}`, 20, y);
+  y += 8;
+  doc.text(`Τοποθεσία: ${data.city}, ${data.region}`, 20, y);
+
+  // 🔴 Κόκκινο πλαίσιο με ID
+  y += 10;
+  doc.setDrawColor(255, 0, 0);
+  doc.setTextColor(255, 0, 0);
+  doc.setFont("Helvetica", "bold");
+  doc.rect(20, y, 170, 10);
+  doc.text(`ID Εγγραφής: ${data.id}`, 25, y + 7);
+
+  y += 15;
+  doc.setFontSize(10);
+  doc.setFont("Helvetica", "normal");
+  doc.setTextColor(255, 0, 0);
+  const warning = `⚠️ ΠΡΟΣΟΧΗ\nΟ κωδικός καταχώρησης είναι μοναδικός.\nΣας παρακαλούμε να τον φυλάξετε για τυχόν μελλοντικές αλλαγές\nστη Βάση Ψηφιακής Μνήμης.`;
+  doc.text(warning, 25, y);
+  y += 30;
+
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+
+  // 🧠 Επιπλέον πεδία
+  const labels = {
+    birth_place: "Τόπος Γέννησης",
+    profession: "Επάγγελμα",
+    education: "Εκπαίδευση",
+    awards: "Διακρίσεις",
+    interests: "Ενδιαφέροντα",
+    cemetery: "Κοιμητήριο",
+    genealogy: "Γενεαλογικά"
+  };
+
+  for (const field in labels) {
+    if (data[field]) {
+      doc.text(`${labels[field]}: ${data[field]}`, 20, y);
+      y += 8;
+    }
+  }
+
+  // 📷 QR Εικόνα
+  if (qrUrl) {
+    const qrImage = await fetch(qrUrl).then(res => res.blob()).then(blob => {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    });
+    y += 10;
+    doc.addImage(qrImage, "PNG", 80, y, 50, 50);
+  }
+
+  // 💾 Αποθήκευση
+  doc.save(`memorial-${data.id}.pdf`);
+}
 
 // ================= Init Modules =================
 document.addEventListener("DOMContentLoaded", () => {
