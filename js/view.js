@@ -1,4 +1,3 @@
-// js/view.js
 import { supabase } from "./supabase.js";
 
 // 👉 Λήψη ID από URL
@@ -22,14 +21,14 @@ function formatDate(isoString) {
 // 👉 Υπολογισμός ηλικίας
 function calculateAge(birth, death) {
   if (!birth || !death) return null;
-  const b = new Date(birth), D = new Date(death);
-  let age = D.getFullYear() - b.getFullYear();
-  const m = D.getMonth() - b.getMonth();
-  if (m < 0 || (m === 0 && D.getDate() < b.getDate())) age--;
+  const b = new Date(birth), d = new Date(death);
+  let age = d.getFullYear() - b.getFullYear();
+  const m = d.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && d.getDate() < b.getDate())) age--;
   return age;
 }
 
-// 👉 Ενημέρωση κειμένου κεριών
+// 👉 Ενημέρωση κερίων
 function updateCandleText(count) {
   const txt = count === 1
     ? "🕯️ 1 κερί έχει ανάψει"
@@ -38,37 +37,41 @@ function updateCandleText(count) {
 }
 
 (async () => {
-  // Φόρτωση από Supabase
+  // 🔄 Φόρτωση memorial από Supabase
   const { data, error } = await supabase
     .from("memorials")
     .select("*")
     .eq("id", id)
     .single();
+
   if (error || !data) {
     document.body.innerHTML = `<p style="text-align:center;">❌ Δεν βρέθηκε η σελίδα μνήμης.</p>`;
     return;
   }
 
-  // ─── Βασικά ─────────────────────────────────
-  document.getElementById("fullName").textContent =
-    `${data.first_name} ${data.last_name}`;
+  // ✅ Τίτλος σελίδας
+  document.title = `Μνήμη του ${data.first_name} ${data.last_name}`;
+
+  // ✅ Βασικά στοιχεία
+  document.getElementById("fullName").textContent = `${data.first_name} ${data.last_name}`;
   const locText = `${data.city}, ${data.region}`;
   document.getElementById("location").textContent = locText;
-  document.getElementById("photo").src        = data.photo_url || "";
+  document.getElementById("photo").src = data.photo_url || "";
   document.getElementById("message").textContent = data.message || "";
 
-  // YouTube embed
+  // 🎞️ YouTube
   if (data.youtube_url) {
-    const container = document.getElementById("videoContainer");
-    const embedUrl  = data.youtube_url.replace("watch?v=", "embed/");
-    container.innerHTML =
-      `<iframe width="100%" height="315" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+    const embedUrl = data.youtube_url.replace("watch?v=", "embed/");
+    document.getElementById("videoContainer").innerHTML = `
+      <iframe width="100%" height="315" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+    `;
   }
 
-  // Ημερομηνίες & ηλικία
+  // 📅 Ημερομηνίες & ηλικία
   const bStr = formatDate(data.birth_date);
   const dStr = formatDate(data.death_date);
   const age  = calculateAge(data.birth_date, data.death_date);
+
   if (bStr && dStr) {
     document.getElementById("dates").innerHTML = `
       <p>Έζησε από</p>
@@ -78,10 +81,10 @@ function updateCandleText(count) {
   } else {
     document.getElementById("dates").innerHTML = "";
   }
+
   updateCandleText(data.candles || 0);
 
-  // ─── Extra Sections (εμφάνιση μόνο αν υπάρχει τιμή) ───
-  // 1) Bio Section
+  // ℹ️ Bio
   if (data.birth_place || data.profession || data.education) {
     document.getElementById("bioSection").style.display = "block";
     if (data.birth_place) {
@@ -98,53 +101,54 @@ function updateCandleText(count) {
     }
   }
 
-  // 2) Awards
   if (data.awards) {
     document.getElementById("awardsSection").style.display = "block";
     document.getElementById("awards").textContent = data.awards;
   }
 
-  // 3) Interests
   if (data.interests) {
     document.getElementById("interestsSection").style.display = "block";
     document.getElementById("interests").textContent = data.interests;
   }
 
-  // 4) Burial
   if (data.cemetery) {
     document.getElementById("burialSection").style.display = "block";
     document.getElementById("cemetery").textContent = data.cemetery;
   }
 
-  // 5) Genealogy (αν το έχετε στο σχήμα)
   if (data.genealogy) {
     document.getElementById("genealogySection").style.display = "block";
     document.getElementById("genealogy").textContent = data.genealogy;
   }
 
-  // ─── Slide-down χάρτης ────────────────────────
-  const openBtn  = document.getElementById("openMapBtn");
+  // 🗺️ Χάρτης
+  const openBtn = document.getElementById("openMapBtn");
   const closeBtn = document.getElementById("closeMapBtn");
-  const mapCont  = document.getElementById("mapContainer");
+  const mapCont = document.getElementById("mapContainer");
   let leafletMap = null;
 
   openBtn.addEventListener("click", async () => {
     if (!leafletMap) {
-      const res    = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locText)}`
-      );
-      const places = await res.json();
-      if (!places[0]) {
-        return alert("Δεν βρέθηκε η τοποθεσία στο χάρτη.");
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locText)}`
+        );
+        const places = await res.json();
+        if (!places[0]) throw new Error("Δεν βρέθηκε η τοποθεσία");
+
+        const lat = parseFloat(places[0].lat);
+        const lon = parseFloat(places[0].lon);
+
+        leafletMap = L.map("map").setView([lat, lon], 15);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: "&copy; OpenStreetMap"
+        }).addTo(leafletMap);
+        L.marker([lat, lon]).addTo(leafletMap);
+      } catch (e) {
+        alert("⚠️ Δεν βρέθηκε η τοποθεσία στο χάρτη.");
+        return;
       }
-      const lat = parseFloat(places[0].lat),
-            lon = parseFloat(places[0].lon);
-      leafletMap = L.map("map").setView([lat, lon], 15);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap"
-      }).addTo(leafletMap);
-      L.marker([lat, lon]).addTo(leafletMap);
     }
     mapCont.classList.add("open");
     mapCont.scrollIntoView({ behavior: "smooth" });
@@ -155,12 +159,11 @@ function updateCandleText(count) {
     document.querySelector(".memorial-container")
       .scrollIntoView({ behavior: "smooth" });
   });
-  // ───────────────────────────────────────────────
 
-})(); // <-- τέλος async IIFE
+})(); // τέλος async
 
-// ─── Toggle Βιογραφικού ─────────────────────────
-const bioBtn  = document.getElementById("toggleBioBtn");
+// 🔄 Toggle Βιογραφικό
+const bioBtn = document.getElementById("toggleBioBtn");
 const bioCont = document.getElementById("bioContainer");
 
 if (bioBtn && bioCont) {
@@ -171,24 +174,25 @@ if (bioBtn && bioCont) {
       : "📖 Βιογραφικό";
   });
 }
-// ────────────────────────────────────────────────
 
 // 🕯️ Άναψε κερί
 document.getElementById("lightCandleBtn")
   .addEventListener("click", async () => {
     const key = `lastCandle_${id}`;
     const last = localStorage.getItem(key);
-    const now  = Date.now();
+    const now = Date.now();
+
     if (last && now - parseInt(last) < 24 * 60 * 60 * 1000) {
-      return alert("Μπορείς να ανάψεις μόνο 1 κερί το 24ωρο");
+      return alert("Μπορείς να ανάψεις μόνο 1 κερί κάθε 24 ώρες.");
     }
-    const { data, error } = await supabase
-      .rpc("increment_candle", { memorial_id: id });
+
+    const { data, error } = await supabase.rpc("increment_candle", { memorial_id: id });
     if (error || data === null) {
-      alert("❌ Το κερί δεν καταγράφηκε. Δοκίμασε ξανά.");
+      alert("❌ Το κερί δεν καταγράφηκε. Προσπάθησε ξανά.");
       console.error(error);
       return;
     }
+
     localStorage.setItem(key, now.toString());
     updateCandleText(data);
   });
