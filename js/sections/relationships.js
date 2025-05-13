@@ -80,7 +80,7 @@ resultsList.addEventListener('click', e => {
   e.target.classList.add('selected');
 });
 
-// ➕ Προσθήκη σχέσης (και αντίστροφης) στον Supabase και στον πίνακα
+// ➕ Προσθήκη σχέσης (και αντίστροφης μόνο αν υπάρχει memorial) στον πίνακα και στη βάση
 addBtn.addEventListener('click', async () => {
   if (!selectedRelative) {
     return alert('Διάλεξε πρώτα έναν συγγενή από τα αποτελέσματα.');
@@ -108,7 +108,7 @@ addBtn.addEventListener('click', async () => {
   tr.querySelector('.remove-relationship').addEventListener('click', () => tr.remove());
   tableBody.appendChild(tr);
 
-  // ✅ Αν υπάρχει memorial και relative (άρα και τα δύο είναι ήδη στην DB), κάνε το upsert διπλής εγγραφής
+  // 🔁 Αν υπάρχει τελικό ID (όχι προσωρινό), κάνε άμεσο upsert διπλής εγγραφής
   const isFinalId = !currentMemorialId.startsWith('temp-');
   if (isFinalId) {
     const inverse = reverseRelationMap[relation] || 'Συγγενής';
@@ -121,38 +121,6 @@ addBtn.addEventListener('click', async () => {
       return alert('Σφάλμα κατά την αποθήκευση της σχέσης.');
     }
   }
-
-  // Καθάρισμα
-  selectedRelative = null;
-  resultsList.innerHTML = '';
-  [idInput, lnameInput, fnameInput, cityInput].forEach(i => i.value = '');
-});
-
-
-  const inverse = reverseRelationMap[relation] || 'Συγγενής';
-
-  // 🔁 Καταχώρηση σχέσης και αντίστροφης σχέσης
-  const { error } = await supabase.from('relationships').upsert([
-    { memorial_id: currentMemorialId, relative_id: selectedRelative.id, relation_type: relation },
-    { memorial_id: selectedRelative.id, relative_id: currentMemorialId, relation_type: inverse }
-  ]);
-
-  if (error) {
-    console.error('❌ Σφάλμα σχέσης:', error.message);
-    return alert('Σφάλμα κατά την αποθήκευση της σχέσης.');
-  }
-
-  // ✅ Εμφάνιση στον πίνακα
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td>${relation}<input type="hidden" name="relationships[][relation]" value="${relation}"></td>
-    <td>${selectedRelative.name}<small>${selectedRelative.id}</small>
-      <input type="hidden" name="relationships[][relative_id]" value="${selectedRelative.id}">
-    </td>
-    <td><button type="button" class="remove-relationship">✖️</button></td>
-  `;
-  tr.querySelector('.remove-relationship').addEventListener('click', () => tr.remove());
-  tableBody.appendChild(tr);
 
   // Καθάρισμα
   selectedRelative = null;
