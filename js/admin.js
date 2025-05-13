@@ -175,7 +175,7 @@ searchForm.addEventListener("submit", async e => {
   });
 
   alert("✅ Memorial φορτώθηκε για επεξεργασία.");
-}
+});
 
   
 async function executeSearch() {
