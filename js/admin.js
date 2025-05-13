@@ -274,7 +274,10 @@ document.getElementById("generatePdfBtn")?.addEventListener("click", async () =>
     genealogy: form.genealogy.value.trim()
   };
 
-  const qrUrl = `https://glsayujqzkevokaznnrd.supabase.co/storage/v1/object/public/qr-codes/${id}.png`;
+  const safeId = toLatin(form.dataset.id || "χωρίς-id");
+const qrUrl = `https://glsayujqzkevokaznnrd.supabase.co/storage/v1/object/public/qr-codes/${encodeURIComponent(safeId)}.png`;
+
+
 
   const qrBase64 = await fetch(qrUrl)
     .then(res => res.blob())
