@@ -159,42 +159,39 @@ searchForm.addEventListener("submit", async e => {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // 📌 Βασικά πεδία
+  // 📌 Required fields
   const first = form.firstname.value.trim();
-  const last = form.lastname.value.trim();
-  const city = form.city.value.trim();
+  const last  = form.lastname.value.trim();
+  const city  = form.city.value.trim();
   if (!first || !last || !city) return alert("Συμπλήρωσε Όνομα, Επώνυμο, Πόλη.");
 
   const birth = form.birth_date.value || null;
   const death = form.death_date.value || null;
 
-  // 🧠 Έλεγχος ημερομηνιών
+  // 📆 Ημερομηνίες ελέγχου
   if (birth && death && new Date(birth) > new Date(death)) return alert("Η γέννηση είναι μετά τον θάνατο.");
   if (!birth && death) return alert("❗ Έχεις θάνατο χωρίς γέννηση.");
   if (!death && birth) return alert("❗ Έχεις γέννηση χωρίς θάνατο.");
 
-  // 🧠 Κανονικοποίηση
+  // 🧠 Normalized strings
   const firstL = toLatin(first).toLowerCase();
-  const lastL = toLatin(last).toLowerCase();
-  const cityL = toLatin(city).toLowerCase();
-
-  // 🔠 Δημιουργία ID: ek548321-eleni-karagiorgi-athens
+  const lastL  = toLatin(last).toLowerCase();
   const initials = toLatin(first[0] + last[0]).toLowerCase();
   const timestamp = Date.now().toString().slice(-6);
-  const slug = `${firstL}-${lastL}-${cityL}`.replace(/\s+/g, "-");
-  const id = `ek${timestamp}-${slug}`;
+  const slug = `${firstL}-${lastL}`;
+  const id = `${initials}${timestamp}-${slug}`;
 
-  console.log("🆔 ID:", id);
+  console.log("🆔 Final ID:", id);
 
-  // 📌 Απόδοση προσωρινά στο form για use από relationships.js
+  // 👉 Απόδοση στο form dataset
   form.dataset.id = id;
 
-  // 🗂 Extra πεδία
+  // 🔎 Συγκέντρωση δεδομένων
   const dataToSave = {
     id,
     first_name: first,
     last_name: lastL,
-    city: cityL,
+    city: toLatin(city).toLowerCase(),
     region: form.region.value.trim(),
     gender: form.gender.value,
     birth_date: birth,
@@ -213,14 +210,14 @@ form.addEventListener("submit", async (e) => {
     candles: 0
   };
 
-  // 🧪 Αποθήκευση memorial
+  // 📝 Αποθήκευση memorial
   const { error: upErr } = await supabase.from("memorials").upsert(dataToSave);
   if (upErr) {
-    console.error("❌ Σφάλμα upsert memorial:", upErr.message);
+    console.error("❌ Σφάλμα upsert:", upErr.message);
     return alert("❌ Δεν αποθηκεύτηκε το memorial.");
   }
 
-  // 🔁 Αποθήκευση relationships (μόνο όσα ΔΕΝ έχουν αποθηκευτεί ήδη)
+  // 🔁 Αποθήκευση σχέσεων
   const rels = Array.from(document.querySelectorAll("#relationshipsTable tbody tr"))
     .filter(tr => !tr.dataset.saved)
     .map(tr => ({
@@ -232,7 +229,7 @@ form.addEventListener("submit", async (e) => {
   if (rels.length > 0) {
     const { error: relErr } = await supabase.from("relationships").insert(rels);
     if (relErr) {
-      console.error("❌ Σφάλμα αποθήκευσης σχέσεων:", relErr.message);
+      console.error("❌ Σφάλμα σχέσεων:", relErr.message);
       alert("❌ Οι σχέσεις δεν αποθηκεύτηκαν.");
     }
   }
@@ -242,13 +239,12 @@ form.addEventListener("submit", async (e) => {
   const blob = await (await fetch(`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(url)}`)).blob();
   const fileName = `${id}.png`;
 
-  // 🗃️ Αποθήκευση QR στο Supabase Storage
   const { error: qrErr } = await supabase.storage
     .from("qr-codes")
     .upload(fileName, blob, { contentType: "image/png", upsert: true });
 
   if (qrErr) {
-    console.error("❌ Σφάλμα upload QR:", qrErr.message);
+    console.error("❌ Σφάλμα QR upload:", qrErr.message);
     return alert("❌ Το QR δεν αποθηκεύτηκε.");
   }
 
@@ -261,12 +257,12 @@ form.addEventListener("submit", async (e) => {
     <a href="${qr.publicUrl}" download="${fileName}">⬇️ Κατέβασε το QR</a>
   `;
 
-  // 🔄 Reset
   alert("✅ Το memorial καταχωρήθηκε!");
   form.reset();
   form.removeAttribute("data-id");
   document.querySelector("#relationshipsTable tbody").innerHTML = "";
 });
+
 
 
 // ================= Logout =================
@@ -300,12 +296,16 @@ document.addEventListener("DOMContentLoaded", () => {
 // ================= Helper: Greek to Latin =================
 function toLatin(text) {
   const map = {
-    'ά':'a','Ά':'A','έ':'e','Έ':'E','ή':'i','Ή':'I','ί':'i','Ί':'I','ό':'o','Ό':'O','ώ':'o','Ώ':'O',
-    'ύ':'y','Ύ':'Y','ϋ':'y','Ϋ':'Y','α':'a','Α':'A','β':'b','Β':'B','γ':'g','Γ':'G','δ':'d','Δ':'D',
-    'ε':'e','Ε':'E','ζ':'z','Ζ':'Z','η':'i','Η':'I','θ':'th','Θ':'Th','ι':'i','Ι':'I','κ':'k','Κ':'K',
-    'λ':'l','Λ':'L','μ':'m','Μ':'M','ν':'n','Ν':'N','ξ':'x','Ξ':'X','ο':'o','Ο':'O','π':'p','Π':'P',
-    'ρ':'r','Ρ':'R','σ':'s','Σ':'S','ς':'s','τ':'t','υ':'y','Υ':'Y','φ':'f','Φ':'F','χ':'ch','Χ':'Ch',
-    'ψ':'ps','Ψ':'Ps','ω':'o','Ω':'O'
+    'ά': 'a','έ': 'e','ή': 'i','ί': 'i','ό': 'o','ύ': 'y','ώ': 'o',
+    'ς': 's','ϊ': 'i','ϋ': 'y','ΰ': 'y','ΐ': 'i',
+    'α': 'a','β': 'b','γ': 'g','δ': 'd','ε': 'e','ζ': 'z','η': 'i','θ': 'th',
+    'ι': 'i','κ': 'k','λ': 'l','μ': 'm','ν': 'n','ξ': 'x','ο': 'o','π': 'p',
+    'ρ': 'r','σ': 's','τ': 't','υ': 'y','φ': 'f','χ': 'ch','ψ': 'ps','ω': 'o',
+    'Α': 'A','Β': 'B','Γ': 'G','Δ': 'D','Ε': 'E','Ζ': 'Z','Η': 'I','Θ': 'Th',
+    'Ι': 'I','Κ': 'K','Λ': 'L','Μ': 'M','Ν': 'N','Ξ': 'X','Ο': 'O','Π': 'P',
+    'Ρ': 'R','Σ': 'S','Τ': 'T','Υ': 'Y','Φ': 'F','Χ': 'Ch','Ψ': 'Ps','Ω': 'O'
   };
-  return text.split('').map(c => map[c] || c).join('');
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .split('').map(c => map[c] || c).join('')
+    .replace(/[^a-zA-Z0-9\-]/g, ""); // remove special chars
 }
