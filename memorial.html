@@ -1,329 +1,269 @@
-<!-- public/memorial.html -->
+<!-- public/admin.html -->
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <!-- ==================================================
-       Favicon
-  ================================================== -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-
-  <!-- ==================================================
-       Open Graph Tags για Social Sharing
-  ================================================== -->
-  <meta property="og:title" content="ekimithin.gr – Ψηφιακή Μνήμη" />
-  <meta property="og:description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί, μήνυμα και επιπλέον στοιχεία." />
-  <meta property="og:image" content="https://ekimithin.vercel.app/ekimithin.png" />
-  <meta property="og:url" content="https://ekimithin.vercel.app/memorial.html" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-
-  <!-- ==================================================
-       Βασικά Meta Tags
-  ================================================== -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Διαχειριστικό Panel – ekimithin.gr</title>
+  <link rel="icon" href="/favicon.ico"/>
 
-  <!-- ==================================================
-       Τίτλος Σελίδας & CSS
-  ================================================== -->
-  <title>Σελίδα Μνήμης – ekimithin.gr</title>
-  <meta name="description" content="Σελίδα ψηφιακής μνήμης με φωτογραφία, βίντεο, κερί, μήνυμα και επιπλέον στοιχεία." />
-  <link rel="stylesheet" href="css/style.css" />
-
-  <!-- ==================================================
-       Leaflet για το διαδραστικό χάρτη
-  ================================================== -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- ==================================================
-       Inline Styles Ειδικά για Memorial
-  ================================================== -->
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="css/style.css"/>
+
+  <!-- Admin-specific styles -->
   <style>
-    /* Μήνυμα μνήμης */
-    .message-box {
-      background: #f9f9f9;
-      border-left: 5px solid #ccc;
-      padding: 1rem;
-      margin: 1.5rem auto;
-      font-style: italic;
-      max-width: 100%;
-      border-radius: 6px;
+    :root {
+      --c-bg: #f5f7fa;
+      --c-card: #fff;
+      --c-primary: #3498db;
+      --c-danger: #e74c3c;
+      --radius: 8px;
+      --gap: 1rem;
     }
-    /* Κουμπί εμφάνισης χάρτη */
-    #mapLink button {
-      background: gold;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      border-radius: 4px;
-      font-weight: bold;
-      margin-bottom: 1rem;
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:Arial,sans-serif;
+      background:var(--c-bg);
+      color:#333;
     }
-    #mapLink button:hover { opacity: 0.9; }
+    header {
+      background:var(--c-card);
+      padding:var(--gap);
+      box-shadow:0 2px 5px rgba(0,0,0,0.1);
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    header h1 { color:var(--c-primary); }
+    .btn {
+      background:var(--c-primary);
+      color:#fff;
+      border:none;
+      padding:0.5rem 1rem;
+      border-radius:var(--radius);
+      cursor:pointer;
+    }
+    .btn.danger { background:var(--c-danger); }
+    main {
+      max-width:1200px;
+      margin:var(--gap) auto;
+      padding:0 var(--gap);
+      display:grid;
+      grid-template-columns:1fr;
+      gap:var(--gap);
+    }
+    @media(min-width:800px) {
+      main { grid-template-columns:2fr 1fr; }
+    }
+    .card {
+      background:var(--c-card);
+      padding:var(--gap);
+      border-radius:var(--radius);
+      box-shadow:0 2px 5px rgba(0,0,0,0.05);
+    }
+    .card h2 { margin-bottom:var(--gap); color:var(--c-primary); }
+    form {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:var(--gap);
+    }
+    form label { font-weight:bold; margin-bottom:0.3rem; display:block; }
+    form input, form select, form textarea {
+      width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:var(--radius);
+      font:inherit;
+    }
+    form input:focus, form select:focus, form textarea:focus {
+      outline:none; border-color:var(--c-primary);
+      box-shadow:0 0 0 2px rgba(52,152,219,0.2);
+    }
+    form button[type="submit"] {
+      grid-column:1/-1;
+      background:var(--c-primary);
+      color:#fff;
+      padding:0.8rem;
+      border:none;
+      border-radius:var(--radius);
+      cursor:pointer;
+    }
+    details {
+      grid-column:1/-1;
+      background:var(--c-bg);
+      padding:var(--gap);
+      border-radius:var(--radius);
+      margin-top:var(--gap);
+    }
+    details summary { cursor:pointer; font-weight:bold; }
+    .fullwidth { grid-column:1/-1; }
+    .relationship-search-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:var(--gap);
+      margin-bottom:var(--gap);
+    }
+    #relativeResults {
+      list-style:none;
+      border:1px solid #ccc;
+      border-radius:var(--radius);
+      max-height:150px;
+      overflow-y:auto;
+      margin-bottom:var(--gap);
+    }
+    #relativeResults li { padding:0.5rem; cursor:pointer; }
+    #relativeResults li:hover { background:#eee; }
 
-    /* Container χάρτη slide-down */
-    #mapContainer {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s ease;
-      margin-bottom: 1rem;
-      position: relative;
-    }
-    #mapContainer.open { max-height: 80vh; }
-    #closeMapBtn {
-      position: absolute;
-      top: 0.5rem; right: 0.5rem;
-      background: #ffc107; border: none;
-      padding: 0.5rem 1rem; cursor: pointer;
-      z-index: 1000; border-radius: 4px;
-    }
+    table { width:100%; border-collapse:collapse; margin-top:var(--gap); }
+    th, td { border:1px solid #ddd; padding:0.5rem; }
+    th { background:var(--c-bg); font-weight:bold; text-align:left; }
 
-    /* Κρυφές extra ενότητες */
-    .extra-section {
-      margin: 1rem 0;
-      text-align: left;
-      display: none;
-    }
-    /* Container βιογραφικού */
-    #bioContainer {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s ease;
-      margin-bottom: 1rem;
-      background: #fafafa;
-      border-radius: 8px;
-      padding: 0 1rem;
-    }
-    #bioContainer.open { max-height: 1000px; }
-    .extra-section h3 {
-      margin-bottom: 0.5rem;
-      font-size: 1.1rem;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 0.25rem;
-    }
-    .extra-section p { margin: 0.25rem 0; }
-
-    /* Πίνακας σχέσεων */
-    #relationshipsTable {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1rem 0;
-    }
-    #relationshipsTable th,
-    #relationshipsTable td {
-      border: 1px solid #ddd;
-      padding: 8px;
-    }
+    #qr-preview { margin-top:var(--gap); }
+    #qr-preview img { max-width:100%; border-radius:var(--radius); }
   </style>
 </head>
 <body>
-  <!-- ==================================================
-       Header με λογότυπο που οδηγεί στην αρχική
-  ================================================== -->
+
   <header>
-    <a href="index.html">
-      <img src="images/logo.png" alt="ekimithin logo" style="cursor:pointer;" />
-    </a>
+    <h1>ekimithin.gr Admin</h1>
+    <button id="logoutBtn" class="btn danger">🚪 Αποσύνδεση</button>
   </header>
 
-  <!-- ==================================================
-       Κύριο περιεχόμενο Memorial
-  ================================================== -->
-  <main class="memorial-container"
-        style="max-width:600px; margin:2rem auto; text-align:center;
-               background:#fff; padding:2rem; border-radius:8px;">
+  <main>
 
-    <!-- Όνομα & Ημερομηνίες -->
-    <h1 id="fullName">…</h1>
-    <div id="dates" style="margin-bottom: 1rem;"></div>
+    <!-- Create/Edit Form -->
+    <section class="card">
+      <h2>➕ Δημιουργία / Επεξεργασία Memorial</h2>
+      <form id="memorialForm">
+        <input type="hidden" id="memorialId"/>
 
-    <!-- Τοποθεσία -->
-    <p id="location" style="font-weight: bold;"></p>
+        <div>
+          <label for="firstname">Όνομα</label>
+          <input type="text" id="firstname" required/>
+        </div>
+        <div>
+          <label for="lastname">Επώνυμο</label>
+          <input type="text" id="lastname" required/>
+        </div>
+        <div>
+          <label for="birth_date">Ημ. Γέννησης</label>
+          <input type="date" id="birth_date" required/>
+        </div>
+        <div>
+          <label for="death_date">Ημ. Θανάτου</label>
+          <input type="date" id="death_date" required/>
+        </div>
+        <div>
+          <label for="gender">Φύλο</label>
+          <select id="gender" required>
+            <option value="" disabled selected>Επιλογή</option>
+            <option value="male">Άνδρας</option>
+            <option value="female">Γυναίκα</option>
+          </select>
+        </div>
 
-    <!-- Κουμπί εμφάνισης/απόκρυψης χάρτη -->
-    <div id="mapLink">
-      <button id="openMapBtn">🗺️ Δες τοποθεσία</button>
-    </div>
-    <div id="mapContainer">
-      <button id="closeMapBtn">✖️ Κλείσιμο χάρτη</button>
-      <div id="map" style="width:100%; height:300px;"></div>
-    </div>
+        <div class="fullwidth">
+          <label for="addressInput">Διεύθυνση / Τοποθεσία</label>
+          <input type="text" id="addressInput" placeholder="π.χ. Οδός …"/>
+          <ul id="suggestions"></ul>
+        </div>
+        <div class="fullwidth" style="height:200px;">
+          <div id="map" style="height:100%; border-radius:var(--radius);"></div>
+        </div>
 
-    <!-- Φωτογραφία -->
-    <img id="photo" class="photo" src="" alt="Φωτογραφία"
-         style="max-width:100%; border-radius:8px; margin: 1rem 0;" />
+        <div>
+          <label for="city">Πόλη</label>
+          <input type="text" id="city" required/>
+        </div>
+        <div>
+          <label for="region">Περιοχή</label>
+          <input type="text" id="region"/>
+        </div>
 
-    <!-- Κουμπί toggle βιογραφικού -->
-    <div id="bioToggle" style="text-align:center; margin:1rem 0;">
-      <button id="toggleBioBtn"
-              style="background:#333;color:#fff;
-                     padding:0.5rem 1rem;border:none;
-                     border-radius:5px;cursor:pointer;">
-        📖 Βιογραφικό
-      </button>
-    </div>
-    <!-- Container βιογραφικού -->
-    <div id="bioContainer">
-      <!-- Βασικά βιογραφικά -->
-      <div id="bioSection" class="extra-section">
-        <h3>Βασικά Βιογραφικά</h3>
-        <p id="birthPlaceLine"><strong>Τόπος γέννησης:</strong> <span id="birthPlace"></span></p>
-        <p id="professionLine"><strong>Επάγγελμα:</strong> <span id="profession"></span></p>
-        <p id="educationLine"><strong>Εκπαίδευση:</strong> <span id="education"></span></p>
+        <!-- Γενεαλογικό Πλαίσιο -->
+        <details>
+          <summary>➤ Γενεαλογικό Πλαίσιο</summary>
+          <textarea id="genealogy" name="genealogy" rows="3" readonly placeholder="Όλες οι σχέσεις…"></textarea>
+        </details>
+
+        <!-- Γενεαλογικές Σχέσεις -->
+        <details>
+          <summary>➤ Γενεαλογικές Σχέσεις</summary>
+          <div class="relationship-search-grid">
+            <input id="relativeIdInput" placeholder="Memorial ID"/>
+            <input id="relativeLastnameInput" placeholder="Επώνυμο"/>
+            <input id="relativeFirstnameInput" placeholder="Όνομα"/>
+            <input id="relativeCityInput" placeholder="Πόλη"/>
+          </div>
+          <ul id="relativeResults"></ul>
+          <div style="display:flex;gap:var(--gap);align-items:center;margin:var(--gap) 0;">
+            <select id="relationType">
+              <option value="" disabled selected>Επίλεξε σχέση</option>
+              <option>Πατέρας</option><option>Μητέρα</option>
+              <option>Υιός</option><option>Κόρη</option>
+              <option>Παππούς</option><option>Γιαγιά</option>
+              <option>Αδελφός</option><option>Αδελφή</option>
+              <option>Θείος</option><option>Θεία</option>
+              <option>Ανιψιός</option><option>Ανιψιά</option>
+              <option>Ξάδερφος</option><option>Ξαδέρφη</option>
+            </select>
+            <button type="button" id="addRelationshipBtn" class="btn">➕ Πρόσθεσε</button>
+          </div>
+          <table id="relations-table">
+            <thead>
+              <tr><th colspan="2">Σχέσεις</th></tr>
+              <tr><th>Συγγενής</th><th>Σχέση</th></tr>
+            </thead>
+            <tbody>
+              <tr id="noRelationshipsRow">
+                <td colspan="2" style="text-align:center">Δεν υπάρχουν.</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+
+        <div class="fullwidth">
+          <label for="message">Μήνυμα Μνήμης</label>
+          <textarea id="message" rows="4"></textarea>
+        </div>
+        <div class="fullwidth">
+          <label for="photoUrl">Φωτογραφία (URL)</label>
+          <input id="photoUrl"/>
+        </div>
+        <div class="fullwidth">
+          <label for="video">YouTube Video (URL)</label>
+          <input id="video"/>
+        </div>
+
+        <button type="submit" class="btn">📌 Καταχώρηση Memorial</button>
+      </form>
+
+      <!-- QR Preview -->
+      <div id="qr-preview" class="fullwidth">
+        <h3>QR Code</h3>
+        <img id="qr-image" alt="QR Code" style="display:none"/>
       </div>
-
-      <!-- Διακρίσεις -->
-      <div id="awardsSection" class="extra-section">
-        <h3>Διακρίσεις</h3>
-        <p id="awards"></p>
-      </div>
-
-      <!-- Ενδιαφέροντα & Χόμπι -->
-      <div id="interestsSection" class="extra-section">
-        <h3>Προσωπικά Ενδιαφέροντα &amp; Χόμπι</h3>
-        <p id="interests"></p>
-      </div>
-
-      <!-- Τοποθεσία Ταφής -->
-      <div id="burialSection" class="extra-section">
-        <h3>Τοποθεσία Ταφής</h3>
-        <p id="cemetery"></p>
-      </div>
-    </div>
-
-    <!-- Πίνακας γενεαλογικών σχέσεων -->
-    <section id="relationshipsSection" style="text-align:left; margin-top:1.5rem;">
-      <h3>Γενεαλογικές Σχέσεις</h3>
-      <table id="relationshipsTable">
-        <thead>
-          <tr><th>Συγγενής</th><th>Σχέση</th></tr>
-        </thead>
-        <tbody>
-          <tr id="noRelationshipsRow">
-            <td colspan="2" style="text-align:center; padding:8px;">
-              Δεν υπάρχουν καταχωρημένες σχέσεις.
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </section>
 
-    <!-- Μήνυμα Μνήμης -->
-    <div class="message-box">
-      <p id="message"></p>
-    </div>
-
-    <!-- Container για YouTube Video -->
-    <div id="videoContainer" style="margin-top:1rem;"></div>
-
-    <!-- Κερί -->
-    <div class="candle" style="margin-top:2rem;">
-      <p id="candleText">🕯️ 0 κεριά έχουν ανάψει</p>
-      <button id="lightCandleBtn"
-              style="background:orange; border:none;
-                     padding:0.8rem 1.5rem; font-size:1rem;
-                     color:white; cursor:pointer; border-radius:5px;">
-        Άναψε ένα κερί
-      </button>
-    </div>
+    <!-- Live Search -->
+    <section class="card">
+      <h2>🔍 Αναζήτηση Memorials</h2>
+      <div style="display:flex;gap:var(--gap);flex-wrap:wrap;margin:var(--gap) 0;">
+        <input id="searchLastname" placeholder="Επώνυμο" style="flex:1"/>
+        <input id="searchCity"     placeholder="Πόλη"   style="flex:1"/>
+      </div>
+      <div id="resultsContainer"></div>
+    </section>
 
   </main>
 
-  <!-- ==================================================
-       Footer
-  ================================================== -->
-  <footer style="margin-top:3rem; text-align:center; font-size:0.9rem; color:#666;">
-    <p>&copy; 2025 ekimithin.gr – Με σεβασμό στη μνήμη</p>
-    <nav style="margin-top:1rem;">
-      <a href="index.html">Αρχική</a> |
-      <a href="psifiaki-mnimi.html">Τι είναι η Ψηφιακή Μνήμη</a> |
-      <a href="privacy.html">Προσωπικά Δεδομένα</a> |
-      <a href="contact.html">Επικοινωνία</a>
-    </nav>
-  </footer>
-
-  <!-- ==================================================
-       Φόρτωση JS Modules
-  ================================================== -->
+  <!-- JS Modules -->
   <script type="module" src="js/supabase.js"></script>
-  <script type="module" src="js/view.js"></script>
-
-  <!-- ==================================================
-       Inline Debug-Logging & Event Binding
-  ================================================== -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Σήμα ότι η σελίδα memorial.html φόρτωσε
-      console.debug('[PAGE LOAD]', { page: 'memorial.html', url: location.href });
-
-      // Εύρεση και έλεγχος στοιχείων DOM
-      const elems = {
-        fullName: document.getElementById('fullName'),
-        dates: document.getElementById('dates'),
-        location: document.getElementById('location'),
-        openMapBtn: document.getElementById('openMapBtn'),
-        closeMapBtn: document.getElementById('closeMapBtn'),
-        mapContainer: document.getElementById('mapContainer'),
-        map: document.getElementById('map'),
-        photo: document.getElementById('photo'),
-        toggleBioBtn: document.getElementById('toggleBioBtn'),
-        bioContainer: document.getElementById('bioContainer'),
-        awards: document.getElementById('awards'),
-        interests: document.getElementById('interests'),
-        burial: document.getElementById('cemetery'),
-        relationshipsTable: document.getElementById('relationshipsTable'),
-        message: document.getElementById('message'),
-        videoContainer: document.getElementById('videoContainer'),
-        lightCandleBtn: document.getElementById('lightCandleBtn'),
-        candleText: document.getElementById('candleText')
-      };
-      for (const [key, el] of Object.entries(elems)) {
-        if (el) console.debug('[DOM FOUND]', key, el);
-        else    console.warn('[DOM MISSING]', key);
-      }
-
-      // Toggle map visibility
-      elems.openMapBtn?.addEventListener('click', () => {
-        console.debug('[EVENT]', 'click', { id: 'openMapBtn' });
-        elems.mapContainer.classList.add('open');
-        console.debug('[DOM UPDATE]', { selector: '#mapContainer', action: 'open' });
-      });
-      elems.closeMapBtn?.addEventListener('click', () => {
-        console.debug('[EVENT]', 'click', { id: 'closeMapBtn' });
-        elems.mapContainer.classList.remove('open');
-        console.debug('[DOM UPDATE]', { selector: '#mapContainer', action: 'close' });
-      });
-
-      // Toggle bio section
-      elems.toggleBioBtn?.addEventListener('click', () => {
-        console.debug('[EVENT]', 'click', { id: 'toggleBioBtn' });
-        elems.bioContainer.classList.toggle('open');
-        console.debug('[DOM UPDATE]', { selector: '#bioContainer', action: 'toggle open' });
-      });
-
-      // Light candle logic
-      elems.lightCandleBtn?.addEventListener('click', async () => {
-        console.debug('[EVENT]', 'click', { id: 'lightCandleBtn' });
-        const id = new URLSearchParams(location.search).get('id');
-        const last = localStorage.getItem(`candle_${id}`);
-        const now = Date.now();
-        if (last && now - last < 24*3600*1000) {
-          alert('Έχετε ήδη ανάψει κερί τις τελευταίες 24 ώρες');
-          return;
-        }
-        localStorage.setItem(`candle_${id}`, now);
-        console.debug('[DOM UPDATE]', { selector: '#candleText', action: 'increment local' });
-        // Κλήση στο view.js για αύξηση στο Supabase
-      });
-
-      // Initialize Leaflet map (placeholder)
-      if (elems.map) {
-        console.debug('[MODULE LOAD]', { module: 'leaflet-map' });
-        // Η πραγματική υλοποίηση γίνεται στο view.js
-        console.debug('[DOM UPDATE]', { selector: '#map', action: 'initialized' });
-      }
-    });
-  </script>
+  <script type="module" src="js/sections/biography.js"></script>
+  <script type="module" src="js/sections/awards.js"></script>
+  <script type="module" src="js/sections/interests.js"></script>
+  <script type="module" src="js/sections/burial.js"></script>
+  <script type="module" src="js/sections/relationships.js"></script>
+  <script type="module" src="js/logout.js"></script>
+  <script type="module" src="js/admin.js"></script>
 </body>
 </html>
