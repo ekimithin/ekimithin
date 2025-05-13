@@ -360,3 +360,176 @@ button.btn-primary {
     grid-column: span 2; /* όλα κρατάνε όλο το πλάτος εκτός ειδικής ανάγκης */
   }
 }
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.form-row .half {
+  flex: 1 1 100%;
+}
+
+@media (min-width: 768px) {
+  .form-row .half {
+    flex: 1 1 50%;
+  }
+}
+.form-group {
+  margin-bottom: 1rem;
+}
+
+select {
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+.map-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+#map {
+  height: 200px;
+  width: 100%;
+  border-radius: 5px;
+  margin-top: 0.5rem;
+}
+.section-block {
+  margin-bottom: 2rem;
+}
+
+details {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+.relationship-search-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-bottom: 1rem;
+}
+
+#relativeResults {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+#relationshipsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+#relationshipsTable th,
+#relationshipsTable td {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.relationship-table-wrapper {
+  overflow-x: auto;
+}
+.preview-block {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+#qr-preview img {
+  max-width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.5rem;
+  background-color: #fff;
+}
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-row .half {
+  flex: 1 1 48%;
+  min-width: 200px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.section-block {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.map-wrapper {
+  margin: 1.5rem 0;
+}
+
+.map-wrapper input[type="text"] {
+  margin-bottom: 0.5rem;
+}
+
+#map {
+  width: 100%;
+  height: 200px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.preview-block {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.preview-block img {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.5rem;
+  background-color: #fff;
+}
+
+.relationship-table-wrapper {
+  overflow-x: auto;
+}
+
+#relationshipsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+#relationshipsTable th,
+#relationshipsTable td {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  text-align: left;
+}
