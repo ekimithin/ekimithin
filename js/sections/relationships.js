@@ -104,12 +104,15 @@ resultsList.addEventListener('click', e => {
   document.getElementById('relativeCityInput').value = e.target.textContent.split('(')[1]?.replace(')', '') || '';
 });
 
+console.log("❌ selectedRelative:", selectedRelative);
 
 
 // ➕ Προσθήκη σχέσης (και αντίστροφης μόνο αν υπάρχει memorial) στον πίνακα και στη βάση
 addBtn.addEventListener('click', async () => {
   if (!selectedRelative) {
     return alert('Διάλεξε πρώτα έναν συγγενή από τα αποτελέσματα.');
+    console.log("👀 selectedRelative είναι:", selectedRelative);
+
   }
 
   const relation = relationSelect.value;
