@@ -7,6 +7,7 @@ import { initInterestsSection } from "./sections/interests.js";
 import { initBurialSection } from "./sections/burial.js";
 import { removeGreekDiacritics } from "./utils/greekUtils.js";
 import "./sections/relationships.js";
+import { removeGreekDiacritics } from "./utils/greekUtils.js";
 
 // 🔐 Redirect αν δεν είσαι συνδεδεμένος
 (async () => {
