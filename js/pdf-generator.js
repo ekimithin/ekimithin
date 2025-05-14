@@ -74,7 +74,16 @@ document.getElementById("generatePdfBtn")?.addEventListener("click", async () =>
   }
 
   if (qrBase64) {
-    content.push({ image: qrBase64, width: 150, alignment: "center", margin: [0, 20, 0, 0] });
+    content.push({ image: qrBase64, width: 150, alignment: "center", margin: [0, 20, 0, 10] });
+
+    // ✅ Marketing μήνυμα κάτω από το QR
+    content.push({
+      text: "Καταχωρήθηκε μέσω της πλατφόρμας ψηφιακής μνήμης ekimithin.gr – Με σεβασμό στη μνήμη, με δύναμη την τεχνολογία.",
+      style: "footer",
+      alignment: "center",
+      margin: [0, 5, 0, 0],
+      link: "https://ekimithin.gr"
+    });
   } else {
     content.push({ text: "❌ Δεν βρέθηκε QR", color: "red", margin: [0, 20, 0, 0] });
   }
@@ -86,7 +95,8 @@ document.getElementById("generatePdfBtn")?.addEventListener("click", async () =>
       normal: { fontSize: 12 },
       idBox: { margin: [0, 10, 0, 10] },
       idText: { fontSize: 13, bold: true, color: 'red' },
-      warning: { fontSize: 10, italics: true, color: 'red' }
+      warning: { fontSize: 10, italics: true, color: 'red' },
+      footer: { fontSize: 9, italics: true, color: '#666' }
     }
   };
 
