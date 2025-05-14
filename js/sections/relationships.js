@@ -81,24 +81,29 @@ document.addEventListener('click', function (event) {
 resultsList.addEventListener('click', e => {
   if (e.target.tagName !== 'LI') return;
 
-  const { id, name } = e.target.dataset;
-  selectedRelative = { id, name };
+  selectedRelative = {
+    id: e.target.dataset.id,
+    name: e.target.dataset.name
+  };
 
-  // ⬇️ Γεμίζει αυτόματα τα πεδία για οπτική επιβεβαίωση
-  idInput.value    = id;
-  fnameInput.value = name.split(' ')[0] || '';
-  lnameInput.value = name.split(' ')[1] || '';
-  cityInput.value  = e.target.textContent.split('(')[1]?.replace(')', '') || '';
+  // ✅ Εμφανίζει επιβεβαίωση επιλογής πάνω από το κουμπί
+  document.getElementById('selectedRelativeDisplay').textContent =
+    `✅ Επιλέχθηκε: ${selectedRelative.name} (${selectedRelative.id})`;
+
+  // ✅ Highlight το επιλεγμένο <li>
+  [...resultsList.children].forEach(li => li.classList.remove('selected'));
+  e.target.classList.add('selected');
 
   // ✅ Κλείνει τη λίστα
   resultsList.innerHTML = '';
 
-  // ✅ Προαιρετικά χρωματίζει προσωρινά το input
-  [idInput, fnameInput, lnameInput, cityInput].forEach(input => {
-    input.classList.add('highlight');
-    setTimeout(() => input.classList.remove('highlight'), 800);
-  });
+  // ✅ Γεμίζει αυτόματα τα input πεδία
+  document.getElementById('relativeIdInput').value = selectedRelative.id;
+  document.getElementById('relativeLastnameInput').value = selectedRelative.name.split(' ')[1] || '';
+  document.getElementById('relativeFirstnameInput').value = selectedRelative.name.split(' ')[0] || '';
+  document.getElementById('relativeCityInput').value = e.target.textContent.split('(')[1]?.replace(')', '') || '';
 });
+
 
 
 // ➕ Προσθήκη σχέσης (και αντίστροφης μόνο αν υπάρχει memorial) στον πίνακα και στη βάση
