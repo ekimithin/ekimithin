@@ -80,13 +80,26 @@ document.addEventListener('click', function (event) {
 // ✔️ Επιλογή συγγενούς από λίστα
 resultsList.addEventListener('click', e => {
   if (e.target.tagName !== 'LI') return;
-  selectedRelative = {
-    id: e.target.dataset.id,
-    name: e.target.dataset.name
-  };
-  [...resultsList.children].forEach(li => li.classList.remove('selected'));
-  e.target.classList.add('selected');
+
+  const { id, name } = e.target.dataset;
+  selectedRelative = { id, name };
+
+  // ⬇️ Γεμίζει αυτόματα τα πεδία για οπτική επιβεβαίωση
+  idInput.value    = id;
+  fnameInput.value = name.split(' ')[0] || '';
+  lnameInput.value = name.split(' ')[1] || '';
+  cityInput.value  = e.target.textContent.split('(')[1]?.replace(')', '') || '';
+
+  // ✅ Κλείνει τη λίστα
+  resultsList.innerHTML = '';
+
+  // ✅ Προαιρετικά χρωματίζει προσωρινά το input
+  [idInput, fnameInput, lnameInput, cityInput].forEach(input => {
+    input.classList.add('highlight');
+    setTimeout(() => input.classList.remove('highlight'), 800);
+  });
 });
+
 
 // ➕ Προσθήκη σχέσης (και αντίστροφης μόνο αν υπάρχει memorial) στον πίνακα και στη βάση
 addBtn.addEventListener('click', async () => {
