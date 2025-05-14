@@ -15,9 +15,26 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <header>
-    <img src="images/logo.png" alt="Λογότυπο ekimithin" style="max-width: 160px; display: block; margin: 2rem auto 1rem;">
-  </header>
+  <!-- ✅ Header με Burger Menu -->
+<header class="main-header">
+  <div class="header-wrapper">
+    <a href="index.html">
+      <img src="images/logo.png" alt="Λογότυπο ekimithin" class="logo" />
+    </a>
+
+    <!-- Burger Button για Mobile -->
+    <button id="menuToggleBtn" class="burger" aria-label="Menu">&#9776;</button>
+
+    <!-- Navigation Links -->
+    <nav id="mainNav" class="main-nav">
+      <a href="index.html">Αρχική</a>
+      <a href="psifiaki-mnimi.html">Ψηφιακή Μνήμη</a>
+      <a href="privacy.html">Προσωπικά Δεδομένα</a>
+      <a href="contact.html">Επικοινωνία</a>
+    </nav>
+  </div>
+</header>
+
 
   <section>
     <h1>Επικοινωνία</h1>
@@ -36,5 +53,7 @@
        <a href="privacy.html">Προσωπικά Δεδομένα</a>
     </nav>
   </footer>
+  <script src="js/navigation.js" type="module"></script>
+
 </body>
 </html>
