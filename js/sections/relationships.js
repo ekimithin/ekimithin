@@ -68,6 +68,14 @@ function renderResults(items) {
     </li>
   `).join('');
 }
+// 🧼 Απόκρυψη της λίστας όταν γίνεται click εκτός
+document.addEventListener('click', function (event) {
+  const isClickInside = document.getElementById('relationshipDetails')?.contains(event.target);
+  if (!isClickInside) {
+    resultsList.innerHTML = '';
+    selectedRelative = null;
+  }
+});
 
 // ✔️ Επιλογή συγγενούς από λίστα
 resultsList.addEventListener('click', e => {
