@@ -12,9 +12,25 @@
 
 </head>
 <body>
-  <header>
-    <img src="/images/logo.png" alt="Λογότυπο ekimithin" style="max-width: 160px; display: block; margin: 2rem auto 1rem;">
-  </header>
+  <header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" alt="ekimithin.gr" />
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <ul>
+        <li><a href="index.html">Αρχική</a></li>
+        <li><a href="psifiaki-mnimi.html">Ψηφιακή Μνήμη</a></li>
+        <li><a href="contact.html">Επικοινωνία</a></li>
+        <li><a href="privacy.html">Προσωπικά Δεδομένα</a></li>
+      </ul>
+    </nav>
+    <button class="burger" id="burgerBtn" aria-label="Μενού">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
 
   <section style="text-align:center;">
     <h1>404 – Η σελίδα δεν βρέθηκε</h1>
@@ -25,5 +41,7 @@
   <footer>
     <p>&copy; 2025 ekimithin.gr</p>
   </footer>
+  <script src="js/navigation.js" type="module"></script>
+
 </body>
 </html>
