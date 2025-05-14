@@ -93,13 +93,24 @@
           </select>
         </div>
 
-        <div class="map-wrapper">
-          <label for="addressInput">Διεύθυνση / Τοποθεσία:</label>
-          <input id="addressInput" type="text" placeholder="Πληκτρολόγησε διεύθυνση ή τόπο…" autocomplete="off" />
-          <ul id="suggestions" class="suggestions-list"></ul>
-          <div id="map"></div>
-        </div>
+       <!-- 🌍 Wrapper τοποθεσίας -->
+<div class="location-section">
 
+  <label for="addressInput">Διεύθυνση / Τοποθεσία:</label>
+
+  <!-- 🔁 Νέο wrapper μόνο για input + suggestions -->
+  <div class="input-suggestions-wrapper">
+    <input id="addressInput" type="text" placeholder="Πληκτρολόγησε διεύθυνση ή τόπο…" autocomplete="off" />
+    <ul id="suggestions" class="suggestions-list"></ul>
+  </div>
+
+  <!-- 🗺️ Χάρτης εκτός από τα suggestions -->
+  <div id="map"></div>
+
+</div>
+
+
+        
         <div class="form-row">
           <div class="half">
             <label for="city">Πόλη:</label>
