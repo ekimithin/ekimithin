@@ -78,7 +78,7 @@ document.getElementById("generatePdfBtn")?.addEventListener("click", async () =>
 
     // ✅ Marketing μήνυμα κάτω από το QR
     content.push({
-      text: "Καταχωρήθηκε μέσω της πλατφόρμας ψηφιακής μνήμης ekimithin.gr – Με σεβασμό στη μνήμη, με δύναμη την τεχνολογία.",
+      text: "Καταχωρήθηκε μέσω της πλατφόρμας ψηφιακής μνήμης - ekimithin.gr – Με σεβασμό στη μνήμη",
       style: "footer",
       alignment: "center",
       margin: [0, 5, 0, 0],
