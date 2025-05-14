@@ -72,10 +72,10 @@ function renderResults(items) {
 document.addEventListener('click', function (event) {
   const isClickInside = document.getElementById('relationshipDetails')?.contains(event.target);
   if (!isClickInside) {
-    resultsList.innerHTML = '';
-    selectedRelative = null;
+    resultsList.innerHTML = ''; // ✅ Κλείνει μόνο τη λίστα
   }
 });
+
 
 // ✔️ Επιλογή συγγενούς από λίστα
 resultsList.addEventListener('click', e => {
@@ -104,14 +104,15 @@ resultsList.addEventListener('click', e => {
   document.getElementById('relativeCityInput').value = e.target.textContent.split('(')[1]?.replace(')', '') || '';
 });
 
-console.log("❌ selectedRelative:", selectedRelative);
+
 
 
 // ➕ Προσθήκη σχέσης (και αντίστροφης μόνο αν υπάρχει memorial) στον πίνακα και στη βάση
 addBtn.addEventListener('click', async () => {
+  console.log("👀 selectedRelative είναι:", selectedRelative);
   if (!selectedRelative) {
     return alert('Διάλεξε πρώτα έναν συγγενή από τα αποτελέσματα.');
-    console.log("👀 selectedRelative είναι:", selectedRelative);
+    
 
   }
 
