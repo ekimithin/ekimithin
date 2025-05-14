@@ -492,3 +492,8 @@ form select {
     gap: 0.2rem;
   }
 }
+input.highlight {
+  outline: 2px solid #4caf50;
+  background-color: #f0fff4;
+  transition: all 0.3s ease;
+}
