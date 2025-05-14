@@ -162,8 +162,8 @@ button#generatePdfBtn:hover {
 
 /* Οριοθετημένες ενότητες με padding και border */
 .section-block {
-  margin-top: 1.5rem;
-  padding: 1rem;
+  margin-top: 0.1rem;
+  padding: 0.2rem;
   background-color: #fafafa;
   border: 1px solid #ddd;
   border-radius: 3px;
