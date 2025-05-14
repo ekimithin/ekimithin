@@ -1,7 +1,6 @@
 // js/pdf-generator.js
 import { toLatin } from './utils/greekUtils.js';
 
-
 document.getElementById("generatePdfBtn")?.addEventListener("click", async () => {
   const form = document.getElementById("memorialForm");
   const idRaw = form.dataset.id;
