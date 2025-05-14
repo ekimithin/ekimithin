@@ -1,21 +1,9 @@
-// js/navigation.js
-document.addEventListener("DOMContentLoaded", () => {
-  const menuBtn = document.getElementById("menuToggleBtn");
-  const navLinks = document.getElementById("mainNav");
+const burgerBtn = document.getElementById("burgerBtn");
+const mainNav = document.getElementById("mainNav");
 
-  if (menuBtn && navLinks) {
-    menuBtn.addEventListener("click", () => {
-      navLinks.classList.toggle("open");
-    });
-
-    // Κλείσιμο με click εκτός
-    document.addEventListener("click", (e) => {
-      if (
-        !menuBtn.contains(e.target) &&
-        !navLinks.contains(e.target)
-      ) {
-        navLinks.classList.remove("open");
-      }
-    });
-  }
-});
+if (burgerBtn && mainNav) {
+  burgerBtn.addEventListener("click", () => {
+    mainNav.classList.toggle("active");
+    console.log("Burger clicked!");
+  });
+}
